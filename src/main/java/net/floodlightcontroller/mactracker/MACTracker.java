@@ -93,10 +93,10 @@ public class MACTracker implements IOFMessageListener, IFloodlightModule {
 		Long sourceMACHash = Ethernet.toLong(eth.getSourceMACAddress());
 		if(!macAddresses.contains(sourceMACHash)){
 			macAddresses.add(sourceMACHash);
-			System.out.println("MACADDRESS: " + macAddresses);
+			System.out.println("MACADDRESS: " + sourceMACHash);
 		}
 		
-		return null;
+		return Command.CONTINUE;
 	}
 
 }
