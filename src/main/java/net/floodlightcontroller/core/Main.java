@@ -24,11 +24,15 @@ import net.floodlightcontroller.core.module.FloodlightModuleException;
 import net.floodlightcontroller.core.module.FloodlightModuleLoader;
 import net.floodlightcontroller.core.module.IFloodlightModuleContext;
 import net.floodlightcontroller.restserver.IRestApiService;
-
+import javax.swing.*;
+import net.floodlightcontroller.UI.*;
 /**
  * Host for the Floodlight main method
  * @author alexreimers
  */
+
+
+
 public class Main {
 
     /**
@@ -60,6 +64,9 @@ public class Main {
         IFloodlightProviderService controller =
                 moduleContext.getServiceImpl(IFloodlightProviderService.class);
         // This call blocks, it has to be the last line in the main
+        
+        new UIThread();
+        
         controller.run();
     }
 }

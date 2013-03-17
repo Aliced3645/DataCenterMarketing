@@ -163,28 +163,6 @@ public class QueueCreatorController implements IOFSwitchListener, IOFMessageList
             break;
         case BARRIER_REPLY:
         	if(currentQueueNum == TOTAL_QUEUE) {
-//        		synchronized(cleaned) {
-//        			if (cleaned == false) {
-//        				//stop benchmarking, delete all queues
-//        				System.out.println("Wait some time before cleaning up...");
-//        				//getAllQueueConfigs(sw);
-//        				try {
-//        					Thread.sleep(10000);
-//        				} catch (InterruptedException e) {
-//        					e.printStackTrace();
-//        				}
-//        				System.out.println("Finished, cleaning up...");
-//        				int port;
-//        				int queue;
-//        				for (int i = 0;i < currentQueueNum;i++) {
-//        					port = nextPort(i);
-//        					queue = nextQueue(i);
-//        					System.out.println("Deleting queue " + queue + " on port " + port + "...");
-//        					deleteQueue(sw, (short) port, queue);
-//        				}
-//        				cleaned = true;
-//        			}
-//        		}
             	System.out.println("Received Barrier Reply");
 				double time = (double)System.nanoTime()/1000000.0;
 				try {
@@ -316,19 +294,7 @@ public class QueueCreatorController implements IOFSwitchListener, IOFMessageList
 	@Override
 	public void addedSwitch(IOFSwitch sw) {
 		// TODO Auto-generated method stub
-//        getAllQueueConfigs(sw);
-//        sendBarrier(sw);
-//
-//        deleteQueue(sw, (short) 2, 30);
-//        sendBarrier(sw);
-//
-//        getAllQueueConfigs(sw);
-//        sendBarrier(sw);
-//
-//        createQueue(sw, (short) 2, 30, (short) 70);
-//        sendBarrier(sw);
-//
-//        getAllQueueConfigs(sw);
+		
 		sendBarrier(sw);
 	}
 
