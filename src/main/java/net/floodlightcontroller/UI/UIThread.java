@@ -1,5 +1,6 @@
 package net.floodlightcontroller.UI;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
@@ -14,14 +15,9 @@ public class UIThread implements Runnable{
 	}
 
 	private static void createUI(){
-		JFrame frame = new JFrame("Flow GUI");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		JLabel label = new JLabel("Hello World");
-        frame.getContentPane().add(label);
-        
-        frame.pack();
-        frame.setVisible(true);
+		FlowUI dialog = new FlowUI();
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		dialog.setVisible(true);
 	}
 	
 	@Override
