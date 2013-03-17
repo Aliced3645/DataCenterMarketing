@@ -8,6 +8,12 @@ import javax.swing.JLabel;
 public class UIThread implements Runnable{
 	
 	Thread uiThread;
+	static FlowUI flowUI;
+	
+	public static FlowUI getFlowUI(){
+		return UIThread.flowUI;
+	}
+	
 	
 	public UIThread(){
 		uiThread = new Thread(this, "UI");
@@ -15,15 +21,15 @@ public class UIThread implements Runnable{
 	}
 
 	private static void createUI(){
-		FlowUI dialog = new FlowUI();
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		dialog.setVisible(true);
+		flowUI = new FlowUI();
+		flowUI.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		flowUI.setVisible(true);
 	}
 	
 	@Override
 	public void run() {
 		System.out.println("UIThread starting");
-		createUI();
+		UIThread.createUI();
 		System.out.println("UIThread started");
 	}
 }

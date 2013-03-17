@@ -12,10 +12,12 @@ import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Logger;
 
+import net.floodlightcontroller.UI.FlowUI;
 import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
 import net.floodlightcontroller.core.IOFMessageListener;
 import net.floodlightcontroller.core.IOFSwitch;
+import net.floodlightcontroller.core.Main;
 import net.floodlightcontroller.core.module.FloodlightModuleContext;
 import net.floodlightcontroller.core.module.FloodlightModuleException;
 import net.floodlightcontroller.core.module.IFloodlightModule;
@@ -97,6 +99,10 @@ public class MACTracker implements IOFMessageListener, IFloodlightModule {
 		}
 		
 		return Command.CONTINUE;
+	}
+	
+	public void test(){
+		FlowUI flowUI = Main.getFlowUI();
 	}
 
 }

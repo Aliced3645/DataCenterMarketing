@@ -19,6 +19,7 @@ import java.awt.Insets;
 import java.awt.Color;
 import java.awt.GridLayout;
 import javax.swing.JTextArea;
+import javax.swing.JList;
 
 public class FlowUI extends JDialog {
 
@@ -35,29 +36,34 @@ public class FlowUI extends JDialog {
 	public static void main(String[] args) {
 		try {
 			FlowUI dialog = new FlowUI();
+			dialog.setTitle("Datacenter Control Panel");
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
+	//getter and sitter..
+	
 
+	
 	/**
 	 * Create the dialog.
 	 */
 	public FlowUI() {
-		setBounds(100, 100, 758, 447);
+		setBounds(100, 100, 877, 979);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.WEST);
 		GridBagLayout gbl_contentPanel = new GridBagLayout();
-		gbl_contentPanel.columnWidths = new int[]{35, 89, 114, 0, 0, 0, 0};
-		gbl_contentPanel.rowHeights = new int[]{65, 0, 19, 0, 117, 0, 0, 0, 0, 0, 0};
-		gbl_contentPanel.columnWeights = new double[]{0.0, 1.0, 1.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-		gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPanel.columnWidths = new int[]{35, 175, 204, 0, 126, 202, 0, 0};
+		gbl_contentPanel.rowHeights = new int[]{65, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 188, 0, 0, 0, 0, 0, 0};
+		gbl_contentPanel.columnWeights = new double[]{0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		contentPanel.setLayout(gbl_contentPanel);
 		{
-			JLabel lblDatacenterMarketingControl = new JLabel("Datacenter Marketing Control Panel");
+			JLabel lblDatacenterMarketingControl = new JLabel("Control Panel");
 			GridBagConstraints gbc_lblDatacenterMarketingControl = new GridBagConstraints();
 			gbc_lblDatacenterMarketingControl.anchor = GridBagConstraints.WEST;
 			gbc_lblDatacenterMarketingControl.fill = GridBagConstraints.VERTICAL;
@@ -89,19 +95,18 @@ public class FlowUI extends JDialog {
 		{
 			sourceHostInput = new JTextField();
 			GridBagConstraints gbc_sourceHostInput = new GridBagConstraints();
+			gbc_sourceHostInput.fill = GridBagConstraints.HORIZONTAL;
 			gbc_sourceHostInput.insets = new Insets(0, 0, 5, 5);
-			gbc_sourceHostInput.anchor = GridBagConstraints.WEST;
 			gbc_sourceHostInput.gridx = 2;
 			gbc_sourceHostInput.gridy = 2;
 			contentPanel.add(sourceHostInput, gbc_sourceHostInput);
 			sourceHostInput.setColumns(10);
 		}
 		{
-			JLabel lblDestinationHost = new JLabel("Destination Host");
+			JLabel lblDestinationHost = new JLabel("Dest Host");
 			lblDestinationHost.setFont(new Font("DejaVu Serif", Font.BOLD, 13));
 			GridBagConstraints gbc_lblDestinationHost = new GridBagConstraints();
 			gbc_lblDestinationHost.insets = new Insets(0, 0, 5, 5);
-			gbc_lblDestinationHost.anchor = GridBagConstraints.EAST;
 			gbc_lblDestinationHost.gridx = 4;
 			gbc_lblDestinationHost.gridy = 2;
 			contentPanel.add(lblDestinationHost, gbc_lblDestinationHost);
@@ -109,33 +114,83 @@ public class FlowUI extends JDialog {
 		{
 			destHostInput = new JTextField();
 			GridBagConstraints gbc_destHostInput = new GridBagConstraints();
-			gbc_destHostInput.insets = new Insets(0, 0, 5, 0);
-			gbc_destHostInput.anchor = GridBagConstraints.WEST;
+			gbc_destHostInput.fill = GridBagConstraints.HORIZONTAL;
+			gbc_destHostInput.insets = new Insets(0, 0, 5, 5);
 			gbc_destHostInput.gridx = 5;
 			gbc_destHostInput.gridy = 2;
 			contentPanel.add(destHostInput, gbc_destHostInput);
 			destHostInput.setColumns(10);
 		}
 		{
-			JLabel lblNetworkAvailability = new JLabel("Network Availability");
+			JLabel lblNetworkElements = new JLabel("Network Elements");
+			lblNetworkElements.setForeground(Color.RED);
+			lblNetworkElements.setFont(new Font("DejaVu Sans Condensed", Font.BOLD | Font.ITALIC, 14));
+			GridBagConstraints gbc_lblNetworkElements = new GridBagConstraints();
+			gbc_lblNetworkElements.anchor = GridBagConstraints.WEST;
+			gbc_lblNetworkElements.insets = new Insets(0, 0, 5, 5);
+			gbc_lblNetworkElements.gridx = 1;
+			gbc_lblNetworkElements.gridy = 3;
+			contentPanel.add(lblNetworkElements, gbc_lblNetworkElements);
+		}
+		{
+			JLabel lblHosts = new JLabel("Hosts");
+			lblHosts.setFont(new Font("DejaVu Serif", Font.BOLD, 13));
+			GridBagConstraints gbc_lblHosts = new GridBagConstraints();
+			gbc_lblHosts.insets = new Insets(0, 0, 5, 5);
+			gbc_lblHosts.gridx = 1;
+			gbc_lblHosts.gridy = 4;
+			contentPanel.add(lblHosts, gbc_lblHosts);
+		}
+		{
+			JTextArea hostsTextArea = new JTextArea();
+			GridBagConstraints gbc_hostsTextArea = new GridBagConstraints();
+			gbc_hostsTextArea.gridheight = 9;
+			gbc_hostsTextArea.insets = new Insets(0, 0, 5, 5);
+			gbc_hostsTextArea.fill = GridBagConstraints.BOTH;
+			gbc_hostsTextArea.gridx = 2;
+			gbc_hostsTextArea.gridy = 4;
+			contentPanel.add(hostsTextArea, gbc_hostsTextArea);
+		}
+		{
+			JLabel lblSwitches = new JLabel("Switches");
+			lblSwitches.setFont(new Font("DejaVu Serif", Font.BOLD, 13));
+			GridBagConstraints gbc_lblSwitches = new GridBagConstraints();
+			gbc_lblSwitches.insets = new Insets(0, 0, 5, 5);
+			gbc_lblSwitches.gridx = 4;
+			gbc_lblSwitches.gridy = 4;
+			contentPanel.add(lblSwitches, gbc_lblSwitches);
+		}
+		{
+			JTextArea switchesTextArea = new JTextArea();
+			GridBagConstraints gbc_switchesTextArea = new GridBagConstraints();
+			gbc_switchesTextArea.gridheight = 9;
+			gbc_switchesTextArea.insets = new Insets(0, 0, 5, 5);
+			gbc_switchesTextArea.fill = GridBagConstraints.BOTH;
+			gbc_switchesTextArea.gridx = 5;
+			gbc_switchesTextArea.gridy = 4;
+			contentPanel.add(switchesTextArea, gbc_switchesTextArea);
+		}
+		{
+			JLabel lblNetworkAvailability = new JLabel("Path Availability");
 			lblNetworkAvailability.setFont(new Font("DejaVu Sans Condensed", Font.BOLD | Font.ITALIC, 14));
 			lblNetworkAvailability.setForeground(Color.RED);
 			GridBagConstraints gbc_lblNetworkAvailability = new GridBagConstraints();
 			gbc_lblNetworkAvailability.anchor = GridBagConstraints.WEST;
 			gbc_lblNetworkAvailability.insets = new Insets(0, 0, 5, 5);
 			gbc_lblNetworkAvailability.gridx = 1;
-			gbc_lblNetworkAvailability.gridy = 3;
+			gbc_lblNetworkAvailability.gridy = 13;
 			contentPanel.add(lblNetworkAvailability, gbc_lblNetworkAvailability);
 		}
 		{
-			JTextArea textArea = new JTextArea();
-			GridBagConstraints gbc_textArea = new GridBagConstraints();
-			gbc_textArea.gridwidth = 5;
-			gbc_textArea.insets = new Insets(0, 0, 5, 0);
-			gbc_textArea.fill = GridBagConstraints.BOTH;
-			gbc_textArea.gridx = 1;
-			gbc_textArea.gridy = 4;
-			contentPanel.add(textArea, gbc_textArea);
+			JTextArea availablePathsText = new JTextArea();
+			availablePathsText.setLineWrap(true);
+			GridBagConstraints gbc_availablePathsText = new GridBagConstraints();
+			gbc_availablePathsText.gridwidth = 5;
+			gbc_availablePathsText.insets = new Insets(0, 0, 5, 5);
+			gbc_availablePathsText.fill = GridBagConstraints.BOTH;
+			gbc_availablePathsText.gridx = 1;
+			gbc_availablePathsText.gridy = 14;
+			contentPanel.add(availablePathsText, gbc_availablePathsText);
 		}
 		{
 			JLabel lblRequirements = new JLabel("Requirements:");
@@ -145,7 +200,7 @@ public class FlowUI extends JDialog {
 			gbc_lblRequirements.anchor = GridBagConstraints.WEST;
 			gbc_lblRequirements.insets = new Insets(0, 0, 5, 5);
 			gbc_lblRequirements.gridx = 1;
-			gbc_lblRequirements.gridy = 5;
+			gbc_lblRequirements.gridy = 15;
 			contentPanel.add(lblRequirements, gbc_lblRequirements);
 		}
 		{
@@ -155,16 +210,16 @@ public class FlowUI extends JDialog {
 			gbc_lblBandwidth.anchor = GridBagConstraints.SOUTH;
 			gbc_lblBandwidth.insets = new Insets(0, 0, 5, 5);
 			gbc_lblBandwidth.gridx = 1;
-			gbc_lblBandwidth.gridy = 6;
+			gbc_lblBandwidth.gridy = 16;
 			contentPanel.add(lblBandwidth, gbc_lblBandwidth);
 		}
 		{
 			bandwidthInput = new JTextField();
 			GridBagConstraints gbc_bandwidthInput = new GridBagConstraints();
-			gbc_bandwidthInput.anchor = GridBagConstraints.WEST;
+			gbc_bandwidthInput.fill = GridBagConstraints.HORIZONTAL;
 			gbc_bandwidthInput.insets = new Insets(0, 0, 5, 5);
 			gbc_bandwidthInput.gridx = 2;
-			gbc_bandwidthInput.gridy = 6;
+			gbc_bandwidthInput.gridy = 16;
 			contentPanel.add(bandwidthInput, gbc_bandwidthInput);
 			bandwidthInput.setColumns(10);
 		}
@@ -174,16 +229,16 @@ public class FlowUI extends JDialog {
 			GridBagConstraints gbc_lblDelayWithin = new GridBagConstraints();
 			gbc_lblDelayWithin.insets = new Insets(0, 0, 5, 5);
 			gbc_lblDelayWithin.gridx = 4;
-			gbc_lblDelayWithin.gridy = 6;
+			gbc_lblDelayWithin.gridy = 16;
 			contentPanel.add(lblDelayWithin, gbc_lblDelayWithin);
 		}
 		{
 			delayInput = new JTextField();
 			GridBagConstraints gbc_delayInput = new GridBagConstraints();
-			gbc_delayInput.insets = new Insets(0, 0, 5, 0);
+			gbc_delayInput.insets = new Insets(0, 0, 5, 5);
 			gbc_delayInput.fill = GridBagConstraints.HORIZONTAL;
 			gbc_delayInput.gridx = 5;
-			gbc_delayInput.gridy = 6;
+			gbc_delayInput.gridy = 16;
 			contentPanel.add(delayInput, gbc_delayInput);
 			delayInput.setColumns(10);
 		}
@@ -195,7 +250,7 @@ public class FlowUI extends JDialog {
 			gbc_lblBid.anchor = GridBagConstraints.WEST;
 			gbc_lblBid.insets = new Insets(0, 0, 5, 5);
 			gbc_lblBid.gridx = 1;
-			gbc_lblBid.gridy = 7;
+			gbc_lblBid.gridy = 17;
 			contentPanel.add(lblBid, gbc_lblBid);
 		}
 		{
@@ -204,7 +259,7 @@ public class FlowUI extends JDialog {
 			GridBagConstraints gbc_lblBidPrice = new GridBagConstraints();
 			gbc_lblBidPrice.insets = new Insets(0, 0, 5, 5);
 			gbc_lblBidPrice.gridx = 1;
-			gbc_lblBidPrice.gridy = 8;
+			gbc_lblBidPrice.gridy = 18;
 			contentPanel.add(lblBidPrice, gbc_lblBidPrice);
 		}
 		{
@@ -213,7 +268,7 @@ public class FlowUI extends JDialog {
 			gbc_inputBidPrice.insets = new Insets(0, 0, 5, 5);
 			gbc_inputBidPrice.fill = GridBagConstraints.HORIZONTAL;
 			gbc_inputBidPrice.gridx = 2;
-			gbc_inputBidPrice.gridy = 8;
+			gbc_inputBidPrice.gridy = 18;
 			contentPanel.add(inputBidPrice, gbc_inputBidPrice);
 			inputBidPrice.setColumns(10);
 		}
@@ -223,16 +278,16 @@ public class FlowUI extends JDialog {
 			GridBagConstraints gbc_lblRe = new GridBagConstraints();
 			gbc_lblRe.insets = new Insets(0, 0, 5, 5);
 			gbc_lblRe.gridx = 4;
-			gbc_lblRe.gridy = 8;
+			gbc_lblRe.gridy = 18;
 			contentPanel.add(lblRe, gbc_lblRe);
 		}
 		{
-			JLabel lblNewLabel = new JLabel("Unknown");
-			GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-			gbc_lblNewLabel.insets = new Insets(0, 0, 5, 0);
-			gbc_lblNewLabel.gridx = 5;
-			gbc_lblNewLabel.gridy = 8;
-			contentPanel.add(lblNewLabel, gbc_lblNewLabel);
+			JLabel CurrentBalance = new JLabel("Unknown");
+			GridBagConstraints gbc_CurrentBalance = new GridBagConstraints();
+			gbc_CurrentBalance.insets = new Insets(0, 0, 5, 5);
+			gbc_CurrentBalance.gridx = 5;
+			gbc_CurrentBalance.gridy = 18;
+			contentPanel.add(CurrentBalance, gbc_CurrentBalance);
 		}
 		{
 			JButton btnBidFlow = new JButton("Bid Flow");
@@ -241,9 +296,18 @@ public class FlowUI extends JDialog {
 				}
 			});
 			GridBagConstraints gbc_btnBidFlow = new GridBagConstraints();
-			gbc_btnBidFlow.gridx = 5;
-			gbc_btnBidFlow.gridy = 9;
+			gbc_btnBidFlow.anchor = GridBagConstraints.EAST;
+			gbc_btnBidFlow.insets = new Insets(0, 0, 0, 5);
+			gbc_btnBidFlow.gridx = 2;
+			gbc_btnBidFlow.gridy = 19;
 			contentPanel.add(btnBidFlow, gbc_btnBidFlow);
+		}
+		{
+			JButton btnRefresh = new JButton("Refresh");
+			GridBagConstraints gbc_btnRefresh = new GridBagConstraints();
+			gbc_btnRefresh.gridx = 6;
+			gbc_btnRefresh.gridy = 19;
+			contentPanel.add(btnRefresh, gbc_btnRefresh);
 		}
 		{
 			JPanel buttonPane = new JPanel();
@@ -252,7 +316,7 @@ public class FlowUI extends JDialog {
 				JButton generateFlowButton = new JButton("Generate Flow (Test)");
 				generateFlowButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
-						
+						System.out.println(sourceHostInput.getText() + " " + destHostInput.getText());
 					}
 				});
 				buttonPane.setLayout(new GridLayout(0, 2, 0, 0));

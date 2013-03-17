@@ -31,8 +31,6 @@ import net.floodlightcontroller.UI.*;
  * @author alexreimers
  */
 
-
-
 public class Main {
 
     /**
@@ -40,6 +38,14 @@ public class Main {
      * @param args
      * @throws FloodlightModuleException 
      */
+	
+	//a reference to UI. All modules could visit and call services.
+	static FlowUI flowUI;
+	
+	public static FlowUI getFlowUI(){
+		return Main.flowUI;
+	}
+	
     public static void main(String[] args) throws FloodlightModuleException {
         // Setup logger
         System.setProperty("org.restlet.engine.loggerFacadeClass", 
@@ -63,10 +69,12 @@ public class Main {
         // Run the main floodlight module
         IFloodlightProviderService controller =
                 moduleContext.getServiceImpl(IFloodlightProviderService.class);
+       
+    
+        UIThread uiThread = new UIThread();
+        Main.flowUI = uiThread.getFlowUI();
+        
         // This call blocks, it has to be the last line in the main
-        
-        new UIThread();
-        
         controller.run();
     }
 }
