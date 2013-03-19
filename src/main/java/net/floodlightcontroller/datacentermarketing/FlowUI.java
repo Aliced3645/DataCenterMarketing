@@ -53,9 +53,7 @@ public class FlowUI extends JDialog {
 	private JTextArea switchesTextArea;
 	private JTextArea availablePathsTextArea;
 	
-	private DeviceManagerImpl deviceManager;
-	private IFloodlightProviderService controller;
-	
+	private MarketManager marketManager;
 	
 	//maintain a local hashset: name - switch
 	
@@ -73,58 +71,43 @@ public class FlowUI extends JDialog {
 		}
 	}
 	
-	//getter and sitter..
-	public DeviceManagerImpl getDeviceManager() {
-		return deviceManager;
+	public MarketManager getMarketManager() {
+		return marketManager;
 	}
 
-	public void setDeviceManager(DeviceManagerImpl deviceManager) {
-		this.deviceManager = deviceManager;
+	public void setMarketManager(MarketManager marketManager) {
+		this.marketManager = marketManager;
 	}
 	
-	
-	public IFloodlightProviderService getController() {
-		return controller;
-	}
-
-	public void setController(IFloodlightProviderService controller) {
-		this.controller = controller;
-	}
-
 	public void updateHostsTextArea(){
-		if(deviceManager == null){
-			System.out.println("DeviceManager is null");
-			return;
-		}
+		
 		//print all devices
-		Collection<? extends IDevice> devices = deviceManager.getAllDevices();
-		Iterator<? extends IDevice> iterator = devices.iterator();
+		marketManager.updateDevices();
+		
+		//manipulate from marketManager
+		Map<Long, IDevice> devices = marketManager.getDevices();
+		Set<Entry<Long, IDevice>> set = devices.entrySet();
+		Iterator<Entry<Long,IDevice>> iterator = set.iterator();
 		while(iterator.hasNext()){
-			IDevice device = iterator.next();
+			IDevice device = iterator.next().getValue();
 			hostsTextArea.append(device.toStringForUI() + "\n\n");
-			
 		}
 	}
 	
-
 	public void updateSwitchesTextArea(){
 		//refresh: get the switches and host information
 		
-		if(controller == null){
-			System.out.println("Controller is null");
-			return;
-		}
-		
-		Map<Long, IOFSwitch> switchesMap = controller.getSwitches();
-		if(switchesMap == null)
-			return;
-		Set<Entry<Long, IOFSwitch>> s = switchesMap.entrySet();
+		marketManager.updateSwitches();
+		Map<Long, IOFSwitch> switches = marketManager.getSwitches();
+		Set<Entry<Long, IOFSwitch>> s = switches.entrySet();
 		Iterator<Entry<Long, IOFSwitch>> it = s.iterator();
 		while(it.hasNext()){
-			IOFSwitch ofSwitch = it.next().getValue();
-			
-			switchesTextArea.append(ofSwitch.getId() + ": " + ofSwitch.getStringId() + "\n");
+			Entry<Long, IOFSwitch> entry = it.next();
+			IOFSwitch ofSwitch = entry.getValue();
+			Long longID = entry.getKey();
+			switchesTextArea.append(longID + ": " + ofSwitch.getStringId() + "\n");
 		}
+		
 		return;
 		
 	}

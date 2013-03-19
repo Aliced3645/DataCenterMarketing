@@ -50,7 +50,7 @@ import net.floodlightcontroller.core.module.IFloodlightModule;
 import net.floodlightcontroller.core.module.IFloodlightService;
 import net.floodlightcontroller.core.util.ListenerDispatcher;
 import net.floodlightcontroller.core.util.SingletonTask;
-import net.floodlightcontroller.datacentermarketing.FlowUI;
+import net.floodlightcontroller.datacentermarketing.MarketManager;
 import net.floodlightcontroller.devicemanager.IDevice;
 import net.floodlightcontroller.devicemanager.IDeviceService;
 import net.floodlightcontroller.devicemanager.IEntityClass;
@@ -710,8 +710,8 @@ IFlowReconcileListener, IInfoProvider, IHAListener {
         this.entityClassifier = fmc.getServiceImpl(IEntityClassifierService.class);
         
         //establish assotiation with FLowUI
-        FlowUI flowUI = Main.getFlowUI();
-        flowUI.setDeviceManager(this);
+        MarketManager marketManager = Main.getMarketManager();
+        marketManager.setDeviceManager(this);
     }
 
     @Override

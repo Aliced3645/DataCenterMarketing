@@ -26,7 +26,6 @@ import net.floodlightcontroller.core.module.IFloodlightModuleContext;
 import net.floodlightcontroller.datacentermarketing.FlowUI;
 import net.floodlightcontroller.datacentermarketing.UIThread;
 import net.floodlightcontroller.restserver.IRestApiService;
-import javax.swing.*;
 import net.floodlightcontroller.datacentermarketing.*;
 
 /**
@@ -44,24 +43,35 @@ public class Main {
 	
 	//a reference to UI. All modules could visit and call services.
 	static FlowUI flowUI;
-	private static IFloodlightProviderService controller;
-	
-	public static IFloodlightProviderService getController(){
-		return Main.controller;
-	}
-	
 	public static FlowUI getFlowUI(){
 		return Main.flowUI;
 	}
 	
+	//a reference to marketManger
+	static MarketManager marketManager;
+	public static MarketManager getMarketManager(){
+		return Main.marketManager;
+	}
 	
-    public static void main(String[] args) throws FloodlightModuleException {
-        
-    	new UIThread();
+	
+	private static void initializeMarketModule(){
+		new UIThread();
         while(UIThread.getFlowUI() == null){
         	System.out.println("Waiting....");
         }
-        Main.flowUI = UIThread.getFlowUI();
+        
+    	marketManager = new MarketManager();
+        flowUI = UIThread.getFlowUI();
+        
+        //mutual reference to each other
+        marketManager.setFlowUI(flowUI);
+        flowUI.setMarketManager(marketManager);
+        
+	}
+	
+    public static void main(String[] args) throws FloodlightModuleException {
+        
+    	initializeMarketModule();
     	
     	// Setup logger
         System.setProperty("org.restlet.engine.loggerFacadeClass", 

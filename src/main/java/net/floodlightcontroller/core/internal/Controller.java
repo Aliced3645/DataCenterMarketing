@@ -63,7 +63,7 @@ import net.floodlightcontroller.core.util.ListenerDispatcher;
 import net.floodlightcontroller.core.util.SingletonTask;
 import net.floodlightcontroller.core.web.CoreWebRoutable;
 import net.floodlightcontroller.counter.ICounterStoreService;
-import net.floodlightcontroller.datacentermarketing.FlowUI;
+import net.floodlightcontroller.datacentermarketing.MarketManager;
 import net.floodlightcontroller.flowcache.IFlowCacheService;
 import net.floodlightcontroller.packet.Ethernet;
 import net.floodlightcontroller.perfmon.IPktInProcessingTimeService;
@@ -1811,8 +1811,9 @@ public class Controller implements IFloodlightProviderService,
       
         }
         
-        FlowUI flowUI = Main.getFlowUI();
-        flowUI.setController(this);
+        MarketManager marketManager = Main.getMarketManager();
+        marketManager.setController(this);
+        
      }
 
     /**
