@@ -52,6 +52,8 @@ public class FlowUI extends JDialog {
 	private JTextArea availablePathsTextArea;
 	
 	private DeviceManagerImpl deviceManager;
+	private IFloodlightProviderService controller;
+	
 	
 	
 	//maintain a local hashset: name - switch
@@ -80,6 +82,14 @@ public class FlowUI extends JDialog {
 	}
 	
 	
+	public IFloodlightProviderService getController() {
+		return controller;
+	}
+
+	public void setController(IFloodlightProviderService controller) {
+		this.controller = controller;
+	}
+
 	public void updateHostsTextArea(){
 		if(deviceManager == null){
 			System.out.println("DeviceManager is null");
@@ -98,7 +108,6 @@ public class FlowUI extends JDialog {
 
 	public void updateSwitchesTextArea(){
 		//refresh: get the switches and host information
-		IFloodlightProviderService controller = Main.getController();
 		
 		if(controller == null){
 			System.out.println("Controller is null");

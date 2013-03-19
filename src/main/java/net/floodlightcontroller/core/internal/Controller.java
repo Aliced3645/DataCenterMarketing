@@ -44,6 +44,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import net.floodlightcontroller.UI.FlowUI;
 import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
 import net.floodlightcontroller.core.IHAListener;
@@ -54,6 +55,7 @@ import net.floodlightcontroller.core.IOFSwitch;
 import net.floodlightcontroller.core.IOFSwitchDriver;
 import net.floodlightcontroller.core.IOFSwitchFilter;
 import net.floodlightcontroller.core.IOFSwitchListener;
+import net.floodlightcontroller.core.Main;
 import net.floodlightcontroller.core.OFSwitchBase;
 import net.floodlightcontroller.core.annotations.LogMessageDoc;
 import net.floodlightcontroller.core.annotations.LogMessageDocs;
@@ -1806,7 +1808,11 @@ public class Controller implements IFloodlightProviderService,
         } else {
             this.setAlwaysClearFlowsOnSwAdd(false);
             log.info("Flush switches on reconnect -- Disabled");
+      
         }
+        
+        FlowUI flowUI = Main.getFlowUI();
+        flowUI.setController(this);
      }
 
     /**

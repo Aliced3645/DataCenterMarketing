@@ -83,8 +83,6 @@ public class Main {
         IFloodlightProviderService controller =
                 moduleContext.getServiceImpl(IFloodlightProviderService.class);
        
-     
-        Main.controller = controller;
       	
         
         // This call blocks, it has to be the last line in the main
