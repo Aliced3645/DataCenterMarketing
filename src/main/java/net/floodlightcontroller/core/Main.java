@@ -23,9 +23,12 @@ import net.floodlightcontroller.core.internal.CmdLineSettings;
 import net.floodlightcontroller.core.module.FloodlightModuleException;
 import net.floodlightcontroller.core.module.FloodlightModuleLoader;
 import net.floodlightcontroller.core.module.IFloodlightModuleContext;
+import net.floodlightcontroller.datacentermarketing.FlowUI;
+import net.floodlightcontroller.datacentermarketing.UIThread;
 import net.floodlightcontroller.restserver.IRestApiService;
 import javax.swing.*;
-import net.floodlightcontroller.UI.*;
+import net.floodlightcontroller.datacentermarketing.*;
+
 /**
  * Host for the Floodlight main method
  * @author alexreimers

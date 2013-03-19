@@ -1,4 +1,4 @@
-package net.floodlightcontroller.UI;
+package net.floodlightcontroller.datacentermarketing;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;

@@ -1,4 +1,4 @@
-package net.floodlightcontroller.UI;
+package net.floodlightcontroller.datacentermarketing;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -39,6 +39,8 @@ import net.floodlightcontroller.devicemanager.IDevice;
 import net.floodlightcontroller.devicemanager.internal.Device;
 import net.floodlightcontroller.devicemanager.internal.DeviceManagerImpl;
 
+
+
 public class FlowUI extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
@@ -53,7 +55,6 @@ public class FlowUI extends JDialog {
 	
 	private DeviceManagerImpl deviceManager;
 	private IFloodlightProviderService controller;
-	
 	
 	
 	//maintain a local hashset: name - switch
