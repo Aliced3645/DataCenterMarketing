@@ -24,6 +24,7 @@ import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IOFMessageListener;
 import net.floodlightcontroller.core.IOFSwitch;
 import net.floodlightcontroller.core.IOFSwitchListener;
+import net.floodlightcontroller.core.Main;
 import net.floodlightcontroller.core.module.FloodlightModuleContext;
 import net.floodlightcontroller.core.module.FloodlightModuleException;
 import net.floodlightcontroller.core.module.IFloodlightModule;
@@ -176,9 +177,11 @@ public class FlowPusherController implements IOFSwitchListener,
 		logger.info("this message is from:" + sw.getId());
 
 		switch (msg.getType()) {
+		
 		case BARRIER_REPLY:
 			synchronized(lock) {
 				if(!stop) {
+					
 					OFBarrierReply br = (OFBarrierReply)msg;
 					logger.info("received barrier reply " + br.getXid());
 					double time = (double)System.nanoTime()/1000000.0;

@@ -18,8 +18,19 @@ import javax.swing.JTextField;
 import java.awt.Insets;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import javax.swing.JTextArea;
 import javax.swing.JList;
+
+import net.floodlightcontroller.core.IFloodlightProviderService;
+import net.floodlightcontroller.core.IOFSwitch;
+import net.floodlightcontroller.core.Main;
 
 public class FlowUI extends JDialog {
 
@@ -29,7 +40,12 @@ public class FlowUI extends JDialog {
 	private JTextField bandwidthInput;
 	private JTextField delayInput;
 	private JTextField inputBidPrice;
-
+	private JTextArea hostsTextArea;
+	private JTextArea switchesTextArea;
+	
+	
+	//maintain a local hashset: name - switch
+	
 	/**
 	 * Launch the application.
 	 */
@@ -46,7 +62,33 @@ public class FlowUI extends JDialog {
 	
 	//getter and sitter..
 	
-
+	public void updateHostsTextArea(){
+		
+	}
+	
+	public void updateSwitchesTextArea(){
+		//refresh: get the switches and host information
+		IFloodlightProviderService controller = Main.getController();
+		
+		if(controller == null){
+			System.out.println("Controller is null");
+			return;
+		}
+		
+		Map<Long, IOFSwitch> switchesMap = controller.getSwitches();
+		if(switchesMap == null)
+			return;
+		Set<Entry<Long, IOFSwitch>> s = switchesMap.entrySet();
+		Iterator<Entry<Long, IOFSwitch>> it = s.iterator();
+		while(it.hasNext()){
+			IOFSwitch ofSwitch = it.next().getValue();
+			
+			switchesTextArea.append(ofSwitch.getId() + ": " + ofSwitch.getStringId() + "\n");
+		}
+		return;
+		
+	}
+	
 	
 	/**
 	 * Create the dialog.
@@ -142,7 +184,7 @@ public class FlowUI extends JDialog {
 			contentPanel.add(lblHosts, gbc_lblHosts);
 		}
 		{
-			JTextArea hostsTextArea = new JTextArea();
+			hostsTextArea = new JTextArea();
 			GridBagConstraints gbc_hostsTextArea = new GridBagConstraints();
 			gbc_hostsTextArea.gridheight = 9;
 			gbc_hostsTextArea.insets = new Insets(0, 0, 5, 5);
@@ -161,7 +203,7 @@ public class FlowUI extends JDialog {
 			contentPanel.add(lblSwitches, gbc_lblSwitches);
 		}
 		{
-			JTextArea switchesTextArea = new JTextArea();
+			switchesTextArea = new JTextArea();
 			GridBagConstraints gbc_switchesTextArea = new GridBagConstraints();
 			gbc_switchesTextArea.gridheight = 9;
 			gbc_switchesTextArea.insets = new Insets(0, 0, 5, 5);
@@ -304,6 +346,18 @@ public class FlowUI extends JDialog {
 		}
 		{
 			JButton btnRefresh = new JButton("Refresh");
+			btnRefresh.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					
+					hostsTextArea.setText("");
+					switchesTextArea.setText("");
+					
+					updateHostsTextArea();
+					updateSwitchesTextArea();
+					
+					//System.out.println("abc");
+				}
+			});
 			GridBagConstraints gbc_btnRefresh = new GridBagConstraints();
 			gbc_btnRefresh.gridx = 6;
 			gbc_btnRefresh.gridy = 19;

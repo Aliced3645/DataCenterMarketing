@@ -141,6 +141,7 @@ public class Controller implements IFloodlightProviderService,
     protected ConcurrentMap<OFType,
                             ListenerDispatcher<OFType,IOFMessageListener>>
                                 messageListeners;
+    
     // OFSwitch driver binding map and order
     protected Map<String, IOFSwitchDriver>switchBindingMap;
     protected List<String> switchDescSortedList;
@@ -252,6 +253,7 @@ public class Controller implements IFloodlightProviderService,
         }
         @Override
         public void dispatch() {
+        	//System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
             if (log.isTraceEnabled()) {
                 log.trace("Dispatching switch update {} {}",
                         sw, switchUpdateType);

@@ -690,7 +690,7 @@ IFlowReconcileListener, IInfoProvider, IHAListener {
         this.perClassIndices =
                 new HashSet<EnumSet<DeviceField>>();
         addIndex(true, EnumSet.of(DeviceField.IPV4));
-
+        
         this.deviceListeners = new ListenerDispatcher<String, IDeviceListener>();
         this.suppressAPs = Collections.newSetFromMap(
                                new ConcurrentHashMap<SwitchPort, Boolean>());
@@ -705,10 +705,14 @@ IFlowReconcileListener, IInfoProvider, IHAListener {
         this.threadPool = fmc.getServiceImpl(IThreadPoolService.class);
         this.flowReconcileMgr = fmc.getServiceImpl(IFlowReconcileService.class);
         this.entityClassifier = fmc.getServiceImpl(IEntityClassifierService.class);
+        
+        //establish assotiation with FLowUI
+        
     }
 
     @Override
     public void startUp(FloodlightModuleContext fmc) {
+    	
         primaryIndex = new DeviceUniqueIndex(entityClassifier.getKeyFields());
         secondaryIndexMap = new HashMap<EnumSet<DeviceField>, DeviceIndex>();
 

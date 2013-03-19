@@ -10,6 +10,7 @@ public class UIThread implements Runnable{
 	Thread uiThread;
 	static FlowUI flowUI;
 	
+	
 	public static FlowUI getFlowUI(){
 		return UIThread.flowUI;
 	}
@@ -22,6 +23,7 @@ public class UIThread implements Runnable{
 
 	private static void createUI(){
 		flowUI = new FlowUI();
+		flowUI.setTitle("Datacenter Control Panel");
 		flowUI.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		flowUI.setVisible(true);
 	}

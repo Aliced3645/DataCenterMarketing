@@ -41,10 +41,16 @@ public class Main {
 	
 	//a reference to UI. All modules could visit and call services.
 	static FlowUI flowUI;
+	private static IFloodlightProviderService controller;
+	
+	public static IFloodlightProviderService getController(){
+		return Main.controller;
+	}
 	
 	public static FlowUI getFlowUI(){
 		return Main.flowUI;
 	}
+	
 	
     public static void main(String[] args) throws FloodlightModuleException {
         // Setup logger
@@ -70,9 +76,14 @@ public class Main {
         IFloodlightProviderService controller =
                 moduleContext.getServiceImpl(IFloodlightProviderService.class);
        
-    
-        UIThread uiThread = new UIThread();
-        Main.flowUI = uiThread.getFlowUI();
+        
+        new UIThread();
+        while(UIThread.getFlowUI() == null){
+        	System.out.println("Waiting....");
+        }
+        Main.flowUI = UIThread.getFlowUI();
+        Main.controller = controller;
+      	
         
         // This call blocks, it has to be the last line in the main
         controller.run();
