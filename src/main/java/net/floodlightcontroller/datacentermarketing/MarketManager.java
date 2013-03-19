@@ -105,4 +105,8 @@ public class MarketManager {
 	}
 	
 	
+	//detect possible paths from two end hosts
+	//using topology floodlight provides
+	
+	
 }

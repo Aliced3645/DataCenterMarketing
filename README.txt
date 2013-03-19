@@ -1,10 +1,13 @@
-  
-  Floodlight
-  An Apache licensed, Java based OpenFlow controller
 
-Floodlight is a Java based OpenFlow controller originally written by David Erickson at Stanford
-University. It is available under the Apache 2.0 license.
 
-For documentation, forums, issue tracking and more visit:
+Welcome!
 
-      http://www.openflowhub.org/display/Floodlight/Floodlight+Home
+It is the project code repo of Datacenter Marketing!
+
+Briefly, it is an application module basing on Floodlight.
+
+For detailed information,please visit:
+
+https://sites.google.com/a/brown.edu/datacentermarketing/
+
+(Brown account is required)
