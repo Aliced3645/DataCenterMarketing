@@ -3,9 +3,12 @@ package net.floodlightcontroller.UI;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -18,6 +21,7 @@ import javax.swing.JTextField;
 import java.awt.Insets;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -31,6 +35,9 @@ import javax.swing.JList;
 import net.floodlightcontroller.core.IFloodlightProviderService;
 import net.floodlightcontroller.core.IOFSwitch;
 import net.floodlightcontroller.core.Main;
+import net.floodlightcontroller.devicemanager.IDevice;
+import net.floodlightcontroller.devicemanager.internal.Device;
+import net.floodlightcontroller.devicemanager.internal.DeviceManagerImpl;
 
 public class FlowUI extends JDialog {
 
@@ -42,6 +49,9 @@ public class FlowUI extends JDialog {
 	private JTextField inputBidPrice;
 	private JTextArea hostsTextArea;
 	private JTextArea switchesTextArea;
+	private JTextArea availablePathsTextArea;
+	
+	private DeviceManagerImpl deviceManager;
 	
 	
 	//maintain a local hashset: name - switch
@@ -61,11 +71,31 @@ public class FlowUI extends JDialog {
 	}
 	
 	//getter and sitter..
-	
-	public void updateHostsTextArea(){
-		
+	public DeviceManagerImpl getDeviceManager() {
+		return deviceManager;
+	}
+
+	public void setDeviceManager(DeviceManagerImpl deviceManager) {
+		this.deviceManager = deviceManager;
 	}
 	
+	
+	public void updateHostsTextArea(){
+		if(deviceManager == null){
+			System.out.println("DeviceManager is null");
+			return;
+		}
+		//print all devices
+		Collection<? extends IDevice> devices = deviceManager.getAllDevices();
+		Iterator<? extends IDevice> iterator = devices.iterator();
+		while(iterator.hasNext()){
+			IDevice device = iterator.next();
+			hostsTextArea.append(device.toStringForUI() + "\n\n");
+			
+		}
+	}
+	
+
 	public void updateSwitchesTextArea(){
 		//refresh: get the switches and host information
 		IFloodlightProviderService controller = Main.getController();
@@ -94,15 +124,15 @@ public class FlowUI extends JDialog {
 	 * Create the dialog.
 	 */
 	public FlowUI() {
-		setBounds(100, 100, 877, 979);
+		setBounds(100, 100, 982, 1184);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.WEST);
 		GridBagLayout gbl_contentPanel = new GridBagLayout();
 		gbl_contentPanel.columnWidths = new int[]{35, 175, 204, 0, 126, 202, 0, 0};
-		gbl_contentPanel.rowHeights = new int[]{65, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 188, 0, 0, 0, 0, 0, 0};
+		gbl_contentPanel.rowHeights = new int[]{65, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 188, 0, 0, 0, 0, 0, 0};
 		gbl_contentPanel.columnWeights = new double[]{0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-		gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_contentPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		contentPanel.setLayout(gbl_contentPanel);
 		{
 			JLabel lblDatacenterMarketingControl = new JLabel("Control Panel");
@@ -185,13 +215,17 @@ public class FlowUI extends JDialog {
 		}
 		{
 			hostsTextArea = new JTextArea();
+			Border border = BorderFactory.createLineBorder(Color.BLACK);
+			hostsTextArea.setBorder(BorderFactory.createCompoundBorder(border, 
+			            BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 			GridBagConstraints gbc_hostsTextArea = new GridBagConstraints();
-			gbc_hostsTextArea.gridheight = 9;
+			gbc_hostsTextArea.gridheight = 7;
 			gbc_hostsTextArea.insets = new Insets(0, 0, 5, 5);
 			gbc_hostsTextArea.fill = GridBagConstraints.BOTH;
 			gbc_hostsTextArea.gridx = 2;
 			gbc_hostsTextArea.gridy = 4;
-			contentPanel.add(hostsTextArea, gbc_hostsTextArea);
+			JScrollPane scroll = new JScrollPane (hostsTextArea);
+			contentPanel.add(scroll, gbc_hostsTextArea);
 		}
 		{
 			JLabel lblSwitches = new JLabel("Switches");
@@ -203,9 +237,14 @@ public class FlowUI extends JDialog {
 			contentPanel.add(lblSwitches, gbc_lblSwitches);
 		}
 		{
+			
+			
 			switchesTextArea = new JTextArea();
+			Border border = BorderFactory.createLineBorder(Color.BLACK);
+			switchesTextArea.setBorder(BorderFactory.createCompoundBorder(border, 
+			            BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 			GridBagConstraints gbc_switchesTextArea = new GridBagConstraints();
-			gbc_switchesTextArea.gridheight = 9;
+			gbc_switchesTextArea.gridheight = 7;
 			gbc_switchesTextArea.insets = new Insets(0, 0, 5, 5);
 			gbc_switchesTextArea.fill = GridBagConstraints.BOTH;
 			gbc_switchesTextArea.gridx = 5;
@@ -220,19 +259,22 @@ public class FlowUI extends JDialog {
 			gbc_lblNetworkAvailability.anchor = GridBagConstraints.WEST;
 			gbc_lblNetworkAvailability.insets = new Insets(0, 0, 5, 5);
 			gbc_lblNetworkAvailability.gridx = 1;
-			gbc_lblNetworkAvailability.gridy = 13;
+			gbc_lblNetworkAvailability.gridy = 11;
 			contentPanel.add(lblNetworkAvailability, gbc_lblNetworkAvailability);
 		}
 		{
-			JTextArea availablePathsText = new JTextArea();
-			availablePathsText.setLineWrap(true);
+			availablePathsTextArea = new JTextArea();
+			availablePathsTextArea.setLineWrap(true);
 			GridBagConstraints gbc_availablePathsText = new GridBagConstraints();
+			Border border = BorderFactory.createLineBorder(Color.BLACK);
+			availablePathsTextArea.setBorder(BorderFactory.createCompoundBorder(border, 
+			            BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 			gbc_availablePathsText.gridwidth = 5;
 			gbc_availablePathsText.insets = new Insets(0, 0, 5, 5);
 			gbc_availablePathsText.fill = GridBagConstraints.BOTH;
 			gbc_availablePathsText.gridx = 1;
-			gbc_availablePathsText.gridy = 14;
-			contentPanel.add(availablePathsText, gbc_availablePathsText);
+			gbc_availablePathsText.gridy = 12;
+			contentPanel.add(availablePathsTextArea, gbc_availablePathsText);
 		}
 		{
 			JLabel lblRequirements = new JLabel("Requirements:");
@@ -242,7 +284,7 @@ public class FlowUI extends JDialog {
 			gbc_lblRequirements.anchor = GridBagConstraints.WEST;
 			gbc_lblRequirements.insets = new Insets(0, 0, 5, 5);
 			gbc_lblRequirements.gridx = 1;
-			gbc_lblRequirements.gridy = 15;
+			gbc_lblRequirements.gridy = 13;
 			contentPanel.add(lblRequirements, gbc_lblRequirements);
 		}
 		{
@@ -252,7 +294,7 @@ public class FlowUI extends JDialog {
 			gbc_lblBandwidth.anchor = GridBagConstraints.SOUTH;
 			gbc_lblBandwidth.insets = new Insets(0, 0, 5, 5);
 			gbc_lblBandwidth.gridx = 1;
-			gbc_lblBandwidth.gridy = 16;
+			gbc_lblBandwidth.gridy = 14;
 			contentPanel.add(lblBandwidth, gbc_lblBandwidth);
 		}
 		{
@@ -261,7 +303,7 @@ public class FlowUI extends JDialog {
 			gbc_bandwidthInput.fill = GridBagConstraints.HORIZONTAL;
 			gbc_bandwidthInput.insets = new Insets(0, 0, 5, 5);
 			gbc_bandwidthInput.gridx = 2;
-			gbc_bandwidthInput.gridy = 16;
+			gbc_bandwidthInput.gridy = 14;
 			contentPanel.add(bandwidthInput, gbc_bandwidthInput);
 			bandwidthInput.setColumns(10);
 		}
@@ -271,7 +313,7 @@ public class FlowUI extends JDialog {
 			GridBagConstraints gbc_lblDelayWithin = new GridBagConstraints();
 			gbc_lblDelayWithin.insets = new Insets(0, 0, 5, 5);
 			gbc_lblDelayWithin.gridx = 4;
-			gbc_lblDelayWithin.gridy = 16;
+			gbc_lblDelayWithin.gridy = 14;
 			contentPanel.add(lblDelayWithin, gbc_lblDelayWithin);
 		}
 		{
@@ -280,7 +322,7 @@ public class FlowUI extends JDialog {
 			gbc_delayInput.insets = new Insets(0, 0, 5, 5);
 			gbc_delayInput.fill = GridBagConstraints.HORIZONTAL;
 			gbc_delayInput.gridx = 5;
-			gbc_delayInput.gridy = 16;
+			gbc_delayInput.gridy = 14;
 			contentPanel.add(delayInput, gbc_delayInput);
 			delayInput.setColumns(10);
 		}
@@ -292,7 +334,7 @@ public class FlowUI extends JDialog {
 			gbc_lblBid.anchor = GridBagConstraints.WEST;
 			gbc_lblBid.insets = new Insets(0, 0, 5, 5);
 			gbc_lblBid.gridx = 1;
-			gbc_lblBid.gridy = 17;
+			gbc_lblBid.gridy = 15;
 			contentPanel.add(lblBid, gbc_lblBid);
 		}
 		{
@@ -301,7 +343,7 @@ public class FlowUI extends JDialog {
 			GridBagConstraints gbc_lblBidPrice = new GridBagConstraints();
 			gbc_lblBidPrice.insets = new Insets(0, 0, 5, 5);
 			gbc_lblBidPrice.gridx = 1;
-			gbc_lblBidPrice.gridy = 18;
+			gbc_lblBidPrice.gridy = 16;
 			contentPanel.add(lblBidPrice, gbc_lblBidPrice);
 		}
 		{
@@ -310,7 +352,7 @@ public class FlowUI extends JDialog {
 			gbc_inputBidPrice.insets = new Insets(0, 0, 5, 5);
 			gbc_inputBidPrice.fill = GridBagConstraints.HORIZONTAL;
 			gbc_inputBidPrice.gridx = 2;
-			gbc_inputBidPrice.gridy = 18;
+			gbc_inputBidPrice.gridy = 16;
 			contentPanel.add(inputBidPrice, gbc_inputBidPrice);
 			inputBidPrice.setColumns(10);
 		}
@@ -320,7 +362,7 @@ public class FlowUI extends JDialog {
 			GridBagConstraints gbc_lblRe = new GridBagConstraints();
 			gbc_lblRe.insets = new Insets(0, 0, 5, 5);
 			gbc_lblRe.gridx = 4;
-			gbc_lblRe.gridy = 18;
+			gbc_lblRe.gridy = 16;
 			contentPanel.add(lblRe, gbc_lblRe);
 		}
 		{
@@ -328,7 +370,7 @@ public class FlowUI extends JDialog {
 			GridBagConstraints gbc_CurrentBalance = new GridBagConstraints();
 			gbc_CurrentBalance.insets = new Insets(0, 0, 5, 5);
 			gbc_CurrentBalance.gridx = 5;
-			gbc_CurrentBalance.gridy = 18;
+			gbc_CurrentBalance.gridy = 16;
 			contentPanel.add(CurrentBalance, gbc_CurrentBalance);
 		}
 		{
@@ -341,7 +383,7 @@ public class FlowUI extends JDialog {
 			gbc_btnBidFlow.anchor = GridBagConstraints.EAST;
 			gbc_btnBidFlow.insets = new Insets(0, 0, 0, 5);
 			gbc_btnBidFlow.gridx = 2;
-			gbc_btnBidFlow.gridy = 19;
+			gbc_btnBidFlow.gridy = 17;
 			contentPanel.add(btnBidFlow, gbc_btnBidFlow);
 		}
 		{
@@ -360,7 +402,7 @@ public class FlowUI extends JDialog {
 			});
 			GridBagConstraints gbc_btnRefresh = new GridBagConstraints();
 			gbc_btnRefresh.gridx = 6;
-			gbc_btnRefresh.gridy = 19;
+			gbc_btnRefresh.gridy = 17;
 			contentPanel.add(btnRefresh, gbc_btnRefresh);
 		}
 		{

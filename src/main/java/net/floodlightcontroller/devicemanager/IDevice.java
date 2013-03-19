@@ -95,4 +95,5 @@ public interface IDevice {
      */
     public IEntityClass getEntityClass();
     
+    public String toStringForUI();
 }

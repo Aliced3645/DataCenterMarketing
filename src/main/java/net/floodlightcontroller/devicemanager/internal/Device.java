@@ -775,4 +775,26 @@ entity.getLastSeenTimestamp().getTime());
         builder.append("]");
         return builder.toString();
     }
+    
+    public String toStringForUI(){
+        StringBuilder builder = new StringBuilder();
+        builder.append("deviceKey=");
+        builder.append(deviceKey);
+        builder.append(", entityClass=");
+        builder.append(entityClass.getName());
+        builder.append(", MAC=");
+        builder.append(macAddressString + "\n");
+        builder.append(", IPs=[");
+        boolean isFirst = true;
+        for (Integer ip: getIPv4Addresses()) {
+            if (!isFirst)
+                builder.append(", ");
+            isFirst = false;
+            builder.append(IPv4.fromIPv4Address(ip));
+        }
+        builder.append("], APs=");
+        builder.append(Arrays.toString(getAttachmentPoints(true)));
+        builder.append("]");
+        return builder.toString();
+    }
 }

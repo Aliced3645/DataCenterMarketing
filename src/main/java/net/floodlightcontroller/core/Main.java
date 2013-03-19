@@ -53,7 +53,14 @@ public class Main {
 	
 	
     public static void main(String[] args) throws FloodlightModuleException {
-        // Setup logger
+        
+    	new UIThread();
+        while(UIThread.getFlowUI() == null){
+        	System.out.println("Waiting....");
+        }
+        Main.flowUI = UIThread.getFlowUI();
+    	
+    	// Setup logger
         System.setProperty("org.restlet.engine.loggerFacadeClass", 
                 "org.restlet.ext.slf4j.Slf4jLoggerFacade");
         
@@ -76,12 +83,7 @@ public class Main {
         IFloodlightProviderService controller =
                 moduleContext.getServiceImpl(IFloodlightProviderService.class);
        
-        
-        new UIThread();
-        while(UIThread.getFlowUI() == null){
-        	System.out.println("Waiting....");
-        }
-        Main.flowUI = UIThread.getFlowUI();
+     
         Main.controller = controller;
       	
         

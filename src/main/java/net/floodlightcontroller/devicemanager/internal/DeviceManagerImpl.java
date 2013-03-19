@@ -37,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import net.floodlightcontroller.UI.FlowUI;
 import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
 import net.floodlightcontroller.core.IHAListener;
@@ -44,6 +45,7 @@ import net.floodlightcontroller.core.IInfoProvider;
 import net.floodlightcontroller.core.IOFMessageListener;
 import net.floodlightcontroller.core.IOFSwitch;
 import net.floodlightcontroller.core.IFloodlightProviderService.Role;
+import net.floodlightcontroller.core.Main;
 import net.floodlightcontroller.core.module.FloodlightModuleContext;
 import net.floodlightcontroller.core.module.IFloodlightModule;
 import net.floodlightcontroller.core.module.IFloodlightService;
@@ -95,6 +97,7 @@ public class DeviceManagerImpl implements
 IDeviceService, IOFMessageListener, ITopologyListener,
 IFloodlightModule, IEntityClassListener,
 IFlowReconcileListener, IInfoProvider, IHAListener {
+	
     protected static Logger logger =
             LoggerFactory.getLogger(DeviceManagerImpl.class);
 
@@ -707,7 +710,8 @@ IFlowReconcileListener, IInfoProvider, IHAListener {
         this.entityClassifier = fmc.getServiceImpl(IEntityClassifierService.class);
         
         //establish assotiation with FLowUI
-        
+        FlowUI flowUI = Main.getFlowUI();
+        flowUI.setDeviceManager(this);
     }
 
     @Override
