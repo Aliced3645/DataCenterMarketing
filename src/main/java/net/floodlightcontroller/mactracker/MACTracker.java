@@ -101,8 +101,4 @@ public class MACTracker implements IOFMessageListener, IFloodlightModule {
 		return Command.CONTINUE;
 	}
 	
-	public void test(){
-		FlowUI flowUI = Main.getFlowUI();
-	}
-
 }

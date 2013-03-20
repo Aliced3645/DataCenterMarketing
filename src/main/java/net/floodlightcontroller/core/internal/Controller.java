@@ -1811,8 +1811,8 @@ public class Controller implements IFloodlightProviderService,
       
         }
         
-        MarketManager marketManager = Main.getMarketManager();
-        marketManager.setController(this);
+       // MarketManager marketManager = Main.getMarketManager();
+       // marketManager.setController(this);
         
      }
 

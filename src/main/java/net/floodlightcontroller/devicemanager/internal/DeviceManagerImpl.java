@@ -710,8 +710,8 @@ IFlowReconcileListener, IInfoProvider, IHAListener {
         this.entityClassifier = fmc.getServiceImpl(IEntityClassifierService.class);
         
         //establish assotiation with FLowUI
-        MarketManager marketManager = Main.getMarketManager();
-        marketManager.setDeviceManager(this);
+        //MarketManager marketManager = Main.getMarketManager();
+        //marketManager.setDeviceManager(this);
     }
 
     @Override

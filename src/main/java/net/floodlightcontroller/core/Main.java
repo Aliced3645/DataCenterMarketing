@@ -41,37 +41,10 @@ public class Main {
      * @throws FloodlightModuleException 
      */
 	
-	//a reference to UI. All modules could visit and call services.
-	static FlowUI flowUI;
-	public static FlowUI getFlowUI(){
-		return Main.flowUI;
-	}
-	
-	//a reference to marketManger
-	static MarketManager marketManager;
-	public static MarketManager getMarketManager(){
-		return Main.marketManager;
-	}
-	
-	
-	private static void initializeMarketModule(){
-		new UIThread();
-        while(UIThread.getFlowUI() == null){
-        	System.out.println("Waiting....");
-        }
-        
-    	marketManager = new MarketManager();
-        flowUI = UIThread.getFlowUI();
-        
-        //mutual reference to each other
-        marketManager.setFlowUI(flowUI);
-        flowUI.setMarketManager(marketManager);
-        
-	}
 	
     public static void main(String[] args) throws FloodlightModuleException {
         
-    	initializeMarketModule();
+    	//initializeMarketModule();
     	
     	// Setup logger
         System.setProperty("org.restlet.engine.loggerFacadeClass", 
