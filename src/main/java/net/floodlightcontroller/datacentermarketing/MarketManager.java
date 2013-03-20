@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -25,8 +26,13 @@ import net.floodlightcontroller.core.module.IFloodlightModule;
 import net.floodlightcontroller.core.module.IFloodlightService;
 import net.floodlightcontroller.devicemanager.IDevice;
 import net.floodlightcontroller.devicemanager.IDeviceService;
+import net.floodlightcontroller.devicemanager.SwitchPort;
 import net.floodlightcontroller.devicemanager.internal.DeviceManagerImpl;
+import net.floodlightcontroller.routing.IRoutingService;
+import net.floodlightcontroller.routing.Route;
 import net.floodlightcontroller.staticflowentry.IStaticFlowEntryPusherService;
+import net.floodlightcontroller.topology.ITopologyService;
+
 
 //logical layer for datacenter networking
 public class MarketManager implements IFloodlightModule, IOFSwitchListener{
@@ -34,6 +40,9 @@ public class MarketManager implements IFloodlightModule, IOFSwitchListener{
 	protected IFloodlightProviderService controller;
 	protected IDeviceService deviceManager;
 	protected IStaticFlowEntryPusherService staticFlowEntryPusher;
+	protected ITopologyService topologyManager;
+	protected IRoutingService routingManager;
+	
 	
 	//internal hashmap for switches and devices
 	private Map<Long, IOFSwitch> switches;
@@ -61,6 +70,9 @@ public class MarketManager implements IFloodlightModule, IOFSwitchListener{
 		l.add(IFloodlightProviderService.class);
 		l.add(IDeviceService.class);
 		l.add(IStaticFlowEntryPusherService.class);
+		l.add(ITopologyService.class);
+		l.add(IRoutingService.class);
+		
 		return l;
 	}
 
@@ -82,6 +94,8 @@ public class MarketManager implements IFloodlightModule, IOFSwitchListener{
 		controller = context.getServiceImpl(IFloodlightProviderService.class);
 		deviceManager = context.getServiceImpl(IDeviceService.class);
 		staticFlowEntryPusher = context.getServiceImpl(IStaticFlowEntryPusherService.class);
+        topologyManager = context.getServiceImpl(ITopologyService.class);
+        routingManager = context.getServiceImpl(IRoutingService.class);
         
 		try {
         	switches = new HashMap<Long, IOFSwitch>();
@@ -183,19 +197,52 @@ public class MarketManager implements IFloodlightModule, IOFSwitchListener{
 		
 	}
 	
+	
+	//unknown implementation yet
 	public long getSwitchPortBandwidth(Long switchKey, short portNum){
 		IOFSwitch targetSwitch = switches.get(switchKey);
 		if(targetSwitch == null) return -1;
 		OFPhysicalPort port = targetSwitch.getPort(portNum);
 		
-		
 		return 0;
 	}
 
-
+	
 	
 	//detect possible paths from two end hosts
-	//using topology interface Floodlight provides
+	//using topology interface and routing service Floodlight provides	
+	
+	public ArrayList<Route> getNonLoopPaths(long srcID, long destID){
+		
+		updateDevices();
+		updateSwitches();
+		
+		IDevice srcDev = devices.get(srcID);
+		IDevice destDev = devices.get(destID);
+		if(srcDev == null || destDev == null)
+			return null;
+		
+		ArrayList<Route> routes = new ArrayList<Route>();
+		
+		/*
+		 Get source and destination SwitchPort lists (aka attachment point of device)
+		 so it is a multisource-multidestination graph searching problem
+		 pick any pair of source and dest to find path set
+		 then aggregate all possible together
+		 */
+		
+		SwitchPort[] srcSwitchPorts = srcDev.getAttachmentPoints();
+		SwitchPort[] destSwitchPorts = destDev.getAttachmentPoints();
+		for(SwitchPort sourceSwitchPort : srcSwitchPorts){
+			for(SwitchPort destSwitchPort : destSwitchPorts){
+				ArrayList<Route> someRoutes = routingManager.getRoutes(sourceSwitchPort.getSwitchDPID(), destSwitchPort.getSwitchDPID(), true);
+				routes.addAll(someRoutes);
+				someRoutes = null;
+			}
+		}
+		
+		return routes;
+	}
 	
 	
 }

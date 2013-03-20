@@ -21,6 +21,7 @@ import javax.swing.JTextField;
 import java.awt.Insets;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -38,6 +39,7 @@ import net.floodlightcontroller.core.Main;
 import net.floodlightcontroller.devicemanager.IDevice;
 import net.floodlightcontroller.devicemanager.internal.Device;
 import net.floodlightcontroller.devicemanager.internal.DeviceManagerImpl;
+import net.floodlightcontroller.routing.Route;
 
 
 
@@ -117,7 +119,7 @@ public class FlowUI extends JDialog {
 	 * Create the dialog.
 	 */
 	public FlowUI() {
-		setBounds(100, 100, 982, 1184);
+		setBounds(100, 100, 982, 1206);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.WEST);
@@ -372,6 +374,37 @@ public class FlowUI extends JDialog {
 				public void actionPerformed(ActionEvent e) {
 				}
 			});
+			{
+				JButton btnGetRoutes = new JButton("Get routes");
+				btnGetRoutes.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent arg0) {
+						
+						availablePathsTextArea.setText("");
+						
+						//get the input 
+						String sourceString = sourceHostInput.getText();
+						String destString = destHostInput.getText();
+						if(sourceString.length() == 0 || destString.length() == 0)
+							return;
+						long sourceID = Long.parseLong(sourceString);
+						long destID = Long.parseLong(destString);
+						
+						ArrayList<Route> routes = marketManager.getNonLoopPaths(sourceID, destID);
+						
+						//show them!
+						for(Route route : routes){
+							availablePathsTextArea.append(route.toString() + "\n");
+						}
+					}
+				});
+				
+				GridBagConstraints gbc_btnGetRoutes = new GridBagConstraints();
+				gbc_btnGetRoutes.fill = GridBagConstraints.HORIZONTAL;
+				gbc_btnGetRoutes.insets = new Insets(0, 0, 5, 0);
+				gbc_btnGetRoutes.gridx = 6;
+				gbc_btnGetRoutes.gridy = 16;
+				contentPanel.add(btnGetRoutes, gbc_btnGetRoutes);
+			}
 			GridBagConstraints gbc_btnBidFlow = new GridBagConstraints();
 			gbc_btnBidFlow.anchor = GridBagConstraints.EAST;
 			gbc_btnBidFlow.insets = new Insets(0, 0, 0, 5);
