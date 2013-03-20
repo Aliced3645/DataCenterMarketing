@@ -106,7 +106,7 @@ public class MarketManager {
 	
 	
 	//detect possible paths from two end hosts
-	//using topology floodlight provides
+	//using topology interface Floodlight provides
 	
 	
 }
