@@ -35,6 +35,12 @@ public class MarketManager implements IFloodlightModule, IOFSwitchListener{
 	protected IDeviceService deviceManager;
 	protected IStaticFlowEntryPusherService staticFlowEntryPusher;
 	
+	//internal hashmap for switches and devices
+	private Map<Long, IOFSwitch> switches;
+	private Map<Long, IDevice> devices;
+	
+	private FlowUI flowUI;
+	
 	@Override
 	public Collection<Class<? extends IFloodlightService>> getModuleServices() {
 		// TODO Auto-generated method stub
@@ -62,6 +68,8 @@ public class MarketManager implements IFloodlightModule, IOFSwitchListener{
 	public void init(FloodlightModuleContext context)
 			throws FloodlightModuleException {
 		// TODO Auto-generated method stub
+		
+		//initialize the UI.
 		new UIThread();
         while(UIThread.getFlowUI() == null){
         	System.out.println("Waiting....");
@@ -87,20 +95,20 @@ public class MarketManager implements IFloodlightModule, IOFSwitchListener{
 	@Override
 	public void startUp(FloodlightModuleContext context) {
 		// TODO Auto-generated method stub
-		//controller.addOFSwitchListener(this);
+		controller.addOFSwitchListener(this);
 		
 	}
 	
 	@Override
 	public void addedSwitch(IOFSwitch sw) {
-		// TODO Auto-generated method stub
-		
+		// update the switches collection
+		switches.put(sw.getId(), sw);
 	}
 
 	@Override
 	public void removedSwitch(IOFSwitch sw) {
 		// TODO Auto-generated method stub
-		
+		switches.remove(sw.getId());
 	}
 
 	@Override
@@ -116,25 +124,6 @@ public class MarketManager implements IFloodlightModule, IOFSwitchListener{
 	}
 	
 	
-	public IDeviceService getDeviceManager() {
-		return deviceManager;
-	}
-
-	public void setDeviceManager(IDeviceService deviceManager) {
-		this.deviceManager = deviceManager;
-	}
-	
-	
-	public IFloodlightProviderService getController() {
-		return controller;
-	}
-
-	public void setController(IFloodlightProviderService controller) {
-		this.controller = controller;
-	}
-	
-	private FlowUI flowUI;
-	
 	public FlowUI getFlowUI() {
 		return flowUI;
 	}
@@ -143,9 +132,7 @@ public class MarketManager implements IFloodlightModule, IOFSwitchListener{
 		this.flowUI = flowUI;
 	}
 
-	//internal hashmap for switches and devices
-	private Map<Long, IOFSwitch> switches;
-	private Map<Long, IDevice> devices;
+
 	
 	public Map<Long, IOFSwitch> getSwitches() {
 		return switches;
@@ -174,8 +161,7 @@ public class MarketManager implements IFloodlightModule, IOFSwitchListener{
 			Entry<Long, IOFSwitch> entry = it.next();
 			IOFSwitch ofSwitch = entry.getValue();
 			
-			Long longID = entry.getKey();
-			switches.put(longID, ofSwitch);
+			switches.put(ofSwitch.getId(), ofSwitch);
 			
 		}
 		
@@ -205,8 +191,6 @@ public class MarketManager implements IFloodlightModule, IOFSwitchListener{
 		
 		return 0;
 	}
-
-
 
 
 	
