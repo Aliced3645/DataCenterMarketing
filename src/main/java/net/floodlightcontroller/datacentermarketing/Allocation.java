@@ -16,4 +16,6 @@ public interface Allocation {
 	// the end of this allocation
 	Date end = null;
 
+	
+	
 }

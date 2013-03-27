@@ -19,4 +19,7 @@ public interface Scheduler {
 	// remove allocation
 	boolean dealloc(Allocation allocation);
 
+	// get bandwidth
+	Status getBandWidth();
+
 }
