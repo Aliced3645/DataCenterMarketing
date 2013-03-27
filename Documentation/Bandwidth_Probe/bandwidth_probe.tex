@@ -1,0 +1,59 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8x]{inputenc}
+
+%opening
+\title{Note on Bandwidth Estimation}
+\author{rui zhou}
+
+\begin{document}
+
+\maketitle
+
+ 
+\section{Target}
+We need to way to determine the available bandwidth between two hosts with in our action network.
+
+\section{Solution}
+\subsection{Existing Approaches}
+
+There are some traditional ways to do bandwidth estimation:
+\begin{enumerate}
+ \item 
+Passive Estimation\\
+Based on the statistics data from previous traffic. This is not quite useful in out data center networks
+ \item 
+Active Estimation : Package Pair\\
+Send two package  through the link we want to test, waiting for the echo. Estimate the available bandwidth 
+by examination on the difference of the gaps between the first bits of the sent packages and the echos. 
+\item
+IGI Algorithm\\
+The IGI algorithm sends a sequence of packet trains with increasing initial packet gap. We monitor
+the difference between the average output gap and the input gap for each train and use the first
+train for which the two are equal. This point is called turning point. At this point, we use the IGI
+formula to compute the competing bandwidth. The available bandwidth is obtained by subtracting
+the estimated competing traffic bandwidth from an estimate of the bottleneck link bandwidth. 
+\end{enumerate}
+
+
+\subsection{Drawbacks}
+Drawbacks of the aforementioned techniques:\\
+They all requires sending multiple packets through a period of time, and its accuracy is largely affected by the variation of the  competing 
+traffic. The statistics nature of this algorithm make a real-time estimation very hard to achieve.
+
+\subsection{Proposed Solution}
+Bandwidth estimation based on network resource allocation scheduler and an variant factor $\alpha$. 
+
+
+ 
+
+\section{Reference}
+Estimating Available Bandwidth
+Using Packet Pair Probing, Ningning Hu, Peter Steenkiste
+September 9, 2002
+CMU-CS-02-166\\
+
+Evaluation and Characterization of Available
+Bandwidth Probing Techniques, Ningning Hu, Student Member, IEEE, and Peter Steenkiste, Senior Member, IEEE\\
+
+
+\end{document}

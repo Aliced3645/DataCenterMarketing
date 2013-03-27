@@ -1,0 +1,35 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8x]{inputenc}
+
+%opening
+\title{Note on Bandwidth Estimation}
+\author{rui zhou}
+
+\begin{document}
+
+\maketitle
+
+ 
+\section{Target}
+We need to way to determine the available bandwidth between two hosts with in our action network.
+
+\section{Solution}
+There are some traditional ways to do bandwidth estimation:
+\begin{enumerate}
+ \item 
+Passive Estimation\\
+Based on the statistics data from previous traffic. This is not quite useful in out data center networks
+ \item 
+Active Estimation : Package Pair\\
+Based on the statistics data from previous traffic. This is not quite useful in out data center networks
+
+
+\end{enumerate}
+
+\section{Conclusion}
+
+\section{Reference}
+
+
+
+\end{document}
