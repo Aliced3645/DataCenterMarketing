@@ -49,7 +49,7 @@ public class LowLevelController implements IFloodlightModule, IOFSwitchListener,
 	// internal hashmap for switches and devices
 	private Map<Long, IOFSwitch> switches;
 	private Map<Long, IDevice> devices;
-
+	
 	@Override
 	public Collection<Class<? extends IFloodlightService>> getModuleServices() {
 		// TODO Auto-generated method stub
@@ -264,9 +264,9 @@ public class LowLevelController implements IFloodlightModule, IOFSwitchListener,
 	
 	
 	//add an entry in the switch's flow table
-	//public boolean addFlowEntry(){
-		
-	//}
+	public boolean addFlowEntry(){
+		return false;
+	}
 	
 	
 
