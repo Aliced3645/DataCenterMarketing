@@ -41,7 +41,6 @@ public class Main {
      * @throws FloodlightModuleException 
      */
 	
-	
     public static void main(String[] args) throws FloodlightModuleException {
         
     	//initializeMarketModule();
@@ -68,8 +67,6 @@ public class Main {
         // Run the main floodlight module
         IFloodlightProviderService controller =
                 moduleContext.getServiceImpl(IFloodlightProviderService.class);
-       
-      	
         
         // This call blocks, it has to be the last line in the main
         controller.run();

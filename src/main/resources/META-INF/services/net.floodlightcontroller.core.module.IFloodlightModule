@@ -27,5 +27,5 @@ net.floodlightcontroller.firewall.Firewall
 net.floodlightcontroller.loadbalancer.LoadBalancer
 net.floodlightcontroller.benchmarkcontroller.FlowPusherController
 net.floodlightcontroller.mactracker.MACTracker
-net.floodlightcontroller.datacentermarketing.MarketManager
+net.floodlightcontroller.datacentermarketing.controller.LowLevelController
 
