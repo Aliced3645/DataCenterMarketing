@@ -1,38 +1,10 @@
 package net.floodlightcontroller.datacentermarketing;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-
-import org.openflow.protocol.OFPhysicalPort;
-import org.slf4j.LoggerFactory;
-
-import net.floodlightcontroller.benchmarkcontroller.FlowPusherController;
-import net.floodlightcontroller.core.IFloodlightProviderService;
 import net.floodlightcontroller.core.IOFSwitch;
-import net.floodlightcontroller.core.IOFSwitchListener;
-import net.floodlightcontroller.core.module.FloodlightModuleContext;
-import net.floodlightcontroller.core.module.FloodlightModuleException;
-import net.floodlightcontroller.core.module.IFloodlightModule;
-import net.floodlightcontroller.core.module.IFloodlightService;
 import net.floodlightcontroller.datacentermarketing.controller.LowLevelController;
 import net.floodlightcontroller.devicemanager.IDevice;
-import net.floodlightcontroller.devicemanager.IDeviceService;
-import net.floodlightcontroller.devicemanager.SwitchPort;
-import net.floodlightcontroller.devicemanager.internal.DeviceManagerImpl;
-import net.floodlightcontroller.routing.IRoutingService;
-import net.floodlightcontroller.routing.Route;
-import net.floodlightcontroller.staticflowentry.IStaticFlowEntryPusherService;
-import net.floodlightcontroller.topology.ITopologyService;
 
 //logical layer for datacenter networking
 //It implements data center marketing via the aid of low level controller and scheduler

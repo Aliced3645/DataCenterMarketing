@@ -68,6 +68,15 @@ public class LowLevelController implements IFloodlightModule, IOFSwitchListener 
 		return l;
 	}
 
+	
+	private void buildDatacenterMarketing(){
+		/* attach this module to MarketManager class */
+		MarketManager marketManager = MarketManager.getInstance();
+		marketManager.setLowLevelController(this);
+		marketManager.setDevices(this.devices);
+		marketManager.setSwitches(this.switches);
+	}
+	
 	@Override
 	public void init(FloodlightModuleContext context)
 			throws FloodlightModuleException {
@@ -86,12 +95,8 @@ public class LowLevelController implements IFloodlightModule, IOFSwitchListener 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		/* attach this module to MarketManager class */
-		MarketManager marketManager = MarketManager.getInstance();
-		marketManager.setLowLevelController(this);
-		marketManager.setDevices(this.devices);
-		marketManager.setSwitches(this.switches);
+		
+		buildDatacenterMarketing();
 	}
 
 	@Override
@@ -209,5 +214,7 @@ public class LowLevelController implements IFloodlightModule, IOFSwitchListener 
 
 		return routes;
 	}
+	
+	
 
 }
