@@ -379,7 +379,7 @@ public class FlowUI extends JDialog {
 				btnGetRoutes.addActionListener(new ActionListener(){
 					public void actionPerformed(ActionEvent arg0) {
 						
-						/*
+						
 						availablePathsTextArea.setText("");
 						
 						//get the input 
@@ -396,7 +396,7 @@ public class FlowUI extends JDialog {
 						for(Route route : routes){
 							availablePathsTextArea.append(route.toString() + "\n");
 						}
-						*/
+						
 						
 					}
 				});

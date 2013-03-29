@@ -1,10 +1,12 @@
 package net.floodlightcontroller.datacentermarketing;
 
 
+import java.util.ArrayList;
 import java.util.Map;
 import net.floodlightcontroller.core.IOFSwitch;
 import net.floodlightcontroller.datacentermarketing.controller.LowLevelController;
 import net.floodlightcontroller.devicemanager.IDevice;
+import net.floodlightcontroller.routing.Route;
 
 //logical layer for datacenter networking
 //It implements data center marketing via the aid of low level controller and scheduler
@@ -78,6 +80,10 @@ public class MarketManager {
 
 	public void setLowLevelController(LowLevelController lowLevelController) {
 		this.lowLevelController = lowLevelController;
+	}
+	
+	public ArrayList<Route> getNonLoopPaths(long srcID, long destID){
+		return lowLevelController.getNonLoopPaths(srcID, destID);
 	}
 	
 }

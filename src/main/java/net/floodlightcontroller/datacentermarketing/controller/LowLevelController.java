@@ -8,13 +8,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.openflow.protocol.OFMessage;
+import org.openflow.protocol.OFType;
+
+import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
+import net.floodlightcontroller.core.IOFMessageListener;
 import net.floodlightcontroller.core.IOFSwitch;
 import net.floodlightcontroller.core.IOFSwitchListener;
 import net.floodlightcontroller.core.module.FloodlightModuleContext;
 import net.floodlightcontroller.core.module.FloodlightModuleException;
 import net.floodlightcontroller.core.module.IFloodlightModule;
 import net.floodlightcontroller.core.module.IFloodlightService;
+import net.floodlightcontroller.counter.ICounterStoreService;
 import net.floodlightcontroller.datacentermarketing.MarketManager;
 import net.floodlightcontroller.devicemanager.IDevice;
 import net.floodlightcontroller.devicemanager.IDeviceService;
@@ -31,14 +37,15 @@ import net.floodlightcontroller.topology.ITopologyService;
  * 1. Assign a switch, and flow properties, to reserve bandwidth
  * 
  */
-public class LowLevelController implements IFloodlightModule, IOFSwitchListener {
+public class LowLevelController implements IFloodlightModule, IOFSwitchListener, IOFMessageListener {
 
 	protected IFloodlightProviderService controller;
 	protected IDeviceService deviceManager;
 	protected IStaticFlowEntryPusherService staticFlowEntryPusher;
 	protected ITopologyService topologyManager;
 	protected IRoutingService routingManager;
-
+	protected ICounterStoreService counterStore;
+	
 	// internal hashmap for switches and devices
 	private Map<Long, IOFSwitch> switches;
 	private Map<Long, IDevice> devices;
@@ -64,7 +71,7 @@ public class LowLevelController implements IFloodlightModule, IOFSwitchListener 
 		l.add(IStaticFlowEntryPusherService.class);
 		l.add(ITopologyService.class);
 		l.add(IRoutingService.class);
-
+		l.add(ICounterStoreService.class);
 		return l;
 	}
 
@@ -88,7 +95,8 @@ public class LowLevelController implements IFloodlightModule, IOFSwitchListener 
 				.getServiceImpl(IStaticFlowEntryPusherService.class);
 		topologyManager = context.getServiceImpl(ITopologyService.class);
 		routingManager = context.getServiceImpl(IRoutingService.class);
-
+		counterStore = context.getServiceImpl(ICounterStoreService.class);
+		
 		try {
 			switches = new HashMap<Long, IOFSwitch>();
 			devices = new HashMap<Long, IDevice>();
@@ -214,6 +222,51 @@ public class LowLevelController implements IFloodlightModule, IOFSwitchListener 
 
 		return routes;
 	}
+
+	@Override
+	public boolean isCallbackOrderingPrereq(OFType type, String name) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isCallbackOrderingPostreq(OFType type, String name) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public net.floodlightcontroller.core.IListener.Command receive(
+			IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/*
+	 * In order to set the bandwidth of a particular flow in a particular switch:
+	 * 1. Get the switch object / ID
+	 * 2. Be able to push an entry 
+	 * 3. Set the maximum counter for bytes ( so as to control the speed , using the counter of queue!)
+	 * 4. For every second, refresh the counter to ensure the bandwidth
+	 */
+	
+	/*  The mapping from flow to queues takes place within the OpenFlow protocol.
+	 *	Assuming that a queue is already configured, the user can associate a flow with an OFPAT_ENQUEUE 
+	 *	action which forwards the packet through the specifc queue in that port. 
+	 *	Note that an enqueue action should override any TOS/VLAN_PCP related behavior 
+	 *	that is potentially defined in the switch. 
+	 *	In all cases, the packet should not change due to an enqueue action. 
+	 *  If the switch needs to set TOS/PCP bits for internal handling, the original values should 
+	 *  be restored before sending the packet out.
+	 */
+	
+	//Code borrowed from QueueCreator.
+	
+	
+	//add an entry in the switch's flow table
+	//public boolean addFlowEntry(){
+		
+	//}
 	
 	
 
