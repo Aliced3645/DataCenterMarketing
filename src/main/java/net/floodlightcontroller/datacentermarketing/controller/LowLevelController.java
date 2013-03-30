@@ -1,21 +1,38 @@
 package net.floodlightcontroller.datacentermarketing.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.openflow.protocol.OFMatch;
 import org.openflow.protocol.OFMessage;
+import org.openflow.protocol.OFPacketQueue;
+import org.openflow.protocol.OFPhysicalPort;
+import org.openflow.protocol.OFPort;
+import org.openflow.protocol.OFQueueGetConfigReply;
+import org.openflow.protocol.OFQueueGetConfigRequest;
+import org.openflow.protocol.OFQueueProp;
 import org.openflow.protocol.OFType;
+import org.openflow.protocol.OFVendor;
+import org.openflow.protocol.OFQueueProp.OFQueuePropType;
+import org.openflow.util.U16;
+import org.openflow.vendor.openflow.OFOpenFlowVendorData;
+import org.openflow.vendor.openflow.OFQueueDeleteVendorData;
+import org.openflow.vendor.openflow.OFQueueModifyVendorData;
 
 import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
 import net.floodlightcontroller.core.IOFMessageListener;
 import net.floodlightcontroller.core.IOFSwitch;
 import net.floodlightcontroller.core.IOFSwitchListener;
+import net.floodlightcontroller.core.IListener.Command;
 import net.floodlightcontroller.core.module.FloodlightModuleContext;
 import net.floodlightcontroller.core.module.FloodlightModuleException;
 import net.floodlightcontroller.core.module.IFloodlightModule;
@@ -33,11 +50,32 @@ import net.floodlightcontroller.topology.ITopologyService;
 // Low level controller interacts with Floodlight, all above modules, access SDN only by this class.
 // The controller provides all interfaces with for Datacenter marketing over SDN.
 //the low level controller does the following stuff:
-/*
- * 1. Assign a switch, and flow properties, to reserve bandwidth
- * 
- */
-public class LowLevelController implements IFloodlightModule, IOFSwitchListener, IOFMessageListener {
+
+//The class is used to map the flow entry to a ( queue - port - switch ) tuple
+class FlowQueue {
+	
+	OFMatch ofMatch;
+	IOFSwitch ofSwitch;
+	short portNumber;
+	short queueNumber;
+
+	public FlowQueue() {
+	}
+
+	public FlowQueue(OFMatch ofMatch, IOFSwitch ofSwitch, short portNumber,
+			short queueNumber) {
+		super();
+		this.ofMatch = ofMatch;
+		this.ofSwitch = ofSwitch;
+		this.portNumber = portNumber;
+		this.queueNumber = queueNumber;
+	};
+	
+}
+
+
+public class LowLevelController implements IFloodlightModule,
+		IOFSwitchListener, IOFMessageListener {
 
 	protected IFloodlightProviderService controller;
 	protected IDeviceService deviceManager;
@@ -45,11 +83,15 @@ public class LowLevelController implements IFloodlightModule, IOFSwitchListener,
 	protected ITopologyService topologyManager;
 	protected IRoutingService routingManager;
 	protected ICounterStoreService counterStore;
-	
+
 	// internal hashmap for switches and devices
 	private Map<Long, IOFSwitch> switches;
 	private Map<Long, IDevice> devices;
-	
+
+	// Manage all ( queue - port - switch - flow ) info
+	private Map<IOFSwitch, ArrayList<FlowQueue>> switchFlowQueues;
+	private Map<OFMatch, ArrayList<FlowQueue>> matchFlowQueues;
+
 	@Override
 	public Collection<Class<? extends IFloodlightService>> getModuleServices() {
 		// TODO Auto-generated method stub
@@ -75,15 +117,14 @@ public class LowLevelController implements IFloodlightModule, IOFSwitchListener,
 		return l;
 	}
 
-	
-	private void buildDatacenterMarketing(){
+	private void buildDatacenterMarketing() {
 		/* attach this module to MarketManager class */
 		MarketManager marketManager = MarketManager.getInstance();
 		marketManager.setLowLevelController(this);
 		marketManager.setDevices(this.devices);
 		marketManager.setSwitches(this.switches);
 	}
-	
+
 	@Override
 	public void init(FloodlightModuleContext context)
 			throws FloodlightModuleException {
@@ -96,14 +137,14 @@ public class LowLevelController implements IFloodlightModule, IOFSwitchListener,
 		topologyManager = context.getServiceImpl(ITopologyService.class);
 		routingManager = context.getServiceImpl(IRoutingService.class);
 		counterStore = context.getServiceImpl(ICounterStoreService.class);
-		
+
 		try {
 			switches = new HashMap<Long, IOFSwitch>();
 			devices = new HashMap<Long, IDevice>();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		buildDatacenterMarketing();
 	}
 
@@ -111,7 +152,8 @@ public class LowLevelController implements IFloodlightModule, IOFSwitchListener,
 	public void startUp(FloodlightModuleContext context) {
 		// TODO Auto-generated method stub
 		controller.addOFSwitchListener(this);
-
+		controller.addOFMessageListener(OFType.QUEUE_GET_CONFIG_REPLY, this);
+		controller.addOFMessageListener(OFType.BARRIER_REPLY, this);
 	}
 
 	@Override
@@ -235,39 +277,141 @@ public class LowLevelController implements IFloodlightModule, IOFSwitchListener,
 		return false;
 	}
 
+	// each port supports up to 7 queues
+	protected final int QUEUE_PER_PORT = 7;
+
 	@Override
 	public net.floodlightcontroller.core.IListener.Command receive(
 			IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
-		// TODO Auto-generated method stub
-		return null;
+		switch (msg.getType()) {
+
+		case QUEUE_GET_CONFIG_REPLY:
+			System.out.println("Got a Queue Config Reply!!");
+			OFQueueGetConfigReply reply = (OFQueueGetConfigReply) msg;
+			List<OFPacketQueue> queues = reply.getQueues();
+
+			System.out.println("This is the port: " + reply.getPortNumber());
+
+			System.out.println("Number of queues: " + queues.size());
+
+			for (OFPacketQueue queue : queues) {
+				long qid = queue.getQueueId();
+				List<OFQueueProp> props = queue.getProperties();
+				System.out.println(" qid = " + qid);
+				System.out.println(" num props = " + props.size());
+				for (OFQueueProp prop : props) {
+					System.out.println(" type = " + prop.getType());
+					System.out.println(" rate = " + prop.getRate());
+				}
+
+			}
+			break;
+		default:
+			System.out.println("unexpected message type: " + msg.getType());
+		}
+		;
+
+		return Command.CONTINUE;
 	}
-	
+
+	private void getAllQueueConfigs(IOFSwitch sw) {
+		OFQueueGetConfigRequest m = new OFQueueGetConfigRequest();
+
+		Collection<OFPhysicalPort> ports = sw.getPorts();
+
+		for (OFPhysicalPort port : ports) {
+			if (U16.f(port.getPortNumber()) >= U16
+					.f(OFPort.OFPP_MAX.getValue())) {
+				continue;
+			}
+
+			System.out.println("Sending a queue get config to: "
+					+ port.getPortNumber());
+
+			m.setPortNumber(port.getPortNumber());
+
+			try {
+				sw.write(m, null);
+			} catch (IOException e) {
+				System.out.println("Tried to write to switch "
+						+ sw.getStringId() + "but got " + e.getMessage());
+			}
+		}
+
+		sw.flush();
+	}
+
+	private void sendOFVendorData(IOFSwitch sw, OFOpenFlowVendorData data) {
+		OFVendor msg = (OFVendor) this.controller.getOFMessageFactory()
+				.getMessage(OFType.VENDOR);
+		msg.setVendor(OFOpenFlowVendorData.OF_VENDOR_ID);
+
+		msg.setVendorData(data);
+		msg.setLengthU(OFVendor.MINIMUM_LENGTH + data.getLength());
+
+		try {
+			sw.write(msg, null);
+		} catch (IOException e) {
+			System.out.println("Tried to write to switch " + sw.getStringId()
+					+ "but got " + e.getMessage());
+		}
+
+		sw.flush();
+	}
+
+	private void createQueue(IOFSwitch sw, short portNumber, int queueId,
+			short rate) {
+		OFQueueProp prop = new OFQueueProp();
+		prop.setType(OFQueuePropType.OFPQT_MIN_RATE);
+		prop.setRate(rate);
+
+		OFPacketQueue queue = new OFPacketQueue(queueId);
+		queue.setProperties(new ArrayList<OFQueueProp>(Arrays.asList(prop)));
+
+		OFQueueModifyVendorData queueModifyData = new OFQueueModifyVendorData();
+		queueModifyData.setPortNumber(portNumber);
+		queueModifyData.setQueues(new ArrayList<OFPacketQueue>(Arrays
+				.asList(queue)));
+
+		sendOFVendorData(sw, queueModifyData);
+	}
+
+	private void deleteQueue(IOFSwitch sw, short portNumber, int queueId) {
+		OFPacketQueue queue = new OFPacketQueue(queueId);
+
+		OFQueueDeleteVendorData queueDeleteData = new OFQueueDeleteVendorData();
+		queueDeleteData.setPortNumber(portNumber);
+		queueDeleteData.setQueues(new ArrayList<OFPacketQueue>(Arrays
+				.asList(queue)));
+
+		sendOFVendorData(sw, queueDeleteData);
+	}
+
 	/*
-	 * In order to set the bandwidth of a particular flow in a particular switch:
-	 * 1. Get the switch object / ID
-	 * 2. Be able to push an entry 
-	 * 3. Set the maximum counter for bytes ( so as to control the speed , using the counter of queue!)
-	 * 4. For every second, refresh the counter to ensure the bandwidth
+	 * In order to set the bandwidth of a particular flow in a particular
+	 * switch: 1. Get the switch object / ID 2. Be able to push an entry 3. Set
+	 * the maximum counter for bytes ( so as to control the speed , using the
+	 * counter of queue!) 4. For every second, refresh the counter to ensure the
+	 * bandwidth
 	 */
-	
-	/*  The mapping from flow to queues takes place within the OpenFlow protocol.
-	 *	Assuming that a queue is already configured, the user can associate a flow with an OFPAT_ENQUEUE 
-	 *	action which forwards the packet through the specifc queue in that port. 
-	 *	Note that an enqueue action should override any TOS/VLAN_PCP related behavior 
-	 *	that is potentially defined in the switch. 
-	 *	In all cases, the packet should not change due to an enqueue action. 
-	 *  If the switch needs to set TOS/PCP bits for internal handling, the original values should 
-	 *  be restored before sending the packet out.
+
+	/*
+	 * The mapping from flow to queues takes place within the OpenFlow protocol.
+	 * Assuming that a queue is already configured, the user can associate a
+	 * flow with an OFPAT_ENQUEUE action which forwards the packet through the
+	 * specifc queue in that port. Note that an enqueue action should override
+	 * any TOS/VLAN_PCP related behavior that is potentially defined in the
+	 * switch. In all cases, the packet should not change due to an enqueue
+	 * action. If the switch needs to set TOS/PCP bits for internal handling,
+	 * the original values should be restored before sending the packet out.
 	 */
-	
-	//Code borrowed from QueueCreator.
-	
-	
-	//add an entry in the switch's flow table
-	public boolean addFlowEntry(){
+
+	// Code borrowed from QueueCreator.
+
+	// add an entry in the switch's flow table
+	public boolean addFlowEntry() {
+		
 		return false;
 	}
-	
-	
 
 }
