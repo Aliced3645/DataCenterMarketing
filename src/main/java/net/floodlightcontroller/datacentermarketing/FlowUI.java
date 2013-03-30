@@ -21,6 +21,7 @@ import javax.swing.JTextField;
 import java.awt.Insets;
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -96,7 +97,7 @@ public class FlowUI extends JDialog {
 		}
 	}
 	
-	public void updateSwitchesTextArea(){
+	public void updateSwitchesTextArea() throws IOException{
 		//refresh: get the switches and host information
 		
 		marketManager.updateSwitches();
@@ -390,7 +391,13 @@ public class FlowUI extends JDialog {
 						long sourceID = Long.parseLong(sourceString);
 						long destID = Long.parseLong(destString);
 						
-						ArrayList<Route> routes = marketManager.getNonLoopPaths(sourceID, destID);
+						ArrayList<Route> routes = null;
+						try {
+							routes = marketManager.getNonLoopPaths(sourceID, destID);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						
 						//show them!
 						for(Route route : routes){
@@ -424,7 +431,12 @@ public class FlowUI extends JDialog {
 					switchesTextArea.setText("");
 					
 					updateHostsTextArea();
-					updateSwitchesTextArea();
+					try {
+						updateSwitchesTextArea();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 					
 					//System.out.println("abc");
 				}
