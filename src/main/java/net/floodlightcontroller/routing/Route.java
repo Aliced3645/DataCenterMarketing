@@ -131,6 +131,4 @@ public class Route implements Comparable<Route> {
     public int compareTo(Route o) {
         return ((Integer)switchPorts.size()).compareTo(o.switchPorts.size());
     }
-    
-    
 }

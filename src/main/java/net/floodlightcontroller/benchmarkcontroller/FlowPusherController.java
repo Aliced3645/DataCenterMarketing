@@ -24,7 +24,6 @@ import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IOFMessageListener;
 import net.floodlightcontroller.core.IOFSwitch;
 import net.floodlightcontroller.core.IOFSwitchListener;
-import net.floodlightcontroller.core.Main;
 import net.floodlightcontroller.core.module.FloodlightModuleContext;
 import net.floodlightcontroller.core.module.FloodlightModuleException;
 import net.floodlightcontroller.core.module.IFloodlightModule;
@@ -40,9 +39,8 @@ import org.openflow.util.HexString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+public class FlowPusherController implements IOFSwitchListener, IOFMessageListener, IFloodlightModule {
 
-public class FlowPusherController implements IOFSwitchListener,
-		IOFMessageListener, IFloodlightModule {
 	protected IFloodlightProviderService floodlightProvider;
 	protected static Logger logger;
 	protected IStaticFlowEntryPusherService staticFlowEntryPusher;
@@ -50,10 +48,10 @@ public class FlowPusherController implements IOFSwitchListener,
 	protected Random ran = new Random();
 	protected boolean stop = false;
 	protected final int TOTAL_FLOWS = 1500;
-
+	
 	Object lock = new Object();
 	double lastTime;
-
+	
 	protected BufferedWriter createRecorder;
 	protected String outPathCreate = "/tmp/createFlow.dat";
 
@@ -177,11 +175,9 @@ public class FlowPusherController implements IOFSwitchListener,
 		logger.info("this message is from:" + sw.getId());
 
 		switch (msg.getType()) {
-		
 		case BARRIER_REPLY:
 			synchronized(lock) {
 				if(!stop) {
-					
 					OFBarrierReply br = (OFBarrierReply)msg;
 					logger.info("received barrier reply " + br.getXid());
 					double time = (double)System.nanoTime()/1000000.0;
@@ -227,5 +223,4 @@ public class FlowPusherController implements IOFSwitchListener,
 	public void switchPortChanged(Long switchId) {
 		// TODO Auto-generated method stub
 	}
-
 }

@@ -93,7 +93,7 @@ public class FlowUI extends JDialog {
 		Iterator<Entry<Long,IDevice>> iterator = set.iterator();
 		while(iterator.hasNext()){
 			IDevice device = iterator.next().getValue();
-			hostsTextArea.append(device.toStringForUI() + "\n\n");
+			hostsTextArea.append(device.toString() + "\n\n");
 		}
 	}
 	

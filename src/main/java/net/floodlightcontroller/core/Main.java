@@ -23,16 +23,12 @@ import net.floodlightcontroller.core.internal.CmdLineSettings;
 import net.floodlightcontroller.core.module.FloodlightModuleException;
 import net.floodlightcontroller.core.module.FloodlightModuleLoader;
 import net.floodlightcontroller.core.module.IFloodlightModuleContext;
-import net.floodlightcontroller.datacentermarketing.FlowUI;
-import net.floodlightcontroller.datacentermarketing.UIThread;
 import net.floodlightcontroller.restserver.IRestApiService;
-import net.floodlightcontroller.datacentermarketing.*;
 
 /**
  * Host for the Floodlight main method
  * @author alexreimers
  */
-
 public class Main {
 
     /**
@@ -40,12 +36,8 @@ public class Main {
      * @param args
      * @throws FloodlightModuleException 
      */
-	
     public static void main(String[] args) throws FloodlightModuleException {
-        
-    	//initializeMarketModule();
-    	
-    	// Setup logger
+        // Setup logger
         System.setProperty("org.restlet.engine.loggerFacadeClass", 
                 "org.restlet.ext.slf4j.Slf4jLoggerFacade");
         
@@ -67,7 +59,6 @@ public class Main {
         // Run the main floodlight module
         IFloodlightProviderService controller =
                 moduleContext.getServiceImpl(IFloodlightProviderService.class);
-        
         // This call blocks, it has to be the last line in the main
         controller.run();
     }

@@ -277,10 +277,15 @@ public class StaticFlowEntryPusher
                         || key.equals("id"))
                     continue; // already handled
                 // explicitly ignore timeouts and wildcards
-                if (key.equals(COLUMN_HARD_TIMEOUT) || key.equals(COLUMN_IDLE_TIMEOUT) ||
-                        key.equals(COLUMN_WILDCARD))
-                    continue;
-                if (key.equals(COLUMN_ACTIVE)) {
+//                if (key.equals(COLUMN_HARD_TIMEOUT) || key.equals(COLUMN_IDLE_TIMEOUT) ||
+//                        key.equals(COLUMN_WILDCARD))
+//                    continue;
+                if (key.equals(COLUMN_WILDCARD) || key.equals(COLUMN_IDLE_TIMEOUT))
+                	continue;
+                if (key.equals(COLUMN_HARD_TIMEOUT)) {
+                	short timeout = Short.parseShort((String)row.get(key));
+                	flowMod.setHardTimeout(timeout);
+                } else if (key.equals(COLUMN_ACTIVE)) {
                     if  (!Boolean.valueOf((String) row.get(COLUMN_ACTIVE))) {
                         log.debug("skipping inactive entry {} for switch {}",
                                 entryName, switchName);

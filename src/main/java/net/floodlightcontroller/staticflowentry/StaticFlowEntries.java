@@ -200,7 +200,9 @@ public class StaticFlowEntries {
         
         if (match.getTransportDestination() != 0)
         	entry.put(StaticFlowEntryPusher.COLUMN_TP_DST, Short.toString(match.getTransportDestination()));
-        
+
+        if (fm.getHardTimeout() != 0)
+        	entry.put(StaticFlowEntryPusher.COLUMN_HARD_TIMEOUT, Short.toString(fm.getHardTimeout()));
         return entry;
     }
     

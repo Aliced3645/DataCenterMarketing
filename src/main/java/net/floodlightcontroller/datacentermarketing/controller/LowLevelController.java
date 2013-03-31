@@ -174,6 +174,8 @@ public class LowLevelController implements IFloodlightModule,
 	public void init(FloodlightModuleContext context)
 			throws FloodlightModuleException {
 		// TODO Auto-generated method stub
+		for(int i = 0; i < 100; i ++)
+			System.out.println("INITING!!!!!!!!!!!");
 		controller = context.getServiceImpl(IFloodlightProviderService.class);
 		deviceManager = context.getServiceImpl(IDeviceService.class);
 		staticFlowEntryPusher = context
