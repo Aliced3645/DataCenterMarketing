@@ -174,7 +174,7 @@ public class LowLevelController implements IFloodlightModule,
 	public void init(FloodlightModuleContext context)
 			throws FloodlightModuleException {
 		// TODO Auto-generated method stub
-		for(int i = 0; i < 100; i ++)
+		for (int i = 0; i < 100; i++)
 			System.out.println("INITING!!!!!!!!!!!");
 		controller = context.getServiceImpl(IFloodlightProviderService.class);
 		deviceManager = context.getServiceImpl(IDeviceService.class);
@@ -239,14 +239,15 @@ public class LowLevelController implements IFloodlightModule,
 		return devices;
 	}
 
-	//send queue queries to port
-	private void sendQueueQuery(IOFSwitch ofSwitch, short portNumber) throws IOException{
+	// send queue queries to port
+	private void sendQueueQuery(IOFSwitch ofSwitch, short portNumber)
+			throws IOException {
 		OFQueueGetConfigRequest queueQueryMessage = new OFQueueGetConfigRequest();
 		queueQueryMessage.setPortNumber(portNumber);
 		ofSwitch.write(queueQueryMessage, null);
 		return;
 	}
-	
+
 	// basic functionality begins here..
 	public void updateSwitches() throws IOException {
 		switches.clear();
@@ -262,7 +263,7 @@ public class LowLevelController implements IFloodlightModule,
 
 		Set<Entry<Long, IOFSwitch>> s = switchesMap.entrySet();
 		Iterator<Entry<Long, IOFSwitch>> it = s.iterator();
-		
+
 		while (it.hasNext()) {
 			Entry<Long, IOFSwitch> entry = it.next();
 			IOFSwitch ofSwitch = entry.getValue();
@@ -323,8 +324,8 @@ public class LowLevelController implements IFloodlightModule,
 		for (SwitchPort sourceSwitchPort : srcSwitchPorts) {
 			for (SwitchPort destSwitchPort : destSwitchPorts) {
 				ArrayList<Route> someRoutes = routingManager.getRoutes(
-						sourceSwitchPort.getSwitchDPID(),
-						destSwitchPort.getSwitchDPID(), true);
+						sourceSwitchPort.getSwitchDPID(), destSwitchPort
+								.getSwitchDPID(), true);
 				routes.addAll(someRoutes);
 				someRoutes = null;
 			}
@@ -348,13 +349,13 @@ public class LowLevelController implements IFloodlightModule,
 	@Override
 	public net.floodlightcontroller.core.IListener.Command receive(
 			IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
-		
+
 		switch (msg.getType()) {
 		// get the reply, update related hash tables for queue/port/switch
 		// management
-		
+
 		case QUEUE_GET_CONFIG_REPLY:
-			
+
 			System.out.println("Got a Queue Config Reply!!");
 			OFQueueGetConfigReply reply = (OFQueueGetConfigReply) msg;
 			List<OFPacketQueue> queues = reply.getQueues();
@@ -374,12 +375,12 @@ public class LowLevelController implements IFloodlightModule,
 				}
 			}
 			break;
-			
+
 		case ERROR:
-			//OFRBRC_BAD_TYPE
-			OFError error = (OFError)msg;
-			//System.out.println("wowow");
-			
+			// OFRBRC_BAD_TYPE
+			OFError error = (OFError) msg;
+			// System.out.println("wowow");
+
 			break;
 		default:
 			System.out.println("unexpected message type: " + msg.getType());

@@ -1,37 +1,50 @@
+/**
+ * 
+ */
 package net.floodlightcontroller.datacentermarketing.Scheduling;
 
-import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
-public class Scheduler implements SchedulerIterface {
+import net.floodlightcontroller.routing.Route;
+import net.floodlightcontroller.topology.NodePortTuple;
 
-	@Override
-	public int alloc(AllocationInterface allocation) {
-		// TODO Auto-generated method stub
-		return 0;
+/**
+ * @author openflow
+ * 
+ */
+public class Scheduler {
+	private HashMap<Integer, Switch> switches;
+
+	private Scheduler instance = null;
+
+	private Scheduler() {
+		switches = new HashMap<Integer, Switch>();
+
 	}
 
-	@Override
-	public boolean dealloc(AllocationInterface allocation) {
-		// TODO Auto-generated method stub
-		return false;
+	public Scheduler instance() {
+		if (instance == null)
+			instance = new Scheduler();
+
+		return instance;
+
 	}
 
-	@Override
-	public StatusInterface getBandWidth() {
-		// TODO Auto-generated method stub
-		return null;
+	/*
+	 * validate to see if a rppute is feaisble in current scheuler
+	 */
+	public boolean validate_route(Route rt) {
+		// we need to validate all the queue reservarions
+		List<NodePortTuple> switchPorts = rt.getPath();
+
 	}
 
-	@Override
-	public StatusInterface getBandWidth(Date time) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public boolean register_route(Route rt) {
+		if (!validate_route(rt))
+			return false;
 
-	@Override
-	public SchedulerIterface getScheduler(Object identifier) {
-		// TODO Auto-generated method stub
-		return null;
+		return true;
 	}
 
 }

@@ -1,6 +1,6 @@
 package net.floodlightcontroller.datacentermarketing.Scheduling;
 
-public enum AllocationPriorities {
-	PRESERVE, EXPANDABLE;
+public enum Port_Type {
+	IN, OUT,BI, UNDEFINED;
 
 }
