@@ -8,6 +8,6 @@ package net.floodlightcontroller.datacentermarketing.Scheduling;
  * 
  */
 public enum Queue_Status {
-	AVAILABLE, RESERVED;
+	AVAILABLE/* can be reserve */, RESERVED/* cannot be reserve */;
 
 }

@@ -4,7 +4,9 @@
 package net.floodlightcontroller.datacentermarketing.Scheduling;
 
 /**
- * @author openflow Queue timed allocation
+ * @author openflow
+ * 
+ *         Queue timed allocation
  */
 public class QTA implements Comparable<QTA> {
 

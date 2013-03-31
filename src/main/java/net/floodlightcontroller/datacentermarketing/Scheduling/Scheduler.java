@@ -35,9 +35,14 @@ public class Scheduler {
 	 * validate to see if a rppute is feaisble in current scheuler
 	 */
 	public boolean validate_route(Route rt) {
-		// we need to validate all the queue reservarions
+		// we need to validate all the possible queue reservations
 		List<NodePortTuple> switchPorts = rt.getPath();
-
+		for (int a = 0; a < switchPorts.size(); a++) {
+			NodePortTuple np = switchPorts.get(a);
+			// validate this port is ok for reservation
+			// TODO
+		}
+		return false;
 	}
 
 	public boolean register_route(Route rt) {
