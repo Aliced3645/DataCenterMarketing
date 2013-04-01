@@ -55,68 +55,7 @@ import net.floodlightcontroller.topology.ITopologyService;
 
 //The class is used to map the flow entry to a ( queue - port - switch ) tuple
 //In this project, there must be one to one relation
-class FlowQueue {
 
-	OFMatch ofMatch;
-	IOFSwitch ofSwitch;
-	short portNumber;
-	short queueNumber;
-
-	public FlowQueue() {
-	}
-
-	public FlowQueue(OFMatch ofMatch, IOFSwitch ofSwitch, short portNumber,
-			short queueNumber) {
-		super();
-		this.ofMatch = ofMatch;
-		this.ofSwitch = ofSwitch;
-		this.portNumber = portNumber;
-		this.queueNumber = queueNumber;
-	};
-}
-
-class SwitchPortTuple {
-	IOFSwitch ofSwitch;
-	short portNumber;
-}
-
-class PortQueueUsage {
-
-	// each port supports up to 7 queues
-	protected final int QUEUE_PER_PORT = 7;
-
-	LinkedList<Integer> usedQueues;
-	LinkedList<Integer> unusedQueues;
-
-	public PortQueueUsage() {
-		usedQueues = new LinkedList<Integer>();
-		unusedQueues = new LinkedList<Integer>();
-		int[] queues = { 0, 1, 2, 3, 4, 5, 6 };
-		for (int i : queues) {
-			unusedQueues.add(i);
-		}
-	}
-
-	// returns -1 if fails
-	public int getFreeQueueId() {
-		if (usedQueues.size() == QUEUE_PER_PORT)
-			return -1;
-		int id = unusedQueues.poll();
-		usedQueues.addFirst(id);
-		return id;
-	}
-
-	public boolean releaseQueueId(int id) {
-		for (int i = 0; i < usedQueues.size(); i++) {
-			if (usedQueues.get(i) == id) {
-				usedQueues.remove(i);
-				unusedQueues.addFirst(i);
-				return true;
-			}
-		}
-		return false;
-	}
-}
 
 public class LowLevelController implements IFloodlightModule,
 		IOFSwitchListener, IOFMessageListener {
@@ -132,10 +71,6 @@ public class LowLevelController implements IFloodlightModule,
 	private Map<Long, IOFSwitch> switches;
 	private Map<Long, IDevice> devices;
 
-	// Manage all ( queue - port - switch - flow ) info
-	private Map<IOFSwitch, ArrayList<FlowQueue>> switchFlowQueues;
-	private Map<OFMatch, ArrayList<FlowQueue>> matchFlowQueues;
-	private Map<SwitchPortTuple, PortQueueUsage> portQueueUsages;
 
 	@Override
 	public Collection<Class<? extends IFloodlightService>> getModuleServices() {
@@ -187,9 +122,6 @@ public class LowLevelController implements IFloodlightModule,
 		try {
 			switches = new HashMap<Long, IOFSwitch>();
 			devices = new HashMap<Long, IDevice>();
-			switchFlowQueues = new HashMap<IOFSwitch, ArrayList<FlowQueue>>();
-			matchFlowQueues = new HashMap<OFMatch, ArrayList<FlowQueue>>();
-			portQueueUsages = new HashMap<SwitchPortTuple, PortQueueUsage>();
 
 		} catch (Exception e) {
 			e.printStackTrace();
