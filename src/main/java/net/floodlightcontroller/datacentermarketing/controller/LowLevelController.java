@@ -71,7 +71,7 @@ public class LowLevelController implements IFloodlightModule,
 	private Map<Long, IOFSwitch> switches;
 	private Map<Long, IDevice> devices;
 
-
+	
 	@Override
 	public Collection<Class<? extends IFloodlightService>> getModuleServices() {
 		// TODO Auto-generated method stub
@@ -394,6 +394,7 @@ public class LowLevelController implements IFloodlightModule,
 
 		sendOFVendorData(sw, queueDeleteData);
 	}
+	
 
 	/*
 	 * In order to set the bandwidth of a particular flow in a particular
@@ -422,4 +423,11 @@ public class LowLevelController implements IFloodlightModule,
 		return false;
 	}
 
+	
+	//really assign routes for a flow (with queue creation)
+	
+	public boolean designateActualRoutes(){
+		
+		return false;
+	}
 }
