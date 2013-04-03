@@ -4,6 +4,8 @@ package net.floodlightcontroller.datacentermarketing;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
 import net.floodlightcontroller.core.IOFSwitch;
 import net.floodlightcontroller.datacentermarketing.controller.LowLevelController;
 import net.floodlightcontroller.devicemanager.IDevice;
@@ -71,7 +73,7 @@ public class MarketManager {
 		lowLevelController.updateDevices();
 	}
 	
-	public void updateSwitches() throws IOException{
+	public void updateSwitches() throws IOException, InterruptedException, ExecutionException{
 		lowLevelController.updateSwitches();
 	}
 
@@ -83,7 +85,7 @@ public class MarketManager {
 		this.lowLevelController = lowLevelController;
 	}
 	
-	public ArrayList<Route> getNonLoopPaths(long srcID, long destID) throws IOException{
+	public ArrayList<Route> getNonLoopPaths(long srcID, long destID) throws IOException, InterruptedException, ExecutionException{
 		return lowLevelController.getNonLoopPaths(srcID, destID);
 	}
 	

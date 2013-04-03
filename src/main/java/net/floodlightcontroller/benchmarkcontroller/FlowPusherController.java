@@ -113,6 +113,7 @@ public class FlowPusherController implements IOFSwitchListener, IOFMessageListen
 		// TODO Auto-generated method stub
 		floodlightProvider.addOFMessageListener(OFType.BARRIER_REPLY, this);
 		floodlightProvider.addOFSwitchListener(this);
+		
 	}
 
 	private void sendBarrier(IOFSwitch sw, FloodlightContext cntx) {
@@ -175,6 +176,10 @@ public class FlowPusherController implements IOFSwitchListener, IOFMessageListen
 		logger.info("this message is from:" + sw.getId());
 
 		switch (msg.getType()) {
+		case FEATURES_REPLY:
+			System.out.println("\n\n feature reply!! \n\n");
+			break;
+		
 		case BARRIER_REPLY:
 			synchronized(lock) {
 				if(!stop) {

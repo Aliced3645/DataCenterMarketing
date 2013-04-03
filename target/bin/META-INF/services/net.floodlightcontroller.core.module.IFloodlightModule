@@ -28,3 +28,4 @@ net.floodlightcontroller.core.test.MockThreadPoolService
 net.floodlightcontroller.firewall.Firewall
 net.floodlightcontroller.loadbalancer.LoadBalancer
 net.floodlightcontroller.datacentermarketing.controller.LowLevelController
+net.floodlightcontroller.benchmarkcontroller.FlowPusherController

@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.JTextArea;
 import javax.swing.JList;
@@ -97,7 +98,7 @@ public class FlowUI extends JDialog {
 		}
 	}
 	
-	public void updateSwitchesTextArea() throws IOException{
+	public void updateSwitchesTextArea() throws IOException, InterruptedException, ExecutionException{
 		//refresh: get the switches and host information
 		
 		marketManager.updateSwitches();
@@ -397,6 +398,12 @@ public class FlowUI extends JDialog {
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (ExecutionException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 						
 						//show them!
@@ -434,6 +441,12 @@ public class FlowUI extends JDialog {
 					try {
 						updateSwitchesTextArea();
 					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ExecutionException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}

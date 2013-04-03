@@ -961,6 +961,7 @@ public class Controller implements IFloodlightProviderService,
                 case ECHO_REPLY:
                     break;
                 case FEATURES_REPLY:
+                	
                     if (log.isTraceEnabled())
                         log.trace("Features Reply from {}", sw);
 
@@ -973,6 +974,7 @@ public class Controller implements IFloodlightProviderService,
                         sw.setFeaturesReply((OFFeaturesReply) m);
                         sw.deliverOFFeaturesReply(m);
                     }
+                    
                     break;
                 case GET_CONFIG_REPLY:
                     if (log.isTraceEnabled())
@@ -1208,7 +1210,7 @@ public class Controller implements IFloodlightProviderService,
                     counterStore.updatePacketInCountersLocal(sw, m, eth);
                 }
                 // fall through to default case...
-
+            
             default:
 
                 List<IOFMessageListener> listeners = null;
