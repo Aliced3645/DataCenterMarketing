@@ -1,6 +1,7 @@
 package net.floodlightcontroller.datacentermarketing.logic;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -10,21 +11,16 @@ public class Auctioneer {
 	//the auctioneer maintains a pool of existing bidders
 	
 	private static Auctioneer _instance = null;
-	ConcurrentHashMap<String, Bidder> bidders;
+	HashSet<String> bidderIDs;
 	
 	//a list of requests received 
 	
 	
-	
 	private Auctioneer(){
 		super();
-		bidders = null;
+		bidderIDs = null;
 	}
 	
-	private Auctioneer(ConcurrentHashMap<String, Bidder> bidders) {
-		super();
-		this.bidders = bidders;
-	}
 	
 	public static Auctioneer getInstance(){
 		if(_instance == null){
