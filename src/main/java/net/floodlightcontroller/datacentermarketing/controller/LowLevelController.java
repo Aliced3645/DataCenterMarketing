@@ -61,8 +61,8 @@ import net.floodlightcontroller.topology.ITopologyService;
 //The class is used to map the flow entry to a ( queue - port - switch ) tuple
 //In this project, there must be one to one relation
 
-
-public class LowLevelController implements IOFSwitchListener, IOFMessageListener, IFloodlightModule {
+public class LowLevelController implements IOFSwitchListener,
+		IOFMessageListener, IFloodlightModule {
 
 	protected IFloodlightProviderService controller;
 	protected IDeviceService deviceManager;
@@ -74,9 +74,9 @@ public class LowLevelController implements IOFSwitchListener, IOFMessageListener
 	// internal hashmap for switches and devices
 	private Map<Long, IOFSwitch> switches;
 	private Map<Long, IDevice> devices;
-	
+
 	private Future<OFFeaturesReply> future;
-	
+
 	@Override
 	public Collection<Class<? extends IFloodlightService>> getModuleServices() {
 		// TODO Auto-generated method stub
@@ -187,8 +187,9 @@ public class LowLevelController implements IOFSwitchListener, IOFMessageListener
 	}
 
 	// basic functionality begins here..
-	public void updateSwitches() throws IOException, InterruptedException, ExecutionException {
-		
+	public void updateSwitches() throws IOException, InterruptedException,
+			ExecutionException {
+
 		switches.clear();
 
 		if (controller == null) {
@@ -204,31 +205,14 @@ public class LowLevelController implements IOFSwitchListener, IOFMessageListener
 		Iterator<Entry<Long, IOFSwitch>> it = s.iterator();
 
 		while (it.hasNext()) {
-			
+
 			Entry<Long, IOFSwitch> entry = it.next();
 			IOFSwitch ofSwitch = entry.getValue();
-			
+
 			switches.put(ofSwitch.getId(), ofSwitch);
 
 			// query the switch to get the update..
-			
-			/*
-			Collection<OFPhysicalPort> ports = ofSwitch.getEnabledPorts();
-			for (OFPhysicalPort port : ports) {
-				short portNumber = port.getPortNumber();
-				sendQueueQuery(ofSwitch, portNumber);
-			}
-			*/
-			
-			//push the feature request to all switches..
-			//But not expected to do that, the message should not be used in this way, 
-			//see the processOFMessage() in class Controller
-			//OFFeaturesRequest featureRequest = new OFFeaturesRequest();
-			//OFEchoRequest echoRequest = new OFEchoRequest();
-			//ofSwitch.write(featureRequest, null);
-			//ofSwitch.write(echoRequest, null);
 			future = ofSwitch.querySwitchFeaturesReply();
-			
 			ofSwitch.flush();
 		}
 
@@ -278,8 +262,8 @@ public class LowLevelController implements IOFSwitchListener, IOFMessageListener
 		for (SwitchPort sourceSwitchPort : srcSwitchPorts) {
 			for (SwitchPort destSwitchPort : destSwitchPorts) {
 				ArrayList<Route> someRoutes = routingManager.getRoutes(
-						sourceSwitchPort.getSwitchDPID(), destSwitchPort
-								.getSwitchDPID(), true);
+						sourceSwitchPort.getSwitchDPID(),
+						destSwitchPort.getSwitchDPID(), true);
 				routes.addAll(someRoutes);
 				someRoutes = null;
 			}
@@ -307,9 +291,9 @@ public class LowLevelController implements IOFSwitchListener, IOFMessageListener
 		switch (msg.getType()) {
 		// get the reply, update related hash tables for queue/port/switch
 		// management
-		
+
 		case QUEUE_GET_CONFIG_REPLY:
-			
+
 			System.out.println("Got a Queue Config Reply!!");
 			OFQueueGetConfigReply reply = (OFQueueGetConfigReply) msg;
 			List<OFPacketQueue> queues = reply.getQueues();
@@ -329,15 +313,15 @@ public class LowLevelController implements IOFSwitchListener, IOFMessageListener
 				}
 			}
 			break;
-		
+
 		case FEATURES_REPLY:
 			System.out.println("\n\n feature reply!! \n\n");
 			break;
-			
+
 		case ECHO_REPLY:
 			System.out.println("\n\n echo reply!! \n\n");
 			break;
-			
+
 		case ERROR:
 			// OFRBRC_BAD_TYPE
 			OFError error = (OFError) msg;
@@ -423,7 +407,6 @@ public class LowLevelController implements IOFSwitchListener, IOFMessageListener
 
 		sendOFVendorData(sw, queueDeleteData);
 	}
-	
 
 	/*
 	 * In order to set the bandwidth of a particular flow in a particular
@@ -452,11 +435,66 @@ public class LowLevelController implements IOFSwitchListener, IOFMessageListener
 		return false;
 	}
 
-	
-	//really assign routes for a flow (with queue creation)
-	
-	public boolean designateActualRoutes(){
-		
+	// really assign routes for a flow (with queue creation)
+
+	public boolean designateActualRoutes() {
+
 		return false;
+	}
+
+	// Provided for the scheduler: get the maximum bandwidth of a port of
+	// specified switch
+
+	public Collection<MaxBandwidth> getPortMaxBandwidthForSwitch(Long switchID,
+			short portNumber) {
+		IOFSwitch ofSwitch = switches.get(switchID);
+		OFPhysicalPort port = ofSwitch.getPort(portNumber);
+		int currentFeatures = port.getCurrentFeatures();
+		LinkedList<MaxBandwidth> maxBandwidths = new LinkedList<MaxBandwidth>();
+		// test first 10 bits
+		int i = 0;
+		while (i <= 9) {
+			MaxBandwidth mb = null;	
+			int mask = 1 << i;
+			int result = currentFeatures & mask;
+			if (result != 0) {
+				switch (i) {
+				case 0:
+					mb = new MaxBandwidth(10, BandwidthUnit.Megabyte, false);
+					break;
+				case 1:
+					mb = new MaxBandwidth(10, BandwidthUnit.Megabyte, true);
+					break;
+				case 2:
+					mb = new MaxBandwidth(100, BandwidthUnit.Megabyte, false);
+					break;
+				case 3:
+					mb = new MaxBandwidth(100, BandwidthUnit.Megabyte, true);
+					break;
+				case 4:
+					mb = new MaxBandwidth(1, BandwidthUnit.Gigabyte, false);
+					break;
+				case 5:
+					mb = new MaxBandwidth(1, BandwidthUnit.Gigabyte, true);
+					break;
+				case 6:
+					mb = new MaxBandwidth(10, BandwidthUnit.Gigabyte, true);
+					break;
+				case 7:
+					mb = new MaxBandwidth(40, BandwidthUnit.Gigabyte, true);
+					break;
+				case 8:
+					mb = new MaxBandwidth(100, BandwidthUnit.Gigabyte, true);
+					break;
+				case 9:
+					mb = new MaxBandwidth(1, BandwidthUnit.Terabyte, true);
+					break;
+				}
+			}
+			if(mb != null){
+				maxBandwidths.add(mb);
+			}
+		}
+		return maxBandwidths;
 	}
 }
