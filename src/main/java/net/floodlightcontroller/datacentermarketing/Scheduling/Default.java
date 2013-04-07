@@ -8,7 +8,7 @@ package net.floodlightcontroller.datacentermarketing.Scheduling;
  * 
  */
 public class Default {
-	public static final int BAND_WIDTH_IN_BYTE = Integer.MAX_VALUE;
+	public static final int MAX_BAND_WIDTH_IN_BYTE = Integer.MAX_VALUE;
 
 	public static final int QUEUE_NUM_PER_PORT = 7;
 

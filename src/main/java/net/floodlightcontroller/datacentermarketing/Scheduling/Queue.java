@@ -11,42 +11,49 @@ import java.util.Comparator;
 public class Queue {
 	public short id = -1;
 
-	// usage
-	public int capacity = Default.BAND_WIDTH_IN_BYTE;
+	/*
+	 * the cap of a particular queue
+	 * 
+	 * This can stay as the maxima Integer from default settings, as if no cap
+	 * is put on a particular queue the port's bandwidth will be capping the
+	 * queues
+	 */
 
-	public Queue_Status status = Queue_Status.AVAILABLE;
+	public int capacity = Default.MAX_BAND_WIDTH_IN_BYTE;
+
+	public QStatus status = QStatus.AVAILABLE;
 
 	// reservation
 	// this should always be ordered
-	private ArrayList<QTA> reservations;
+	private ArrayList<Allocation> reservations;
 
 	// test if an reservation is feasible
-	public boolean can_reserve(QTA qta) {
+	public Allocation get_overlap(Allocation Allocation) {
 		for (int a = 0; a < reservations.size(); a++) {
-			QTA q = reservations.get(a);
-			if (q.overlap(qta))
-				return false;
-			if (q.from > qta.to)
-				return true;
+			Allocation q = reservations.get(a);
+			if (q.overlap(Allocation)) {
+				return Allocation;
+			}
+			if (q.from > Allocation.to) {
+				return null;
+			}
 		}
-		return true;
+		return null;
 
 	}
 
-	// test if a resevervation is available, if so , add it
-	public boolean try_reserve(QTA qta) {
-		if (can_reserve(qta)) {
-			reserve(qta);
-			return true;
-		}
-		return false;
-	}
+	/*
+	 * // test if a resevervation is available, if so , add it public boolean
+	 * try_reserve(Allocation allocation) { if (get_overlap(allocation) == null)
+	 * { reserve(allocation); return true; } return false; }
+	 */
 
 	// go ahead and reserve
-	private void reserve(QTA qta) {
+	public void reserve(Allocation allocation) {
 
-		Collections.sort(reservations, new Comparator<QTA>() {
-			public int compare(QTA a, QTA b) {
+		reservations.add(allocation);
+		Collections.sort(reservations, new Comparator<Allocation>() {
+			public int compare(Allocation a, Allocation b) {
 				return a.compareTo(b);
 			}
 		});

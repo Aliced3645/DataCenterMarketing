@@ -3,8 +3,6 @@
  */
 package net.floodlightcontroller.datacentermarketing.Scheduling;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 
 /**
@@ -12,73 +10,125 @@ import java.util.HashSet;
  * 
  */
 
-public class Port {
+public class Port
+{
 
-	public int id = -1;
+    public int id = -1;
 
-	public Port_Type type = Port_Type.BI;
+    public Port_Type type = Port_Type.FULL_DUPLEX;
 
-	public Queue[] queues;
+    public Queue[] queues;
 
-	public Port(int i) {
-		id = i;
-		full_populate();
+    // the bandwidth of this port
+    public long capacity = -1; // not initialized
+
+    public Port(int i)
+    {
+	id = i;
+	full_populate();
+    }
+
+    public void full_populate()
+    {
+
+	queues = new Queue[Default.QUEUE_NUM_PER_PORT];
+	for (int a = 0; a < queues.length; a++)
+	{
+	    queues[a] = new Queue();
+
+	}
+    }
+
+    public void full_populate(int queue_size)
+    {
+
+	queues = new Queue[queue_size];
+	for (int a = 0; a < queues.length; a++)
+	{
+	    queues[a] = new Queue();
+
 	}
 
-	public void full_populate() {
+    }
 
-		queues = new Queue[Default.QUEUE_NUM_PER_PORT];
-		for (int a = 0; a < queues.length; a++) {
-			queues[a] = new Queue();
+    /*
+     * test if an reservation is feasible
+     * 
+     * Naive Algo : check all queues for the following case: If a queue's
+     * allocations already have overlaps with qta and is different direction,
+     * immediately fail. Otherwise record the bandwidth that is used. If a
+     * queue' allocation does not overlap with qta, remember it for possible
+     * allocation. If we have finish checking all the queues, return
+     */
+    public HashSet<Integer> possibleQ(Allocation allocation)
+    {
 
+	HashSet<Integer> s = new HashSet<Integer>();
+	long usedBandWidth = 0;
+	for (int a = 0; a < queues.length; a++)
+	{
+	    Allocation allocated = queues[a].get_overlap(allocation);
+	    if (allocated == null)
+	    {
+		s.add(a);
+	    }
+	    else
+	    {
+		if (allocated.direction != allocation.direction)
+		{
+		    return null;
 		}
-	}
-
-	public void full_populate(int queue_size) {
-
-		queues = new Queue[queue_size];
-		for (int a = 0; a < queues.length; a++) {
-			queues[a] = new Queue();
-
+		else
+		{
+		    usedBandWidth += allocated.bandwidth;
+		    if (usedBandWidth + allocation.bandwidth > capacity)
+		    {
+			return null;
+		    }
 		}
+	    }
+	}
+	return s.size() > 0 ? s : null;
+    }
+
+    public int reserve(Allocation allocation)
+    {
+	HashSet<Integer> ps = possibleQ(allocation);
+	if (ps == null)
+	    return -1;
+	int randomQueue = ps.iterator().next();
+
+	try
+	{
+	    queues[randomQueue].reserve(allocation);
+	    return randomQueue;
 
 	}
-
-	// test if an reservation is feasible
-	public HashSet<Integer> can_reserve(QTA qta) {
-
-		HashSet<Integer> s = new HashSet<Integer>();
-
-		for (int a = 0; a < queues.length; a++) {
-			if (queues[a].can_reserve(qta)) {
-				s.add(a);
-			}
-
-		}
-		return s;
+	catch (Exception e)
+	{
+	    System.out.println("Hmmm??? " + e.getMessage() + " : "
+		    + e.toString());
 
 	}
+	return -1;
+    }
 
-	// test if a resevervation is available, if so , add it
-	public int try_reserve(QTA qta) {
-
-		for (int a = 0; a < queues.length; a++) {
-			if (queues[a].can_reserve(qta)) {
-				queues[a].try_reserve(qta);
-				return a;
-			}
-
-		}
-
-		return -1;
-	}
-
-	// test if a resevervation is available on a queue, if so , add it
-	public boolean try_reserve(QTA qta, int q) {
-		if (q >= queues.length)
-			return false;
-		return queues[q].try_reserve(qta);
-
-	}
-
+    /*
+     * // test if a resevervation is available, if so , add it public int
+     * try_reserve(Allocation qta) {
+     * 
+     * for (int a = 0; a < queues.length; a++) { if (queues[a].can_reserve(qta))
+     * { queues[a].try_reserve(qta); return a; }
+     * 
+     * }
+     * 
+     * return -1; }
+     */
+    // test if a resevervation is available on a queue, if so , add it
+    /*
+     * public boolean try_reserve(Allocation qta, int q) { if (q >=
+     * queues.length) return false; return queues[q].try_reserve(qta);
+     * 
+     * }
+     */
 }

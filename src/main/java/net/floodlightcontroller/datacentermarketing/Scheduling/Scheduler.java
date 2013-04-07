@@ -12,44 +12,59 @@ import net.floodlightcontroller.topology.NodePortTuple;
 /**
  * @author openflow
  * 
+ * 
+ *         This is the scheduler singleton This Scheduler is in charge of
+ *         recording all the allocation are provide of the feasibleness of a
+ *         desired allocation
+ * 
+ *         The scheduler should also provide snapshots for the marketing module
+ *         to reason base on.
  */
-public class Scheduler {
-	private HashMap<Integer, Switch> switches;
+public class Scheduler
+{
+    private HashMap<Integer, Switch> switches;
 
-	private Scheduler instance = null;
+    private Scheduler instance = null;
 
-	private Scheduler() {
-		switches = new HashMap<Integer, Switch>();
+    private Scheduler()
+    {
+	switches = new HashMap<Integer, Switch>();
+	// TODO how to initialize all the switches?
+    }
 
+    public Scheduler instance()
+    {
+	if (instance == null)
+	    instance = new Scheduler();
+
+	return instance;
+
+    }
+
+    /*
+     * validate to see if a repute is feasible in current scheduler
+     */
+    public boolean validate_route(Route rt)
+    {
+	// we need to validate all the possible queue reservations
+	List<NodePortTuple> switchPorts = rt.getPath();
+	for (int a = 0; a < switchPorts.size(); a++)
+	{
+	    NodePortTuple np = switchPorts.get(a);
+	    // validate this port is ok for reservation
+	    // TODO
+	    
+	    
 	}
+	return false;
+    }
 
-	public Scheduler instance() {
-		if (instance == null)
-			instance = new Scheduler();
+    public boolean registerRoute(Route rt)
+    {
+	if (!validate_route(rt))
+	    return false;
 
-		return instance;
-
-	}
-
-	/*
-	 * validate to see if a rppute is feaisble in current scheuler
-	 */
-	public boolean validate_route(Route rt) {
-		// we need to validate all the possible queue reservations
-		List<NodePortTuple> switchPorts = rt.getPath();
-		for (int a = 0; a < switchPorts.size(); a++) {
-			NodePortTuple np = switchPorts.get(a);
-			// validate this port is ok for reservation
-			// TODO
-		}
-		return false;
-	}
-
-	public boolean register_route(Route rt) {
-		if (!validate_route(rt))
-			return false;
-
-		return true;
-	}
+	return true;
+    }
 
 }
