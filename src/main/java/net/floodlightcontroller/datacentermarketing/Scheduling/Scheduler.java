@@ -45,7 +45,7 @@ public class Scheduler
     /*
      * validate to see if a repute is feasible in current scheduler
      */
-    public boolean validate_route(Route rt, Allocation alloc)
+    public boolean validateRoute(Route rt, Allocation alloc)
     {
 	// we need to validate all the possible queue reservations
 	List<NodePortTuple> switchPorts = rt.getPath();
@@ -54,8 +54,8 @@ public class Scheduler
 	    NodePortTuple np = switchPorts.get(a);
 	    // validate this port is ok for reservation
 	    /* to do : get numbers */
-	    int switchNum;
-	    int portNum;
+	    int switchNum = 01;
+	    int portNum = 1;
 
 	    HashSet<Integer> ps = switches.get(switchNum).getPort(portNum)
 		    .possibleQ(alloc);
@@ -69,7 +69,7 @@ public class Scheduler
 
     public boolean registerRoute(Route rt)
     {
-	if (!validate_route(rt))
+	if (!validateRoute(rt, null))
 	    return false;
 
 	return true;
