@@ -18,8 +18,9 @@ public class Bidder implements Runnable{
 	private BidRequest generateBidRequest(HashMap<Resource, Float> requestResources, long sourceID, long destID, float value){
 		
 		//clear the result for the last time
-		BidRequest request = new BidRequest(bidderID, sourceID, destID, value, requestResources);
+		BidRequest request = new BidRequest(this, sourceID, destID, value, requestResources);
 		return request;
+		
 	}
 	
 	public void pushResult(BidResult result){
