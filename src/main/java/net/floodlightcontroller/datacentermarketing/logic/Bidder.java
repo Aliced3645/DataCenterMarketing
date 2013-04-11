@@ -12,7 +12,7 @@ public class Bidder implements Runnable{
 	String bidderID;
 	
 	//the most recent bidding result
-	BidResult latestResult;
+	private BidResult latestResult;
 	
 	//performs as a factory for BidRequest
 	private BidRequest generateBidRequest(HashMap<Resource, Float> requestResources, long sourceID, long destID, float value){
@@ -25,6 +25,11 @@ public class Bidder implements Runnable{
 	public void pushResult(BidResult result){
 		this.latestResult = result;
 	}
+	
+	public BidResult getLatestResult(){
+		return this.latestResult;
+	}
+	
 	
 	//send bid request to Auctioneer
 	//blocked until the auctioneer received the request
