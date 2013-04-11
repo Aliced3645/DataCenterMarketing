@@ -2,7 +2,10 @@ package net.floodlightcontroller.datacentermarketing.logic;
 
 public enum Resource {
 	
-	BANDWIDTH,
-	LATENCY
+	MIN_RATE,
+	MAX_RATE,
+	START_TIME,
+	END_TIME,
+	DATA
 	
 }

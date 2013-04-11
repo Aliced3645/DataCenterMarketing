@@ -5,7 +5,7 @@
     project="floodlight" 
     file="/floodlight/src/main/java/net/floodlightcontroller/datacentermarketing/logic/ResourceDemand.java" 
     binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="306" y="301"/>    
+    <position height="-1" width="-1" x="314" y="335"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
@@ -37,7 +37,7 @@
   <class id="4" language="java" name="net.floodlightcontroller.datacentermarketing.logic.Bidder" project="floodlight" 
     file="/floodlight/src/main/java/net/floodlightcontroller/datacentermarketing/logic/Bidder.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="554" y="374"/>    
+    <position height="-1" width="-1" x="573" y="362"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
@@ -48,7 +48,7 @@
     project="floodlight" 
     file="/floodlight/src/main/java/net/floodlightcontroller/datacentermarketing/logic/BidRequest.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="548" y="218"/>    
+    <position height="-1" width="-1" x="598" y="128"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
@@ -59,7 +59,7 @@
     project="floodlight" 
     file="/floodlight/src/main/java/net/floodlightcontroller/datacentermarketing/logic/BiddingClock.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="520" y="531"/>    
+    <position height="-1" width="-1" x="566" y="522"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
