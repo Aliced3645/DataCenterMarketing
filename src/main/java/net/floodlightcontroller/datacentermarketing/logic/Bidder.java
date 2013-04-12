@@ -14,6 +14,21 @@ public class Bidder extends Thread{
 	//the most recent bidding result
 	private BidResult latestResult;
 	
+	public String getBidderID() {
+		return bidderID;
+	}
+
+
+	public void setBidderID(String bidderID) {
+		this.bidderID = bidderID;
+	}
+
+
+	public void setLatestResult(BidResult latestResult) {
+		this.latestResult = latestResult;
+	}
+
+
 	//performs as a factory for BidRequest
 	private BidRequest generateBidRequest(HashMap<Resource, Float> requestResources, long sourceID, long destID, float value){
 		
@@ -22,6 +37,7 @@ public class Bidder extends Thread{
 		return request;
 		
 	}
+	
 	
 	public void pushResult(BidResult result){
 		this.latestResult = result;

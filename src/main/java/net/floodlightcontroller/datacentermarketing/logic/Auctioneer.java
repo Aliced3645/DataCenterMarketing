@@ -2,6 +2,7 @@ package net.floodlightcontroller.datacentermarketing.logic;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -23,6 +24,12 @@ public class Auctioneer {
 	private Auctioneer(){
 		super();
 		requests = new ConcurrentLinkedQueue<BidRequest>();
+		resultsForThisRound = new LinkedList<BidResult>();
+		BidResult br = new BidResult();
+		br.setAllocationResultInString("Congratulations");
+		br.setBidderID("Shu Zhang");
+		br.setRound(10);
+		resultsForThisRound.add(br);
 	}
 	
 	

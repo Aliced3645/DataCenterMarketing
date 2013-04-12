@@ -1,4 +1,4 @@
-package net.floodlightcontroller.datacentermarketing.controller;
+package net.floodlightcontroller.datacentermarketing.messagepasser;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,7 +62,5 @@ public class BiddingMessagePasser implements IFloodlightModule{
 		restApi.addRestletRoutable(new BiddingMessageRouter());
 		
 	}
-	
-	
 	
 }
