@@ -7,7 +7,7 @@ import java.util.HashMap;
 //temporarily we emulate the network behavior on a single machine
 //so using threads which stands for bidders are reasonable
 
-public class Bidder implements Runnable{
+public class Bidder extends Thread{
 	
 	String bidderID;
 	
@@ -43,7 +43,7 @@ public class Bidder implements Runnable{
 		BidRequest request = this.generateBidRequest(requestResources, sourceID, destID, value);
 		//get the auctioneer instance1
 		Auctioneer auctioneer = Auctioneer.getInstance();
-		
+		auctioneer.pushRequest(request);
 		//block self and wait for result
 		this.wait();
 		
