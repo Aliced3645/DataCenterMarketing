@@ -2,9 +2,9 @@ package net.floodlightcontroller.datacentermarketing.logic;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 
 
 //Auctioneer is a singleton class
@@ -15,6 +15,7 @@ public class Auctioneer {
 	
 	//current policy in resource allocaiton for this round
 	private AuctioneerStrategy strategy;
+	private List<BidResult> resultsForThisRound;
 	
 	//collects the bidding requests
 	ConcurrentLinkedQueue<BidRequest> requests;
@@ -47,10 +48,9 @@ public class Auctioneer {
 	public void clearRound(){
 		requests.clear();
 	}
-	
-	
 
-	
-	
+	public List<BidResult> getResultsForThisRound(){
+		return this.resultsForThisRound;
+	}
 	
 }
