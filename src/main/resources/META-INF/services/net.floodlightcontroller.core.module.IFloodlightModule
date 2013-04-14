@@ -29,3 +29,4 @@ net.floodlightcontroller.firewall.Firewall
 net.floodlightcontroller.loadbalancer.LoadBalancer
 net.floodlightcontroller.datacentermarketing.controller.LowLevelController
 net.floodlightcontroller.benchmarkcontroller.FlowPusherController
+net.floodlightcontroller.datacentermarketing.messagepasser.BiddingMessagePasser

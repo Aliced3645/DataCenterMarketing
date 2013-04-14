@@ -10,6 +10,5 @@ public interface AuctioneerStrategy {
 	public Collection<BidResult> processAllocation(Collection<BidRequest> requests);
 	
 	
-	
 }
 

@@ -3,22 +3,26 @@ package net.floodlightcontroller.datacentermarketing.logic;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import net.floodlightcontroller.datacentermarketing.messagepasser.BidResultJSONSerializer;
+
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+@JsonSerialize(using=BidResultJSONSerializer.class)
 public class BidRequest implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 
 	//Referenced Andrew's paper about marketing
-	Bidder bidder;
+	private Bidder bidder;
 	
 	//The total value user uses to bid
-	float bidValue;
+	private float bidValue;
 	
 	//the end host IP addresses for the requested bided flow
-	long sourceID;
-	long destID;
+	private long sourceID;
+	private long destID;
 	
 	//a key-value pair list for resource and required amount
-	HashMap<Resource, Float> requiredResources;
+	private HashMap<Resource, Float> requiredResources;
 	
 	public BidRequest(){
 		this.requiredResources = new HashMap<Resource, Float>();
@@ -32,6 +36,54 @@ public class BidRequest implements Serializable{
 		this.destID = _destID;
 	}
 	
+	public String toString(){
+		return "BidderID: " + bidder.getBidderID() + " Value: " + bidValue + " Source ID: " + sourceID + " Dest ID: " + destID + " " + requiredResources ;
+	}
+	
+	public Bidder getBidder() {
+		return bidder;
+	}
+
+	public void setBidder(Bidder bidder) {
+		this.bidder = bidder;
+	}
+
+	public float getBidValue() {
+		return bidValue;
+	}
+
+	public void setBidValue(float bidValue) {
+		this.bidValue = bidValue;
+	}
+
+	public long getSourceID() {
+		return sourceID;
+	}
+
+	public void setSourceID(long sourceID) {
+		this.sourceID = sourceID;
+	}
+
+	public long getDestID() {
+		return destID;
+	}
+
+	public void setDestID(long destID) {
+		this.destID = destID;
+	}
+
+	public HashMap<Resource, Float> getRequiredResources() {
+		return requiredResources;
+	}
+
+	public void setRequiredResources(HashMap<Resource, Float> requiredResources) {
+		this.requiredResources = requiredResources;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
 	public void addRequestField(Resource resource, float amount){
 		if(requiredResources.containsKey(resource)){
 			requiredResources.put(resource, requiredResources.get(resource) + amount);

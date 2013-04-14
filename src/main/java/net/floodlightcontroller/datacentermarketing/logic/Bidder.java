@@ -2,11 +2,16 @@ package net.floodlightcontroller.datacentermarketing.logic;
 
 import java.util.HashMap;
 
+import net.floodlightcontroller.datacentermarketing.messagepasser.BidResultJSONSerializer;
+
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import net.floodlightcontroller.datacentermarketing.messagepasser.BidderJSONSerializer;
 
 //each bidder is a thread
 //temporarily we emulate the network behavior on a single machine
 //so using threads which stands for bidders are reasonable
-
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+@JsonSerialize(using=BidderJSONSerializer.class)
 public class Bidder extends Thread{
 	
 	String bidderID;
@@ -14,6 +19,22 @@ public class Bidder extends Thread{
 	//the most recent bidding result
 	private BidResult latestResult;
 	
+	public String getBidderID() {
+		return bidderID;
+	}
+
+	public String toString(){
+		return "Bidder: " + bidderID;
+	}
+	public void setBidderID(String _bidderID) {
+		this.bidderID = _bidderID;
+	}
+
+	public void setLatestResult(BidResult latestResult) {
+		this.latestResult = latestResult;
+	}
+
+
 	//performs as a factory for BidRequest
 	private BidRequest generateBidRequest(HashMap<Resource, Float> requestResources, long sourceID, long destID, float value){
 		
@@ -22,6 +43,7 @@ public class Bidder extends Thread{
 		return request;
 		
 	}
+	
 	
 	public void pushResult(BidResult result){
 		this.latestResult = result;
