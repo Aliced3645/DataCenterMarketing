@@ -24,9 +24,7 @@ public class BidRequestJSONSerializer extends JsonSerializer<BidRequest>{
 		jGen.writeNumberField("SourceHostID", bidRequest.getSourceID());
 		jGen.writeNumberField("DestHostID", bidRequest.getDestID());
 		jGen.writeEndObject();
-		
 	}
-	
 	
     @Override
     public Class<BidRequest> handledType() {
