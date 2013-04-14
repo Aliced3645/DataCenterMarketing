@@ -36,6 +36,10 @@ public class BidRequest implements Serializable{
 		this.destID = _destID;
 	}
 	
+	public String toString(){
+		return "BidderID: " + bidder.getBidderID() + " Value: " + bidValue + " Source ID: " + sourceID + " Dest ID: " + destID + " " + requiredResources ;
+	}
+	
 	public Bidder getBidder() {
 		return bidder;
 	}

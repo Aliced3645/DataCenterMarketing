@@ -13,6 +13,7 @@ public class BiddingMessageRouter implements RestletRoutable{
 		// TODO Auto-generated method stub
 		Router router = new Router(context);
 		router.attach("/results/json", BiddingMessageResource.class);
+		router.attach("/request/json", BiddingMessageResource.class);
 		return router;
 	}
 
