@@ -13,9 +13,9 @@ public class BiddingMessageRouter implements RestletRoutable{
 	public Restlet getRestlet(Context context) {
 		// TODO Auto-generated method stub
 		Router router = new Router(context);
-		router.attach("/results/json/", BidResultResource.class).setMatchingMode(Template.MODE_STARTS_WITH);
+		router.attach("/result/{BidderID}", BidResultResource.class);
 		//router.attach("/request/json/", BidRequestResource.class).setMatchingMode(Template.MODE_STARTS_WITH);
-		router.attach("/request/json/{BidderID}", BidRequestResource.class);
+		router.attach("/request/{BidderID}", BidRequestResource.class);
 		
 		//router.at
 		return router;

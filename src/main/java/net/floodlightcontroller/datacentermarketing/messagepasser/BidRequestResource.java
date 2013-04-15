@@ -27,6 +27,10 @@ public class BidRequestResource extends ServerResource {
 	        MappingJsonFactory f = new MappingJsonFactory();
 	        JsonParser jp;
 	        
+	        //these six fields must be filled in the JSON request
+	        boolean bBidder = false, bValue = false , bSID = false, bDID = false , 
+	        		bMinRate = false, bData = false;
+	        
 	        try {
 	            jp = f.createJsonParser(bidRequestString);
 	        } catch (JsonParseException e) {
@@ -52,23 +56,29 @@ public class BidRequestResource extends ServerResource {
 	            	String bidderID = jp.getText();
 	            	bidder.setBidderID(bidderID);
 	            	bidRequest.setBidder(bidder);
-	            	
+	            	bidder.setLastRequest(bidRequest);
+	            	bBidder = true;
 	            }
+	            
 	            else if(name == "Value"){
 	            	jp.nextToken();
 	            	bidRequest.setBidValue(jp.getFloatValue());
+	            	bValue = true;
 	            }
 	            else if(name == "SID"){
 	            	jp.nextToken();
 	            	bidRequest.setSourceID(jp.getLongValue());
+	            	bSID = true;
 	            }
 	            else if(name == "DID"){
 	            	jp.nextToken();
 	            	bidRequest.setDestID(jp.getLongValue());
+	            	bDID = true;
 	            }
 	            else if(name == "MinRate"){
 	            	jp.nextToken();
 	            	bidRequest.addRequestField(Resource.MIN_RATE, jp.getFloatValue());
+	            	bMinRate = true;
 	            }
 	            else if(name == "MaxRate"){
 	            	jp.nextToken();
@@ -77,13 +87,20 @@ public class BidRequestResource extends ServerResource {
 	            else if(name == "Data"){
 	            	jp.nextToken();
 	            	bidRequest.addRequestField(Resource.DATA, jp.getFloatValue());
+	            	bData = true;
 	            }
 	            else {
 	            	jp.nextToken();
 	            }
 	            
 	        }     
-			return bidRequest;
+	        
+	        //check if the bidRequest is value by seeing whether minimum set of fields are filled
+	        if(bBidder && bValue && bMinRate && bSID && bDID && bData)
+	        	return bidRequest;
+	        else
+	        	//not a valid bid request
+	        	return null;
 		}
 		
 		@Post
@@ -92,17 +109,28 @@ public class BidRequestResource extends ServerResource {
 		public void postBidRequest(String bidRequestString) throws IOException{
 			//System.out.println(bidRequestString);
 			BidRequest bidRequest = this.requestJsonStringToBidRequest(bidRequestString);
-			
-			//generate the URL for this User/BidRequest
-			
+			if(bidRequest == null)
+				return;
+			//generate the URL Hash for this User/BidRequest
+			bidRequest.getBidder().setLastRequest(bidRequest);
+			RESTQuerier querier = RESTQuerier.getInstance();
+			String URI = querier.getBidderURIForRequest(this.getReference());
+			querier.addBidder(URI, bidRequest.getBidder());
 			return;
 		}
 		
 		@Get("json")
 		public BidRequest retrive(){
-			BidRequest br = new BidRequest();
-			System.out.println(this.getReference());
-			return br;
+			//System.out.println(this.getReference());
+			RESTQuerier querier = RESTQuerier.getInstance();
+			String URI = querier.getBidderURIForRequest(this.getReference());
+			//query the bidder object
+			Bidder bidder = querier.getBidder(URI);
+			if(bidder == null)
+				return null;
+			//we are done
+			System.out.println(bidder.getLastRequest());
+			return bidder.getLastRequest();
 		}
 		
 		

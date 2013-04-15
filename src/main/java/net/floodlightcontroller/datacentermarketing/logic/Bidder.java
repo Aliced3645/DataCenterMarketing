@@ -18,6 +18,8 @@ public class Bidder extends Thread{
 	
 	//the most recent bidding result
 	private BidResult latestResult;
+	private BidRequest lastRequest;
+	
 	
 	public String getBidderID() {
 		return bidderID;
@@ -42,8 +44,7 @@ public class Bidder extends Thread{
 		BidRequest request = new BidRequest(this, sourceID, destID, value, requestResources);
 		return request;
 		
-	}
-	
+	}	
 	
 	public void pushResult(BidResult result){
 		this.latestResult = result;
@@ -53,6 +54,13 @@ public class Bidder extends Thread{
 		return this.latestResult;
 	}
 	
+	public BidRequest getLastRequest(){
+		return this.lastRequest;
+	}
+	
+	public void setLastRequest(BidRequest request){
+		this.lastRequest = request;
+	}
 	
 	//send bid request to Auctioneer
 	//blocked until the auctioneer received the request
@@ -66,9 +74,9 @@ public class Bidder extends Thread{
 		//get the auctioneer instance1
 		Auctioneer auctioneer = Auctioneer.getInstance();
 		auctioneer.pushRequest(request);
+		this.lastRequest = request;
 		//block self and wait for result
 		this.wait();
-		
 		//it is woken up, try to get the result
 		//If everything is OK, then the result should have been "pushed" to the bidder
 		if(this.latestResult == null)
@@ -77,10 +85,26 @@ public class Bidder extends Thread{
 			return true;
 	}
 
+	
+	public boolean sendBidRequestAndWaitForResult(BidRequest request) throws InterruptedException{
+		latestResult = null;
+		Auctioneer auctioneer = Auctioneer.getInstance();
+		auctioneer.pushRequest(request);
+		this.lastRequest = request;
+		//block self and wait for result
+		this.wait();
+		//it is woken up, try to get the result
+		//If everything is OK, then the result should have been "pushed" to the bidder
+		if(this.latestResult == null)
+			return false;
+		else 
+			return true;
+	}
+	
+	
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		
 	}
 
 }

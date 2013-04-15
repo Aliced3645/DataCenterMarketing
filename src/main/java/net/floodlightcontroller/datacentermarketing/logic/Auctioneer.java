@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class Auctioneer {
 	//the auctioneer maintains a pool of existing bidders
 	
+	
 	private static Auctioneer _instance = null;
 	
 	//current policy in resource allocaiton for this round

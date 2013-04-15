@@ -3,10 +3,11 @@ package net.floodlightcontroller.datacentermarketing.logic;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import net.floodlightcontroller.datacentermarketing.messagepasser.BidRequestJSONSerializer;
 import net.floodlightcontroller.datacentermarketing.messagepasser.BidResultJSONSerializer;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-@JsonSerialize(using=BidResultJSONSerializer.class)
+@JsonSerialize(using=BidRequestJSONSerializer.class)
 public class BidRequest implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
