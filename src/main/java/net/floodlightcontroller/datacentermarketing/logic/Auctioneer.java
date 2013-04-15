@@ -20,11 +20,11 @@ public class Auctioneer {
 	private List<BidResult> resultsForThisRound;
 	
 	//collects the bidding requests
-	ConcurrentLinkedQueue<BidRequest> requests;
+	HashMap<String, BidRequest> requestsForThisRound;
 	
 	private Auctioneer(){
 		super();
-		requests = new ConcurrentLinkedQueue<BidRequest>();
+		requestsForThisRound = new HashMap<String, BidRequest>();
 		resultsForThisRound = new LinkedList<BidResult>();
 		BidResult br = new BidResult();
 		br.setAllocationResultInString("Congratulations");
@@ -33,6 +33,9 @@ public class Auctioneer {
 		resultsForThisRound.add(br);
 	}
 	
+	public HashMap<String, BidRequest>  getBidRequestForThisRound(){
+		return this.requestsForThisRound;
+	}
 	
 	public static Auctioneer getInstance(){
 		if(_instance == null){
@@ -44,7 +47,7 @@ public class Auctioneer {
 	
 	public void pushRequest(BidRequest bidRequest){
 		if(bidRequest != null){
-			requests.add(bidRequest);
+			requestsForThisRound.put(bidRequest.getBidder().getBidderID(), bidRequest);
 		}
 	}
 	
@@ -54,7 +57,7 @@ public class Auctioneer {
 	
 	//a bidding round has ended, clear the round
 	public void clearRound(){
-		requests.clear();
+		requestsForThisRound.clear();
 	}
 
 	public List<BidResult> getResultsForThisRound(){

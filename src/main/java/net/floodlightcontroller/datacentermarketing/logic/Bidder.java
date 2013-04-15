@@ -21,6 +21,10 @@ public class Bidder extends Thread{
 	private BidRequest lastRequest;
 	
 	
+	public int hashCode(){
+		return bidderID.hashCode();//bidderID as a unique identifier
+	}
+	
 	public String getBidderID() {
 		return bidderID;
 	}

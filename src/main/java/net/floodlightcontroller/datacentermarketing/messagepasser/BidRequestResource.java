@@ -1,7 +1,11 @@
 package net.floodlightcontroller.datacentermarketing.messagepasser;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
 
+import net.floodlightcontroller.datacentermarketing.logic.Auctioneer;
 import net.floodlightcontroller.datacentermarketing.logic.BidRequest;
 import net.floodlightcontroller.datacentermarketing.logic.Bidder;
 import net.floodlightcontroller.datacentermarketing.logic.Resource;
@@ -92,7 +96,6 @@ public class BidRequestResource extends ServerResource {
 	            else {
 	            	jp.nextToken();
 	            }
-	            
 	        }     
 	        
 	        //check if the bidRequest is value by seeing whether minimum set of fields are filled
@@ -116,6 +119,17 @@ public class BidRequestResource extends ServerResource {
 			RESTQuerier querier = RESTQuerier.getInstance();
 			String URI = querier.getBidderURIForRequest(this.getReference());
 			querier.addBidder(URI, bidRequest.getBidder());
+			//push to the auctioneer
+			Auctioneer.getInstance().pushRequest(bidRequest);
+			
+			//for debugging
+			/*
+			HashMap<String,BidRequest> requests = Auctioneer.getInstance().getBidRequestForThisRound();
+			Set<Entry<String,BidRequest>> reqset = requests.entrySet();
+			for(Entry<String, BidRequest> req : reqset){
+				System.out.println(req.getValue());
+			}
+			*/
 			return;
 		}
 		
