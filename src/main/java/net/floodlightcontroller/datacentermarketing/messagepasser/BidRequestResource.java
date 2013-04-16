@@ -143,7 +143,7 @@ public class BidRequestResource extends ServerResource {
 			if(bidder == null)
 				return null;
 			//we are done
-			System.out.println(bidder.getLastRequest());
+			//System.out.println(bidder.getLastRequest());
 			return bidder.getLastRequest();
 		}
 		
