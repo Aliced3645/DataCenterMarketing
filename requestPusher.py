@@ -85,7 +85,7 @@ elif args.action == 'query':
     uri = "http://%s/marketing/request/%s" %(args.controllerRestIp, bidderID)
     command = "curl -s " + uri + " | python -mjson.tool"
     result = os.popen(command).read()
-    print result
+    print '\n' + result
     sys.exit()
 
 

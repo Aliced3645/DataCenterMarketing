@@ -1,17 +1,31 @@
 package net.floodlightcontroller.datacentermarketing.logic;
-
+	
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
+import java.util.Hashtable;
 
 //Auctioneer is a singleton class
 public class Auctioneer {
 	//the auctioneer maintains a pool of existing bidders
 	
+	private boolean busyFlag= false;
+	public void setBusy(){
+		//busy if calculating the bidding for this round
+		this.busyFlag = true;
+	}
+	
+	public boolean isBusy(){
+		return this.busyFlag;
+	}
+	
+	public void setNotBusy(){
+		this.busyFlag = false;
+	}
 	
 	private static Auctioneer _instance = null;
 	
@@ -20,11 +34,15 @@ public class Auctioneer {
 	private List<BidResult> resultsForThisRound;
 	
 	//collects the bidding requests
-	HashMap<String, BidRequest> requestsForThisRound;
+	Hashtable<String, BidRequest> requestsForThisRound;
+	//If the auctioneer is busy processing bidding for the round, 
+	//so bids for next round will be stored in this map
+	//after doing the calculation, the bids will be moved to requestsForThisRound
+	Hashtable<String, BidRequest> requestsForNextRound;
 	
 	private Auctioneer(){
 		super();
-		requestsForThisRound = new HashMap<String, BidRequest>();
+		requestsForThisRound = new Hashtable<String, BidRequest>();
 		resultsForThisRound = new LinkedList<BidResult>();
 		BidResult br = new BidResult();
 		br.setAllocationResultInString("Congratulations");
@@ -33,8 +51,12 @@ public class Auctioneer {
 		resultsForThisRound.add(br);
 	}
 	
-	public HashMap<String, BidRequest>  getBidRequestForThisRound(){
+	public Hashtable<String, BidRequest>  getBidRequestForThisRound(){
 		return this.requestsForThisRound;
+	}
+	
+	public Collection<BidResult> computeAllocation(){
+		return this.strategy.processAllocation(requestsForThisRound);
 	}
 	
 	public static Auctioneer getInstance(){
@@ -47,7 +69,11 @@ public class Auctioneer {
 	
 	public void pushRequest(BidRequest bidRequest){
 		if(bidRequest != null){
-			requestsForThisRound.put(bidRequest.getBidder().getBidderID(), bidRequest);
+			if(!this.isBusy())
+				requestsForThisRound.put(bidRequest.getBidder().getBidderID(), bidRequest);
+			
+			if(this.isBusy())
+				requestsForNextRound.put(bidRequest.getBidder().getBidderID(), bidRequest);
 		}
 	}
 	
@@ -55,13 +81,22 @@ public class Auctioneer {
 		this.strategy = _strategy;
 	}
 	
+	public AuctioneerStrategy getStrategy(){
+		return this.strategy;
+	}
+	
 	//a bidding round has ended, clear the round
 	public void clearRound(){
 		requestsForThisRound.clear();
+		//If there are bids for the next round, move them to this buffer
+		if(!requestsForNextRound.isEmpty()){
+			requestsForThisRound = requestsForNextRound;
+			requestsForNextRound = new Hashtable<String, BidRequest>();
+		}
+		this.setNotBusy();
 	}
-
+	
 	public List<BidResult> getResultsForThisRound(){
 		return this.resultsForThisRound;
 	}
-	
 }
