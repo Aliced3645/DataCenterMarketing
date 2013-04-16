@@ -14,6 +14,8 @@ public class Auctioneer {
 	//the auctioneer maintains a pool of existing bidders
 	
 	private boolean busyFlag= false;
+	public static int round = 0;
+	
 	public void setBusy(){
 		//busy if calculating the bidding for this round
 		this.busyFlag = true;
@@ -25,13 +27,18 @@ public class Auctioneer {
 	
 	public void setNotBusy(){
 		this.busyFlag = false;
+		//IF there are something in the NextRoundrequests
+		//add them into thisRound request
+		if(this.requestsForNextRound != null){
+			requestsForThisRound.putAll(requestsForNextRound);
+		}
 	}
 	
 	private static Auctioneer _instance = null;
 	
 	//current policy in resource allocaiton for this round
 	private AuctioneerStrategy strategy;
-	private List<BidResult> resultsForThisRound;
+	private Hashtable<String, BidResult> resultsForThisRound;
 	
 	//collects the bidding requests
 	Hashtable<String, BidRequest> requestsForThisRound;
@@ -43,20 +50,20 @@ public class Auctioneer {
 	private Auctioneer(){
 		super();
 		requestsForThisRound = new Hashtable<String, BidRequest>();
-		resultsForThisRound = new LinkedList<BidResult>();
+		resultsForThisRound = new Hashtable<String, BidResult>();
 		BidResult br = new BidResult();
 		br.setAllocationResultInString("Congratulations");
 		br.setBidderID("Shu Zhang");
 		br.setRound(10);
-		resultsForThisRound.add(br);
+		resultsForThisRound.put(br.getBidderID(), br);
 	}
 	
 	public Hashtable<String, BidRequest>  getBidRequestForThisRound(){
 		return this.requestsForThisRound;
 	}
 	
-	public Collection<BidResult> computeAllocation(){
-		return this.strategy.processAllocation(requestsForThisRound);
+	public void computeAllocation(){
+		this.resultsForThisRound = strategy.processAllocation(requestsForThisRound);
 	}
 	
 	public static Auctioneer getInstance(){
@@ -88,6 +95,7 @@ public class Auctioneer {
 	//a bidding round has ended, clear the round
 	public void clearRound(){
 		requestsForThisRound.clear();
+		resultsForThisRound.clear();
 		//If there are bids for the next round, move them to this buffer
 		if(!requestsForNextRound.isEmpty()){
 			requestsForThisRound = requestsForNextRound;
@@ -96,7 +104,7 @@ public class Auctioneer {
 		this.setNotBusy();
 	}
 	
-	public List<BidResult> getResultsForThisRound(){
+	public Hashtable<String, BidResult> getResultsForThisRound(){
 		return this.resultsForThisRound;
 	}
 }

@@ -1,25 +1,28 @@
 package net.floodlightcontroller.datacentermarketing.logic;
 
-import java.util.HashMap;
-
-import net.floodlightcontroller.datacentermarketing.Scheduling.Scheduler;
-import net.floodlightcontroller.datacentermarketing.Scheduling.Switch;
+import java.util.Hashtable;
 
 public class PriceAdjuster {
-	private PriceAdjuster instance = null;
+	
+	
+	//per unit price..
+	Hashtable<Resource, Integer> currentPrices;
+	
+	private static PriceAdjuster instance = null;
 
 	private PriceAdjuster() {
 	}
 
-	public PriceAdjuster instance() {
+	public static PriceAdjuster getInstance() {
 		if (instance == null)
 			instance = new PriceAdjuster();
-
 		return instance;
-
 	}
 
 	public void adjustPrice() {
 		return;
 	}
+	
+	
+	
 }

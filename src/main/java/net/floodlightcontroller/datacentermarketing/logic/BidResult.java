@@ -12,9 +12,12 @@ public class BidResult {
 
 	//round counter (which round generates the result? )
 	int round;
-	
 	//bidder ID
 	String bidderID;
+	
+	
+	
+	
 	
 	//the allocation upon his requests
 	//For testing JSON

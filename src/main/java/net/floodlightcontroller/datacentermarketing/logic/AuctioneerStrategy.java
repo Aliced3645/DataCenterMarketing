@@ -8,8 +8,7 @@ public interface AuctioneerStrategy {
 	public abstract String toString();
 	
 	//the allocation process returns the collection of BidResults
-	public Collection<BidResult> processAllocation(Hashtable<String, BidRequest> requests);
-	
+	public Hashtable<String,BidResult> processAllocation(Hashtable<String, BidRequest> requests);
 	
 }
 

@@ -10,7 +10,7 @@ public class MaxUtilizationStrategy implements AuctioneerStrategy{
 	}
 
 	@Override
-	public Collection<BidResult> processAllocation(
+	public Hashtable<String, BidResult> processAllocation(
 			Hashtable<String, BidRequest> requests) {
 		// TODO Auto-generated method stub
 		return null;

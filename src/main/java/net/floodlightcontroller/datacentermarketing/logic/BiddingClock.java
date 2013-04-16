@@ -12,8 +12,14 @@ public class BiddingClock implements Runnable{
 	ActionListener roundCleaner = new ActionListener() {
 	     public void actionPerformed(ActionEvent evt) {
 	    	 //time is up
-	    	 
+	    	 Auctioneer.getInstance().setBusy();
+	    	 Auctioneer.getInstance().computeAllocation();
+	    	 Auctioneer.getInstance().setNotBusy();
+	    	
+	    	 PriceAdjuster.getInstance().adjustPrice(); 	 
 	    	 Auctioneer.getInstance().clearRound();
+	    	 //a new round
+	    	 Auctioneer.getInstance().round ++ ;
 	     }
 	 };
 	  
@@ -41,6 +47,5 @@ public class BiddingClock implements Runnable{
 		// TODO Auto-generated method stub
 		
 	}
-	
 	
 }
