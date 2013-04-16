@@ -1,6 +1,7 @@
 package net.floodlightcontroller.datacentermarketing.controller;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,6 +39,8 @@ import org.openflow.vendor.openflow.OFOpenFlowVendorData;
 import org.openflow.vendor.openflow.OFQueueDeleteVendorData;
 import org.openflow.vendor.openflow.OFQueueModifyVendorData;
 import org.restlet.engine.io.IoState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
@@ -60,6 +63,7 @@ import net.floodlightcontroller.packet.IPv4;
 import net.floodlightcontroller.routing.IRoutingService;
 import net.floodlightcontroller.routing.Route;
 import net.floodlightcontroller.staticflowentry.IStaticFlowEntryPusherService;
+import net.floodlightcontroller.staticflowentry.StaticFlowEntryPusher;
 import net.floodlightcontroller.topology.ITopologyService;
 import net.floodlightcontroller.topology.NodePortTuple;
 
@@ -86,6 +90,8 @@ public class LowLevelController implements IOFSwitchListener,
     private Map<Long, IDevice> devices;
 
     private Future<OFFeaturesReply> future;
+    protected static Logger log = LoggerFactory
+	    .getLogger(StaticFlowEntryPusher.class);
 
     @Override
     public Collection<Class<? extends IFloodlightService>> getModuleServices()
@@ -354,34 +360,37 @@ public class LowLevelController implements IOFSwitchListener,
 	System.out.println("LowLevelController: " + str);
     }
 
-    
     /**
      * Writes an OFFlowMod to a switch
-     * @param sw The IOFSwitch to write to
-     * @param flowMod The OFFlowMod to write
+     * 
+     * @param sw
+     *            The IOFSwitch to write to
+     * @param flowMod
+     *            The OFFlowMod to write
      */
-    @LogMessageDoc(level="ERROR",
-            message="Tried to write OFFlowMod to {switch} but got {error}",
-            explanation="An I/O error occured while trying to write a " +
-                    "static flow to a switch",
-            recommendation=LogMessageDoc.CHECK_SWITCH)
-    private void writeFlowModToSwitch(IOFSwitch sw, OFFlowMod flowMod) {
-        try {
-            sw.write(flowMod, null);
-            sw.flush();
-        } catch (IOException e) {
-            log.error("Tried to write OFFlowMod to {} but failed: {}", 
-                    HexString.toHexString(sw.getId()), e.getMessage());
-        }
+    @LogMessageDoc(level = "ERROR", message = "Tried to write OFFlowMod to {switch} but got {error}", explanation = "An I/O error occured while trying to write a "
+	    + "static flow to a switch", recommendation = LogMessageDoc.CHECK_SWITCH)
+    private void writeFlowModToSwitch(IOFSwitch sw, OFFlowMod flowMod)
+    {
+	try
+	{
+	    sw.write(flowMod, null);
+	    sw.flush();
+	}
+	catch (IOException e)
+	{
+	    log.error("Tried to write OFFlowMod to {} but failed: {}",
+		    HexString.toHexString(sw.getId()), e.getMessage());
+	}
     }
-    
+
     /**
      * the following code probe through a route to obtain latency
      * 
      * 
      * 
      */
-    public long probeLatency(Route rt, long bandwidth)
+    public long probeLatency(Route rt, long bandwidth) throws Exception
     {
 	// allocate the reservation switch by switch
 	List<NodePortTuple> switchesPorts = rt.getPath();
@@ -389,24 +398,43 @@ public class LowLevelController implements IOFSwitchListener,
 	{
 	    debug("Route length is not right.");
 	}
-	int index=0;
+	int index = 0;
 	// the first allocation, instead of a table forwarding packet from start
 	// host to next switch
 	// we add a rule to forward packet from controller to next switch
-	
-	//get the switch
+
+	// get the switch
 	NodePortTuple firstPair = switchesPorts.get(index);
 	long nodePid = firstPair.getNodeId();
 	IOFSwitch sw = switches.get(nodePid);
-	
-	OFFlowMod flowMod= new OFFlowMod();
-	
-	
+	short ingressPortPid = firstPair.getPortId();
+
+	NodePortTuple secondPair = switchesPorts.get(index);
+	short egressPortPid = secondPair.getPortId();
+	ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
+	OFFlowMod flowMod = new OFFlowMod();
+	flowMod.setType(OFType.FLOW_MOD);
+	OFAction outputTo = new OFActionOutput(egressPortPid);
+	actionsTo.add(outputTo);
+	OFMatch match = new OFMatch();
+	try
+	{
+	    match.setNetworkDestination(IPv4.toIPv4Address(InetAddress
+		    .getLocalHost().getHostAddress()));
+	    match.setNetworkSource(IPv4.toIPv4Address(InetAddress
+		    .getLocalHost().getHostAddress()));
+	}
+	catch (Exception e)
+	{
+	    debug("error geting local controler iP!");
+	    throw e;
+	}
+	match.setDataLayerType(Ethernet.TYPE_IPv4);
+	flowMod.setActions(actionsTo);
+	flowMod.setMatch(match);
+
 	writeFlowModToSwitch(sw, flowMod);
-	
-	
-	
-	
+
 	// send the probe packet
 
 	return 1l;
