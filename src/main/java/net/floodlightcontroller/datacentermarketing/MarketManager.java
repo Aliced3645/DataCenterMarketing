@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 
 import net.floodlightcontroller.core.IOFSwitch;
 import net.floodlightcontroller.datacentermarketing.controller.LowLevelController;
+import net.floodlightcontroller.datacentermarketing.logic.BiddingClock;
 import net.floodlightcontroller.devicemanager.IDevice;
 import net.floodlightcontroller.routing.Route;
 
@@ -31,7 +32,7 @@ public class MarketManager {
 	private Map<Long, IOFSwitch> switches;
 	private Map<Long, IDevice> devices;
 	private LowLevelController lowLevelController;
-
+	private BiddingClock clock;
 	private FlowUI flowUI;
 
 	private MarketManager() {
@@ -43,6 +44,10 @@ public class MarketManager {
 		flowUI = UIThread.getFlowUI();
 		setFlowUI(flowUI);
 		flowUI.setMarketManager(this);
+		
+		//initialize the timer
+		clock = BiddingClock.getInstance();
+		
 	}
 
 	public FlowUI getFlowUI() {
