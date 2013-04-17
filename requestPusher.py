@@ -31,9 +31,14 @@ parser.add_argument('-value', dest = 'value', action='store', help='value of the
 parser.add_argument('-min', dest='minRate', action='store', help='minimum required rate')
 parser.add_argument('-max', dest='maxRate', action='store', help='maximum required rate')
 parser.add_argument('-data', dest='data', action='store', help='data to transmit')
-parser.add_argument('-bid', dest='action', action='store_const', const='bid', default='bid', help='action: bid, query')
-parser.add_argument('-query', dest='action', action='store_const', const='query', default='bid', help='action: bid, query')
-
+parser.add_argument('-bid', dest='action', action='store_const', const='bid',
+        default='bid', help='action: bid, queray, result')
+parser.add_argument('-query', dest='action', action='store_const',
+        const='query', default='bid', help='action: bid, query,result, allresults')
+parser.add_argument('-result', dest='action', action='store_const',
+        const='result', default='bid', help='action: bid, query,result, allresults')
+parser.add_argument('-allresults', dest='action', action='store_const',
+        const='query', default='bid', help='action: bid, query, result,allresults')
 args = parser.parse_args()
 
 if args.action == 'bid':
@@ -88,4 +93,14 @@ elif args.action == 'query':
     print '\n' + result
     sys.exit()
 
+elif args.action == 'result':
+    bidderID = args.bidderID
+    if bidderID is None:
+        print 'BidderID not filled'
+        sys.exit()
+    uri = "http://%s/marketing/result/%s" %(args.controllerRestIp, bidderID)
+    command = "curl -s " + uri + " | python -mjson.tool"
+    result = os.popen(command).read()
+    print '\n' + result
+    sys.exit()
 
