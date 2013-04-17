@@ -2,6 +2,7 @@ package net.floodlightcontroller.datacentermarketing.logic;
 
 import java.util.Collection;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 public class MaxUtilizationStrategy implements AuctioneerStrategy{
 
@@ -10,8 +11,8 @@ public class MaxUtilizationStrategy implements AuctioneerStrategy{
 	}
 
 	@Override
-	public Hashtable<String, BidResult> processAllocation(
-			Hashtable<String, BidRequest> requests) {
+	public LinkedHashMap<String, BidResult> processAllocation(
+			LinkedHashMap<String, BidRequest> requests) {
 		// TODO Auto-generated method stub
 		return null;
 	}
