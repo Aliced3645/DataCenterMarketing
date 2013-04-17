@@ -22,6 +22,7 @@ import org.openflow.protocol.OFFeaturesRequest;
 import org.openflow.protocol.OFFlowMod;
 import org.openflow.protocol.OFMatch;
 import org.openflow.protocol.OFMessage;
+import org.openflow.protocol.OFPacketOut;
 import org.openflow.protocol.OFPacketQueue;
 import org.openflow.protocol.OFPhysicalPort;
 import org.openflow.protocol.OFPort;
@@ -41,6 +42,8 @@ import org.openflow.vendor.openflow.OFQueueModifyVendorData;
 import org.restlet.engine.io.IoState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.xml.internal.messaging.saaj.packaging.mime.util.BEncoderStream;
 
 import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
@@ -390,52 +393,129 @@ public class LowLevelController implements IOFSwitchListener,
      * 
      * 
      */
+
+    private class TimePair
+    {
+	public long start;
+	public long end;
+
+	public TimePair(long s, long e)
+	{
+	    start = s;
+	    end = s;
+	}
+
+    }
+
+    // bench marks cache
+    private HashMap<String, TimePair> routesBenchMarks = new HashMap();
+
     public long probeLatency(Route rt, long bandwidth) throws Exception
     {
+
+	// TODO check cache
+
+	// TODO first and last port needs to be configured to the port of
+	// controller
+
+	// for the first one, we make a packet and send it to the first swicth
+	// the last switch send the packet back, as required by an action
+
 	// allocate the reservation switch by switch
 	List<NodePortTuple> switchesPorts = rt.getPath();
 	if (switchesPorts.size() < 2)
 	{
 	    debug("Route length is not right.");
 	}
+	if (switchesPorts.size() % 2 == 1)
+	{
+	    debug("mismatched switch in-out port number!");
+	}
+
 	int index = 0;
-	// the first allocation, instead of a table forwarding packet from start
-	// host to next switch
-	// we add a rule to forward packet from controller to next switch
+	IOFSwitch startSW = null;
 
-	// get the switch
-	NodePortTuple firstPair = switchesPorts.get(index);
-	long nodePid = firstPair.getNodeId();
-	IOFSwitch sw = switches.get(nodePid);
-	short ingressPortPid = firstPair.getPortId();
-
-	NodePortTuple secondPair = switchesPorts.get(index);
-	short egressPortPid = secondPair.getPortId();
-	ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
-	OFFlowMod flowMod = new OFFlowMod();
-	flowMod.setType(OFType.FLOW_MOD);
-	OFAction outputTo = new OFActionOutput(egressPortPid);
-	actionsTo.add(outputTo);
-	OFMatch match = new OFMatch();
-	try
+	while (index < switchesPorts.size())
 	{
-	    match.setNetworkDestination(IPv4.toIPv4Address(InetAddress
-		    .getLocalHost().getHostAddress()));
-	    match.setNetworkSource(IPv4.toIPv4Address(InetAddress
-		    .getLocalHost().getHostAddress()));
-	}
-	catch (Exception e)
-	{
-	    debug("error geting local controler iP!");
-	    throw e;
-	}
-	match.setDataLayerType(Ethernet.TYPE_IPv4);
-	flowMod.setActions(actionsTo);
-	flowMod.setMatch(match);
+	    // get the switch
+	    NodePortTuple firstPair = switchesPorts.get(index);
+	    long nodePid = firstPair.getNodeId();
+	    IOFSwitch sw = switches.get(nodePid);
+	    short ingressPortPid = firstPair.getPortId();
+	    index++;
+	    NodePortTuple secondPair = switchesPorts.get(index);
+	    short egressPortPid = secondPair.getPortId();
+	    index++;
 
-	writeFlowModToSwitch(sw, flowMod);
+	    if (firstPair.getNodeId() != secondPair.getNodeId())
+	    {
+		debug("mismatched switch numbers!");
+	    }
 
+	    ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
+	    OFFlowMod flowMod = new OFFlowMod();
+	    flowMod.setType(OFType.FLOW_MOD);
+	    OFAction outputTo;
+	    if (index == switchesPorts.size() - 1)
+	    {
+		// output to controller
+		outputTo = new OFActionOutput(OFPort.OFPP_CONTROLLER.getValue());
+
+	    }
+	    else
+	    {
+		outputTo = new OFActionOutput(egressPortPid);
+	    }
+
+	    actionsTo.add(outputTo);
+	    OFMatch match = new OFMatch();
+	    if (index == 1)
+	    {
+		// match.setInputPort(ingressPortPid);
+		// leave the ingress at the first switch as wild card
+		startSW = sw;
+	    }
+	    else
+	    {
+		match.setInputPort(ingressPortPid);
+
+	    }
+	    try
+	    {
+		match.setNetworkDestination(IPv4.toIPv4Address(InetAddress
+			.getLocalHost().getHostAddress()));
+		match.setNetworkSource(IPv4.toIPv4Address(InetAddress
+			.getLocalHost().getHostAddress()));
+	    }
+	    catch (Exception e)
+	    {
+		debug("error geting local controler iP!");
+		throw e;
+	    }
+	    match.setDataLayerType(Ethernet.TYPE_IPv4);
+	    flowMod.setActions(actionsTo);
+	    flowMod.setMatch(match);
+
+	    writeFlowModToSwitch(sw, flowMod);
+	}
 	// send the probe packet
+
+	// an ip v4 packet
+	IPv4 probe = new IPv4();
+	probe.setSourceAddress(InetAddress.getLocalHost().getHostAddress());
+	probe.setDestinationAddress(InetAddress.getLocalHost().getHostAddress());
+	// put the identifier string in the body
+
+	// packet out ofoutmessage
+	OFPacketOut probeMsg = new OFPacketOut();
+	probeMsg.setPacketData(probe.serialize());
+
+	// record the time
+	routesBenchMarks.put(rt.toString(), new TimePair(System.nanoTime(), 0));
+
+	// send it out
+
+	startSW.write(probeMsg, null);// TODO context?
 
 	return 1l;
     }

@@ -238,6 +238,7 @@ public class OFMessage {
         Ethernet eth;
         StringBuffer sb =  new StringBuffer("");
 
+        //EXAM time
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
         Date date = new Date();
 
