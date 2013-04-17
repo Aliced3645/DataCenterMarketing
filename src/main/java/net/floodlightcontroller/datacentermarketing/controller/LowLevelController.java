@@ -61,6 +61,7 @@ import net.floodlightcontroller.datacentermarketing.MarketManager;
 import net.floodlightcontroller.devicemanager.IDevice;
 import net.floodlightcontroller.devicemanager.IDeviceService;
 import net.floodlightcontroller.devicemanager.SwitchPort;
+import net.floodlightcontroller.packet.Data;
 import net.floodlightcontroller.packet.Ethernet;
 import net.floodlightcontroller.packet.IPv4;
 import net.floodlightcontroller.routing.IRoutingService;
@@ -505,6 +506,7 @@ public class LowLevelController implements IOFSwitchListener,
 	probe.setSourceAddress(InetAddress.getLocalHost().getHostAddress());
 	probe.setDestinationAddress(InetAddress.getLocalHost().getHostAddress());
 	// put the identifier string in the body
+	probe.setPayload(new Data(rt.toString().getBytes()));
 
 	// packet out ofoutmessage
 	OFPacketOut probeMsg = new OFPacketOut();
