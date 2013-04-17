@@ -20,7 +20,7 @@ public class BidResultResource extends ServerResource{
 		Bidder bidder = querier.getBidder(URI);
 		if(bidder == null)
 			return null;
-		System.out.println(bidder.getLastRequest());
+		//System.out.println(bidder.getLastRequest());
 		return bidder.getLatestResult();
 		
 	}
