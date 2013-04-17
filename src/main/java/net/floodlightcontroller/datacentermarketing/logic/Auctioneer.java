@@ -53,6 +53,9 @@ public class Auctioneer {
 		super();
 		requestsForThisRound = new LinkedHashMap<String, BidRequest>();
 		resultsForThisRound = new LinkedHashMap<String, BidResult>();
+		requestsForNextRound = new LinkedHashMap<String, BidRequest>();
+		//default strategy..
+		this.strategy = new FirstComeFirstServeStrategy();
 		BidResult br = new BidResult();
 		br.setAllocationResultInString("Congratulations");
 		br.setBidderID("Shu Zhang");
@@ -101,16 +104,17 @@ public class Auctioneer {
 
 	// a bidding round has ended, clear the round
 	public void clearRound() {
-		synchronized (this) {
+		//synchronized (this) {
 			requestsForThisRound.clear();
-			resultsForThisRound.clear();
+			if(resultsForThisRound != null)
+				resultsForThisRound.clear();
 			// If there are bids for the next round, move them to this buffer
 			if (!requestsForNextRound.isEmpty()) {
 				requestsForThisRound = requestsForNextRound;
 				requestsForNextRound = new LinkedHashMap<String, BidRequest>();
 			}
 			this.setNotBusy();
-		}
+		//}
 	}
 
 	public LinkedHashMap<String, BidResult> getResultsForThisRound() {
