@@ -39,7 +39,7 @@ public class BiddingClock implements Runnable{
 	int delay= 30000;
 	private Timer timer;	
 	
-	
+	long currentTime;
 	@Override
 	//send the auctioneer signals
 	//when a bidding round begins/ends ???

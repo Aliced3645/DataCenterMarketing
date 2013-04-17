@@ -14,6 +14,7 @@ public class BidResult {
 	int round;
 	//bidder ID
 	String bidderID;
+	private boolean successful;
 	
 	
 	

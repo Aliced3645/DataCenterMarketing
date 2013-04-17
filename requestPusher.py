@@ -34,11 +34,12 @@ parser.add_argument('-data', dest='data', action='store', help='data to transmit
 parser.add_argument('-bid', dest='action', action='store_const', const='bid',
         default='bid', help='action: bid, queray, result')
 parser.add_argument('-query', dest='action', action='store_const',
-        const='query', default='bid', help='action: bid, query,result, allresults')
+        const='query', default='bid', help='action: bid, query,result,allresults, time')
 parser.add_argument('-result', dest='action', action='store_const',
-        const='result', default='bid', help='action: bid, query,result, allresults')
+        const='result', default='bid', help='action: bid, query,result, allresults, time')
 parser.add_argument('-allresults', dest='action', action='store_const',
-        const='query', default='bid', help='action: bid, query, result,allresults')
+        const='query', default='bid', help='action: bid, query, result,allresults, time')
+parser.add_argument('-time', dest='action', action='store_const', const='query', default='bid', help='action: bid,query, result,allresults, time')
 args = parser.parse_args()
 
 if args.action == 'bid':
