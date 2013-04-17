@@ -22,6 +22,7 @@ import org.openflow.protocol.OFFeaturesRequest;
 import org.openflow.protocol.OFFlowMod;
 import org.openflow.protocol.OFMatch;
 import org.openflow.protocol.OFMessage;
+import org.openflow.protocol.OFPacketOut;
 import org.openflow.protocol.OFPacketQueue;
 import org.openflow.protocol.OFPhysicalPort;
 import org.openflow.protocol.OFPort;
@@ -41,6 +42,8 @@ import org.openflow.vendor.openflow.OFQueueModifyVendorData;
 import org.restlet.engine.io.IoState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.xml.internal.messaging.saaj.packaging.mime.util.BEncoderStream;
 
 import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
@@ -390,14 +393,33 @@ public class LowLevelController implements IOFSwitchListener,
      * 
      * 
      */
+
+    private class TimePair
+    {
+	public long start;
+	public long end;
+
+	public TimePair(long s, long e)
+	{
+	    start = s;
+	    end = s;
+	}
+
+    }
+
+    // bench marks cache
+    private HashMap<String, TimePair> routesBenchMarks = new HashMap();
+
     public long probeLatency(Route rt, long bandwidth) throws Exception
     {
 
+	// TODO check cache
+
 	// TODO first and last port needs to be configured to the port of
 	// controller
-	
-	//for the first one, we make a packet and send it to the first swicth
-	//the last switch send the packet back, as required by an action
+
+	// for the first one, we make a packet and send it to the first swicth
+	// the last switch send the packet back, as required by an action
 
 	// allocate the reservation switch by switch
 	List<NodePortTuple> switchesPorts = rt.getPath();
@@ -411,6 +433,8 @@ public class LowLevelController implements IOFSwitchListener,
 	}
 
 	int index = 0;
+	IOFSwitch startSW = null;
+
 	while (index < switchesPorts.size())
 	{
 	    // get the switch
@@ -434,8 +458,9 @@ public class LowLevelController implements IOFSwitchListener,
 	    OFAction outputTo;
 	    if (index == switchesPorts.size() - 1)
 	    {
+		// output to controller
+		outputTo = new OFActionOutput(OFPort.OFPP_CONTROLLER.getValue());
 
-		outputTo = new OFActionOutput(egressPortPid);
 	    }
 	    else
 	    {
@@ -446,7 +471,9 @@ public class LowLevelController implements IOFSwitchListener,
 	    OFMatch match = new OFMatch();
 	    if (index == 1)
 	    {
-		match.setInputPort(ingressPortPid);
+		// match.setInputPort(ingressPortPid);
+		// leave the ingress at the first switch as wild card
+		startSW = sw;
 	    }
 	    else
 	    {
@@ -472,6 +499,23 @@ public class LowLevelController implements IOFSwitchListener,
 	    writeFlowModToSwitch(sw, flowMod);
 	}
 	// send the probe packet
+
+	// an ip v4 packet
+	IPv4 probe = new IPv4();
+	probe.setSourceAddress(InetAddress.getLocalHost().getHostAddress());
+	probe.setDestinationAddress(InetAddress.getLocalHost().getHostAddress());
+	// put the identifier string in the body
+
+	// packet out ofoutmessage
+	OFPacketOut probeMsg = new OFPacketOut();
+	probeMsg.setPacketData(probe.serialize());
+
+	// record the time
+	routesBenchMarks.put(rt.toString(), new TimePair(System.nanoTime(), 0));
+
+	// send it out
+
+	startSW.write(probeMsg, null);// TODO context?
 
 	return 1l;
     }
