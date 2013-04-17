@@ -38,8 +38,8 @@ parser.add_argument('-query', dest='action', action='store_const',
 parser.add_argument('-result', dest='action', action='store_const',
         const='result', default='bid', help='action: bid, query,result, allresults, time')
 parser.add_argument('-allresults', dest='action', action='store_const',
-        const='query', default='bid', help='action: bid, query, result,allresults, time')
-parser.add_argument('-time', dest='action', action='store_const', const='query', default='bid', help='action: bid,query, result,allresults, time')
+        const='allresults', default='bid', help='action: bid, query, result,allresults, time')
+parser.add_argument('-time', dest='action', action='store_const', const='time', default='bid', help='action: bid,query, result,allresults, time')
 args = parser.parse_args()
 
 if args.action == 'bid':
@@ -100,6 +100,20 @@ elif args.action == 'result':
         print 'BidderID not filled'
         sys.exit()
     uri = "http://%s/marketing/result/%s" %(args.controllerRestIp, bidderID)
+    command = "curl -s " + uri + " | python -mjson.tool"
+    result = os.popen(command).read()
+    print '\n' + result
+    sys.exit()
+
+elif args.action == 'allresults':
+    uri = "http://%s/marketing/result/" %(args.controllerRestIp)
+    command = "curl -s " + uri + " | python -mjson.tool"
+    result = os.popen(command).read()
+    print '\n' + result
+    sys.exit()
+
+elif args.action == 'time':
+    uri = "http://%s/marketing/time/" %(args.controllerRestIp)
     command = "curl -s " + uri + " | python -mjson.tool"
     result = os.popen(command).read()
     print '\n' + result

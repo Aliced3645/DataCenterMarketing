@@ -4,6 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.Timer;
 
+import net.floodlightcontroller.datacentermarketing.messagepasser.ClockJSONSerializer;
+
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+@JsonSerialize(using=ClockJSONSerializer.class)
 public class BiddingClock implements Runnable{
 	//performs as a thread to take care of time
 	//send hint to auctioneer when the auction cycle begins/ends
@@ -22,7 +26,7 @@ public class BiddingClock implements Runnable{
 	    	 Auctioneer.getInstance().clearRound();
 	    	 //a new round
 	    	 Auctioneer.getInstance().round ++ ;
-	    	 tickTimer.restart();
+	    	 tickTimer.start();
 	     }
 	 };
 	 
@@ -30,7 +34,9 @@ public class BiddingClock implements Runnable{
 		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			currentTime ++;
+			synchronized(this){
+				currentTime ++;
+			}
 		}
 		
 	 };
@@ -52,7 +58,7 @@ public class BiddingClock implements Runnable{
 	}
 
 	//in milliseconds
-	int roundTime= 30000;
+	int roundTime= 3000;
 	int tick = 100;
 	private Timer biddingTimer;
 	private Timer tickTimer;
@@ -60,7 +66,9 @@ public class BiddingClock implements Runnable{
 	long currentTime;
 	
 	public long getCurrentTime(){
-		return currentTime;
+		synchronized (this){
+			return currentTime;
+		}
 	}
 	
 	@Override
