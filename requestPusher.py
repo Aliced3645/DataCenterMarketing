@@ -31,6 +31,8 @@ parser.add_argument('-value', dest = 'value', action='store', help='value of the
 parser.add_argument('-min', dest='minRate', action='store', help='minimum required rate')
 parser.add_argument('-max', dest='maxRate', action='store', help='maximum required rate')
 parser.add_argument('-data', dest='data', action='store', help='data to transmit')
+parser.add_argument('-start', dest='start', action='store', help='start time')
+parser.add_argument('-end', dest='end', action='store', help='end time')
 parser.add_argument('-bid', dest='action', action='store_const', const='bid',
         default='bid', help='action: bid, queray, result')
 parser.add_argument('-query', dest='action', action='store_const',
@@ -50,6 +52,8 @@ if args.action == 'bid':
     minRate = args.minRate
     maxRate = args.maxRate
     data = args.data
+    start = args.start
+    end = args.end
 
     if bidderID is None:
         print 'BidderID not filled'
@@ -69,9 +73,15 @@ if args.action == 'bid':
     if data is None:
         print 'Data size is not filled'
         sys.exit()
+    if start is None:
+        print 'Start time is not filled'
+        sys.exit()
+    if end is None:
+        print'End time is not filled'
+        sys.exit()
 
     # all fields are submitted, construct the REST qurey string
-    json = " '{\"Bidder\":\"%s\", \"Value\":%s, \"SID\":%s, \"DID\":%s, \"MinRate\":%s, \"Data\":%s" %(bidderID, value, srcID, destID, minRate, data)
+    json = " '{\"Bidder\":\"%s\", \"Value\":%s, \"SID\":%s, \"DID\":%s, \"MinRate\":%s, \"Data\":%s,\"Start\":%s, \"End\":%s" %(bidderID, value, srcID, destID, minRate, data, start, end)
 
     if maxRate is not None:
         json += " \"MaxRate\":%s " %(maxRate)

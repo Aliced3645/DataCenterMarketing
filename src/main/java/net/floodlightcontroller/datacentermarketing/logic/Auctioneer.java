@@ -1,5 +1,6 @@
 package net.floodlightcontroller.datacentermarketing.logic;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,7 +9,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
 import java.util.Hashtable;
+
+import net.floodlightcontroller.datacentermarketing.messagepasser.RESTQuerier;
 
 //Auctioneer is a singleton class
 public class Auctioneer {
@@ -56,18 +60,13 @@ public class Auctioneer {
 		requestsForNextRound = new LinkedHashMap<String, BidRequest>();
 		//default strategy..
 		this.strategy = new FirstComeFirstServeStrategy();
-		BidResult br = new BidResult();
-		br.setAllocationResultInString("Congratulations");
-		br.setBidderID("Shu Zhang");
-		br.setRound(10);
-		resultsForThisRound.put(br.getBidderID(), br);
 	}
 
 	public LinkedHashMap<String, BidRequest> getBidRequestForThisRound() {
 		return this.requestsForThisRound;
 	}
 
-	public void computeAllocation() {
+	public void computeAllocation() throws IOException, InterruptedException, ExecutionException {
 		this.resultsForThisRound = strategy
 				.processAllocation(requestsForThisRound);
 	}

@@ -2,6 +2,9 @@ package net.floodlightcontroller.datacentermarketing.logic;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+
 import javax.swing.Timer;
 
 import net.floodlightcontroller.datacentermarketing.messagepasser.ClockJSONSerializer;
@@ -19,7 +22,18 @@ public class BiddingClock implements Runnable{
 	    	 tickTimer.stop();
 	    	 //time is up
 	    	 Auctioneer.getInstance().setBusy();
-	    	 Auctioneer.getInstance().computeAllocation();
+	    	 try {
+				Auctioneer.getInstance().computeAllocation();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	    	 Auctioneer.getInstance().setNotBusy();
 	    	
 	    	 PriceAdjuster.getInstance().adjustPrice(); 	 
@@ -58,7 +72,7 @@ public class BiddingClock implements Runnable{
 	}
 
 	//in milliseconds
-	int roundTime= 3000;
+	int roundTime= 30000;
 	int tick = 100;
 	private Timer biddingTimer;
 	private Timer tickTimer;

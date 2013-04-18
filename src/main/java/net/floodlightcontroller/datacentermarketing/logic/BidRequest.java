@@ -102,5 +102,24 @@ public class BidRequest implements Serializable{
 		return false;
 	}
 	
+	public float getStartTime(){
+		return requiredResources.get(Resource.START_TIME);
+	}
+	
+	public float getEndTime(){
+		return requiredResources.get(Resource.END_TIME);
+	}
+	
+	public float getMinBandwidth(){
+		return requiredResources.get(Resource.MIN_RATE);
+	}
+	
+	public float getMaxBandwidth(){
+		return requiredResources.get(Resource.MAX_RATE);
+	}
+	
+	public float getData(){
+		return requiredResources.get(Resource.DATA);
+	}
 	
 }

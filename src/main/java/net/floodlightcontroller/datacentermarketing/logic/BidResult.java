@@ -1,5 +1,8 @@
 package net.floodlightcontroller.datacentermarketing.logic;
 
+import java.util.LinkedList;
+
+import net.floodlightcontroller.datacentermarketing.Scheduling.Allocation;
 import net.floodlightcontroller.datacentermarketing.messagepasser.BidResultJSONSerializer;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -12,11 +15,11 @@ public class BidResult {
 
 	//round counter (which round generates the result? )
 	int round;
-	//bidder ID
-	String bidderID;
+	Bidder bidder;
 	//true for success
 	//false for fail
 	private boolean result;
+	
 	public boolean getResult(){
 		return result;
 	}
@@ -24,10 +27,19 @@ public class BidResult {
 	public void setResult(boolean _result){
 		result = _result;
 	}
-		
+	
+	private LinkedList<Allocation> allocations;
+	
+	public LinkedList<Allocation> getAllocations(){
+		return allocations;
+	}
+	
+	public void addAllocation(Allocation allocation){
+		this.allocations.add(allocation);
+	}
+	
 	//the allocation upon his requests
 	//For testing JSON
-	String allocationResultInString;
 
 	public int getRound() {
 		return round;
@@ -37,21 +49,12 @@ public class BidResult {
 		this.round = round;
 	}
 
-	public String getBidderID() {
-		return bidderID;
+	public Bidder getBidder() {
+		return bidder;
 	}
 
-	public void setBidderID(String bidderID) {
-		this.bidderID = bidderID;
+	public void setBidder(Bidder bidder) {
+		this.bidder = bidder;
 	}
-
-	public String getAllocationResultInString() {
-		return allocationResultInString;
-	}
-
-	public void setAllocationResultInString(String allocationResultInString) {
-		this.allocationResultInString = allocationResultInString;
-	}
-	
 	
 }

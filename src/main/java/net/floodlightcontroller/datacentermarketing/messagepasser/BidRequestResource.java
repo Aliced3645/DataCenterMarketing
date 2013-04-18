@@ -33,7 +33,7 @@ public class BidRequestResource extends ServerResource {
 	        
 	        //these six fields must be filled in the JSON request
 	        boolean bBidder = false, bValue = false , bSID = false, bDID = false , 
-	        		bMinRate = false, bData = false;
+	        		bMinRate = false, bData = false, bStart = false, bEnd = false;
 	        
 	        try {
 	            jp = f.createJsonParser(bidRequestString);
@@ -93,13 +93,24 @@ public class BidRequestResource extends ServerResource {
 	            	bidRequest.addRequestField(Resource.DATA, jp.getFloatValue());
 	            	bData = true;
 	            }
+	            else if(name == "Start"){
+	            	jp.nextToken();
+	            	bidRequest.addRequestField(Resource.START_TIME, jp.getFloatValue());
+	            	bStart = true;
+	            }
+	            else if(name == "End"){
+	            	jp.nextToken();
+	            	bidRequest.addRequestField(Resource.END_TIME, jp.getFloatValue());
+	            	bEnd = true;
+	            }
+	            
 	            else {
 	            	jp.nextToken();
 	            }
 	        }     
 	        
 	        //check if the bidRequest is value by seeing whether minimum set of fields are filled
-	        if(bBidder && bValue && bMinRate && bSID && bDID && bData)
+	        if(bBidder && bValue && bMinRate && bSID && bDID && bData && bStart && bEnd)
 	        	return bidRequest;
 	        else
 	        	//not a valid bid request
