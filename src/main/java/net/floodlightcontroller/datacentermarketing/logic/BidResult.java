@@ -14,12 +14,17 @@ public class BidResult {
 	int round;
 	//bidder ID
 	String bidderID;
-	private boolean successful;
+	//true for success
+	//false for fail
+	private boolean result;
+	public boolean getResult(){
+		return result;
+	}
 	
-	
-	
-	
-	
+	public void setResult(boolean _result){
+		result = _result;
+	}
+		
 	//the allocation upon his requests
 	//For testing JSON
 	String allocationResultInString;
