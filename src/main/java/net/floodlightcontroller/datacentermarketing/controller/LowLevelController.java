@@ -22,6 +22,7 @@ import org.openflow.protocol.OFFeaturesRequest;
 import org.openflow.protocol.OFFlowMod;
 import org.openflow.protocol.OFMatch;
 import org.openflow.protocol.OFMessage;
+import org.openflow.protocol.OFPacketIn;
 import org.openflow.protocol.OFPacketOut;
 import org.openflow.protocol.OFPacketQueue;
 import org.openflow.protocol.OFPhysicalPort;
@@ -61,6 +62,7 @@ import net.floodlightcontroller.datacentermarketing.MarketManager;
 import net.floodlightcontroller.devicemanager.IDevice;
 import net.floodlightcontroller.devicemanager.IDeviceService;
 import net.floodlightcontroller.devicemanager.SwitchPort;
+import net.floodlightcontroller.packet.Data;
 import net.floodlightcontroller.packet.Ethernet;
 import net.floodlightcontroller.packet.IPv4;
 import net.floodlightcontroller.routing.IRoutingService;
@@ -505,6 +507,7 @@ public class LowLevelController implements IOFSwitchListener,
 	probe.setSourceAddress(InetAddress.getLocalHost().getHostAddress());
 	probe.setDestinationAddress(InetAddress.getLocalHost().getHostAddress());
 	// put the identifier string in the body
+	probe.setPayload(new Data(rt.toString().getBytes()));
 
 	// packet out ofoutmessage
 	OFPacketOut probeMsg = new OFPacketOut();
@@ -518,6 +521,28 @@ public class LowLevelController implements IOFSwitchListener,
 	startSW.write(probeMsg, null);// TODO context?
 
 	return 1l;
+    }
+
+    private void finishRouteBenchMark(OFPacketIn msg)
+    {
+	// get the data out of the msg
+	IPv4 probe = new IPv4();
+	probe.deserialize(msg.getPacketData(), 0, msg.getPacketData().length);
+	String id = ((Data) probe.getPayload()).toString();
+
+	if (routesBenchMarks.containsKey(id))
+	{
+	    // update the back time
+	    routesBenchMarks.put(id, new TimePair(
+		    routesBenchMarks.get(id).start, System.nanoTime()));
+
+	}
+	else
+	{
+	    debug("what???");
+
+	}
+
     }
 
     @Override
@@ -581,6 +606,10 @@ public class LowLevelController implements IOFSwitchListener,
 	    OFError error = (OFError) msg;
 	    // System.out.println("wowow");
 	    break;
+
+	case PACKET_IN:
+	    finishRouteBenchMark((OFPacketIn) msg);
+
 	default:
 	    System.out.println("unexpected message type: " + msg.getType());
 	}
