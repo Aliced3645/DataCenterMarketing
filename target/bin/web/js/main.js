@@ -28,9 +28,6 @@ var AppRouter = Backbone.Router.extend({
         "host/:id":"hostDetails",
         // "vlans":"vlanList" // maybe one day
         // "vlan/:id":"vlanDetails"
-        
-        //Here we go, datacenter marketing
-        "marketing" : 
     },
 
     initialize:function () {

@@ -285,6 +285,7 @@ public class LowLevelController implements IOFSwitchListener,
 		 */
 		SwitchPort[] srcSwitchPorts = srcDev.getAttachmentPoints();
 		SwitchPort[] destSwitchPorts = destDev.getAttachmentPoints();
+		
 		for (SwitchPort sourceSwitchPort : srcSwitchPorts) {
 			for (SwitchPort destSwitchPort : destSwitchPorts) {
 				ArrayList<Route> someRoutes = routingManager.getRoutes(
@@ -294,7 +295,7 @@ public class LowLevelController implements IOFSwitchListener,
 				someRoutes = null;
 			}
 		}
-
+		//routes = routingManager.getRoutes(srcID, destID, true);
 		return routes;
 	}
 
