@@ -285,6 +285,7 @@ public class LowLevelController implements IOFSwitchListener,
 		 */
 		SwitchPort[] srcSwitchPorts = srcDev.getAttachmentPoints();
 		SwitchPort[] destSwitchPorts = destDev.getAttachmentPoints();
+		
 		for (SwitchPort sourceSwitchPort : srcSwitchPorts) {
 			for (SwitchPort destSwitchPort : destSwitchPorts) {
 				ArrayList<Route> someRoutes = routingManager.getRoutes(
@@ -294,7 +295,7 @@ public class LowLevelController implements IOFSwitchListener,
 				someRoutes = null;
 			}
 		}
-
+		//routes = routingManager.getRoutes(srcID, destID, true);
 		return routes;
 	}
 
@@ -382,6 +383,33 @@ public class LowLevelController implements IOFSwitchListener,
 
 	}
 
+	
+	public boolean installRoute(long srcID, long destID, Route rt, long bandwidth) throws Exception {
+		List<NodePortTuple> switchesPorts = rt.getPath();
+		if (switchesPorts.size() < 2) {
+			debug("Route length is not right.");
+		}
+		if (switchesPorts.size() % 2 == 1) {
+			debug("mismatched switch in-out port number!");
+		}
+		int index = 0;
+		IOFSwitch startSW = null;
+		//get devices
+		IDevice srcDev = devices.get(srcID);
+		IDevice destDev = devices.get(destID);
+		//set up match rule
+		OFMatch match = new OFMatch();
+		match.setDataLayerDestination(destDev.getMACAddressString());
+		match.setDataLayerSource(srcDev.getMACAddressString());
+		
+		
+		while (index < switchesPorts.size()) {
+			
+		}
+		
+		return false;
+	}
+	
 	// bench marks cache
 	private HashMap<String, TimePair> routesBenchMarks = new HashMap();
 
