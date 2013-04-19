@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.1" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:UMLLabProfile="http:///schemas/UMLLabProfile/NS/0" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xsi:schemaLocation="http:///schemas/UMLLabProfile/NS/0 pathmap://UMLLAB_PROFILES/UMLLab.profile.uml#UMLLabProfile-Annotation_2-UMLLabProfile">
+  <uml:Model xmi:id="_C7nfwKeWEeKEbJP506GSQg" name="DataCenterMarketing">
+    <eAnnotations xmi:id="_DS5XUKeWEeKEbJP506GSQg" source="http://ns.yatta.de/umllab">
+      <contents xmi:type="ecore:EAnnotation" xmi:id="_DS7MgKeWEeKEbJP506GSQg" source="codegen">
+        <details xmi:id="_DS7MgaeWEeKEbJP506GSQg" key="codegenDirectory" value="/DataCenterMarketing/lib/gen-java"/>
+      </contents>
+    </eAnnotations>
+    <profileApplication xmi:id="_DTAFAKeWEeKEbJP506GSQg">
+      <eAnnotations xmi:id="_DTChQKeWEeKEbJP506GSQg" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="pathmap://UMLLAB_PROFILES/UMLLab.profile.uml#UMLLabProfile-Annotation_2-UMLLabProfile"/>
+      </eAnnotations>
+      <appliedProfile href="pathmap://UMLLAB_PROFILES/UMLLab.profile.uml#UMLLabProfile"/>
+    </profileApplication>
+  </uml:Model>
+  <UMLLabProfile:TargetLanguage xmi:id="_DTIn4KeWEeKEbJP506GSQg" base_Package="_C7nfwKeWEeKEbJP506GSQg">
+    <languageName>java</languageName>
+  </UMLLabProfile:TargetLanguage>
+</xmi:XMI>
