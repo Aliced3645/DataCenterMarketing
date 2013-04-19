@@ -3,8 +3,6 @@ package net.floodlightcontroller.datacentermarketing.messagepasser;
 import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
-import org.restlet.routing.Template;
-
 import net.floodlightcontroller.restserver.RestletRoutable;
 
 public class BiddingMessageRouter implements RestletRoutable

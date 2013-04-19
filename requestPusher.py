@@ -35,6 +35,8 @@ parser.add_argument('-start', dest='start', action='store', help='start time')
 parser.add_argument('-end', dest='end', action='store', help='end time')
 parser.add_argument('-bid', dest='action', action='store_const', const='bid',
         default='bid', help='action: bid, queray, result')
+parser.add_argument('-ping', dest='action', action='store_const', const='ping',
+        default='ping', help='action: pibg, bid, queray, result')
 parser.add_argument('-query', dest='action', action='store_const',
         const='query', default='bid', help='action: bid, query,result,allresults, time')
 parser.add_argument('-result', dest='action', action='store_const',
@@ -100,6 +102,23 @@ elif args.action == 'query':
         sys.exit()
     uri = "http://%s/marketing/request/%s" %(args.controllerRestIp, bidderID)
     command = "curl -s " + uri + " | python -mjson.tool"
+    result = os.popen(command).read()
+    print '\n' + result
+    sys.exit()
+
+elif args.action == 'ping':
+    srcID = args.srcID
+    destID = args.destID
+    if srcID is None:
+        print 'Source Host ID not filled'
+        sys.exit()
+    if destID is None:
+        print 'Destination Host ID not filled'
+        sys.exit()
+    json = " '{\"SID\":%s, \"DID\":%s" %(srcID, destID)
+    json += "}'"
+    uri = "http://%s/marketing/latency/" %(args.controllerRestIp)
+    command = "curl -d" + json + " " + uri
     result = os.popen(command).read()
     print '\n' + result
     sys.exit()
