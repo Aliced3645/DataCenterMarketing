@@ -21,58 +21,54 @@ import net.floodlightcontroller.topology.NodePortTuple;
  *         The scheduler should also provide snapshots for the marketing module
  *         to reason base on.
  */
-public class Scheduler
-{
-    private HashMap<Integer, Switch> switches;
+public class Scheduler {
+	private HashMap<Integer, Switch> switches;
 
-    private Scheduler instance = null;
+	private static Scheduler instance = null;
 
-    private Scheduler()
-    {
-	switches = new HashMap<Integer, Switch>();
-	// TODO how to initialize all the switches?
-    }
+	private Scheduler() {
+		switches = new HashMap<Integer, Switch>();
+		// TODO how to initialize all the switches?
+	}
 
-    public Scheduler instance()
-    {
-	if (instance == null)
-	    instance = new Scheduler();
+	public static Scheduler getInstance() {
+		if (instance == null)
+			instance = new Scheduler();
 
-	return instance;
-
-    }
-
-    /*
-     * validate to see if a repute is feasible in current scheduler
-     */
-    public boolean validateRoute(Route rt, Allocation alloc)
-    {
-	// we need to validate all the possible queue reservations
-	List<NodePortTuple> switchPorts = rt.getPath();
-	for (int a = 0; a < switchPorts.size(); a++)
-	{
-	    NodePortTuple np = switchPorts.get(a);
-	    // validate this port is ok for reservation
-	    /* to do : get numbers */
-	    int switchNum = 01;
-	    int portNum = 1;
-
-	    HashSet<Integer> ps = switches.get(switchNum).getPort(portNum)
-		    .possibleQ(alloc);
-
-	    if (ps != null)
-		return false;
+		return instance;
 
 	}
-	return true;
-    }
 
-    public boolean registerRoute(Route rt)
-    {
-	if (!validateRoute(rt, null))
-	    return false;
+	/*
+	 * validate to see if a repute is feasible in current scheduler
+	 */
+	public boolean validateRoute(Route rt, Allocation alloc) {
+		if (true)
+			return true;
+		// we need to validate all the possible queue reservations
+		List<NodePortTuple> switchPorts = rt.getPath();
+		for (int a = 0; a < switchPorts.size(); a++) {
+			NodePortTuple np = switchPorts.get(a);
+			// validate this port is ok for reservation
+			/* to do : get numbers */
+			int switchNum = 01;
+			int portNum = 1;
 
-	return true;
-    }
+			HashSet<Integer> ps = switches.get(switchNum).getPort(portNum)
+					.possibleQ(alloc);
+
+			if (ps != null)
+				return false;
+
+		}
+		return true;
+	}
+
+	public boolean registerRoute(Route rt) {
+		if (!validateRoute(rt, null))
+			return false;
+
+		return true;
+	}
 
 }

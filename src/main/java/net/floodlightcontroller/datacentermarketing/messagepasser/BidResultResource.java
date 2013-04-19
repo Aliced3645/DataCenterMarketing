@@ -1,6 +1,11 @@
 package net.floodlightcontroller.datacentermarketing.messagepasser;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import net.floodlightcontroller.datacentermarketing.logic.Auctioneer;
 import net.floodlightcontroller.datacentermarketing.logic.BidResult;
 import net.floodlightcontroller.datacentermarketing.logic.Bidder;
@@ -13,15 +18,27 @@ public class BidResultResource extends ServerResource{
 	
 	//Return the latest bidding result for a particular user
 	@Get("json")
-	public BidResult retriveResults(){
-		//System.out.println(this.getAttribute());
+	public LinkedList<BidResult> retriveResults(){
 		RESTQuerier querier = RESTQuerier.getInstance();
-		String URI = querier.getBidderURIForRequest(this.getReference());
+		String URI = querier.getBidderURIForResult(this.getReference());
+		LinkedList<BidResult> toReturn = new LinkedList<BidResult>();
+		System.out.println("\n\nURI:" + URI + "\n\n");
+		if(URI.length() == 0){
+			//which means return all results
+			LinkedHashMap<String, BidResult> resultsMap = Auctioneer.getInstance().getResultsForThisRound();
+			Set<Entry<String, BidResult>> resultSet = resultsMap.entrySet();
+			for(Entry<String, BidResult> e : resultSet){
+				toReturn.add(e.getValue());
+			}
+			return toReturn;
+		}
+		
 		Bidder bidder = querier.getBidder(URI);
 		if(bidder == null)
 			return null;
 		//System.out.println(bidder.getLastRequest());
-		return bidder.getLatestResult();
+		toReturn.add(bidder.getLatestResult());
+		return toReturn;
 		
 	}
 	

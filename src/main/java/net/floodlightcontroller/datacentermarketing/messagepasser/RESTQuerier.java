@@ -24,7 +24,7 @@ public class RESTQuerier {
 	}
 	
 	private static String requestTemplate = "http://localhost:8080/marketing/request/";
-	private static String resultTemplate =  "http://localhost:8080/marketing/result";
+	private static String resultTemplate =  "http://localhost:8080/marketing/result/";
 	
 	HashMap<String, Bidder> biddersMap = new HashMap<String, Bidder>();
 	

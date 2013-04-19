@@ -16,8 +16,10 @@ public class BidResultJSONSerializer extends JsonSerializer<BidResult>{
 			JsonProcessingException {
 		jGen.writeStartObject();
 		jGen.writeNumberField("Round", bidResult.getRound());
-		jGen.writeStringField("BidderID", bidResult.getBidderID());
-		jGen.writeStringField("BidResult", bidResult.getAllocationResultInString());
+		jGen.writeStringField("BidderID", bidResult.getBidder().getBidderID());
+		String result = (bidResult.getResult() == true? "Win something" : "Gain nothing");
+		jGen.writeStringField("Result", result);
+		//jGen.write
 		jGen.writeEndObject();
 	}
 	

@@ -16,6 +16,7 @@ public class BiddingMessageRouter implements RestletRoutable{
 		router.attach("/result/{BidderID}", BidResultResource.class);
 		//router.attach("/request/json/", BidRequestResource.class).setMatchingMode(Template.MODE_STARTS_WITH);
 		router.attach("/request/{BidderID}", BidRequestResource.class);
+		router.attach("/result/", BidResultResource.class);
 		router.attach("/time/", TimeResource.class);
 		//router.at
 		return router;
