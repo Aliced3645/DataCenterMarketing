@@ -41,18 +41,14 @@ import org.openflow.util.U16;
 import org.openflow.vendor.openflow.OFOpenFlowVendorData;
 import org.openflow.vendor.openflow.OFQueueDeleteVendorData;
 import org.openflow.vendor.openflow.OFQueueModifyVendorData;
-import org.restlet.engine.io.IoState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.xml.internal.messaging.saaj.packaging.mime.util.BEncoderStream;
 
 import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
 import net.floodlightcontroller.core.IOFMessageListener;
 import net.floodlightcontroller.core.IOFSwitch;
 import net.floodlightcontroller.core.IOFSwitchListener;
-import net.floodlightcontroller.core.IListener.Command;
 import net.floodlightcontroller.core.annotations.LogMessageDoc;
 import net.floodlightcontroller.core.module.FloodlightModuleContext;
 import net.floodlightcontroller.core.module.FloodlightModuleException;
