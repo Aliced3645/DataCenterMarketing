@@ -18,7 +18,7 @@ public class BiddingMessageRouter implements RestletRoutable{
 		router.attach("/request/{BidderID}", BidRequestResource.class);
 		router.attach("/result/", BidResultResource.class);
 		router.attach("/time/", TimeResource.class);
-		//router.at
+
 		return router;
 	}
 
