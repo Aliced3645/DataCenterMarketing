@@ -403,7 +403,26 @@ public class LowLevelController implements IOFSwitchListener,
     private class TimePair
     {
 	public long start;
-	public long end;
+	private long end;
+	private boolean isDone;
+
+	/*
+	 * public synchronized boolean isDone() { return isDone; }
+	 * 
+	 * public synchronized void setDone(boolean isDone) { this.isDone =
+	 * isDone; }
+	 */
+
+	public synchronized long getEnd()
+	{
+	    return end;
+	}
+
+	public synchronized void setEnd(long end)
+	{
+	    this.end = end;
+	    isDone = true;
+	}
 
 	public TimePair(long s, long e)
 	{
@@ -444,9 +463,21 @@ public class LowLevelController implements IOFSwitchListener,
     }
 
     // bench marks cache
-    private HashMap<String, Future<TimePair>> routesBenchMarks = new HashMap();
+    private HashMap<String, TimePair> routesBenchMarks = new HashMap();
 
-    public void probeLatency(Route rt, long bandwidth) throws Exception
+    public void ping(long start, long end) throws Exception
+    {
+	routesBenchMarks.clear();
+	// get the routes
+	ArrayList<Route> routes = getNonLoopPaths(start, end);
+	for (Route rt : routes)
+	{
+	    probeLatency(rt);
+	}
+
+    }
+
+    private void probeLatency(Route rt) throws Exception
     {
 
 	// TODO check cache
@@ -617,29 +648,40 @@ public class LowLevelController implements IOFSwitchListener,
 
 	startSw.write(probeMsg, null);// TODO context?
 
+	debug("\n\n\n\n\n\npacket out, now wait for inmessage");
+
 	return;
     }
 
     private void finishRouteBenchMark(OFPacketIn msg)
     {
+
 	// get the data out of the msg
-	IPv4 probe = new IPv4();
-	probe.deserialize(msg.getPacketData(), 0, msg.getPacketData().length);
-	String id = ((Data) probe.getPayload()).toString();
-
-	if (routesBenchMarks.containsKey(id))
+	try
 	{
-	    // update the back time
-	    routesBenchMarks.put(id, new TimePair(
-		    routesBenchMarks.get(id).start, System.nanoTime()));
+	    IPv4 probe = new IPv4();
+	    probe.deserialize(msg.getPacketData(), 0,
+		    msg.getPacketData().length);
+	    String id = ((Data) probe.getPayload()).toString();
 
-	    // TODO tear down the route
+	    if (routesBenchMarks.containsKey(id))
+	    {
+		// update the back time
+		routesBenchMarks.get(id).setEnd(System.nanoTime());
+		debug("\n\n\n\n\n\n\n\n\nActually worked! : " + id);
+		// TODO tear down the route
 
+	    }
+	    else
+	    {
+		debug("None idetified id: " + id);
+
+	    }
 	}
-	else
+	catch (Exception e)
 	{
-	    debug("what???");
-
+	    debug("Exception : " + e.toString());
+	    return;
 	}
 
     }
@@ -723,7 +765,7 @@ public class LowLevelController implements IOFSwitchListener,
 	    break;
 
 	case PACKET_IN:
-	    // finishRouteBenchMark((OFPacketIn) msg);
+	    finishRouteBenchMark((OFPacketIn) msg);
 	    break;
 	default:
 	    System.out.println("unexpected message type: " + msg.getType());

@@ -3,6 +3,7 @@ package net.floodlightcontroller.datacentermarketing.messagepasser;
 import java.io.IOException;
 import java.util.LinkedList;
 
+import net.floodlightcontroller.datacentermarketing.MarketManager;
 import net.floodlightcontroller.datacentermarketing.logic.Auctioneer;
 import net.floodlightcontroller.datacentermarketing.logic.BidRequest;
 import net.floodlightcontroller.datacentermarketing.logic.Bidder;
@@ -16,6 +17,8 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
+
+import com.sun.corba.se.spi.ior.MakeImmutable;
 
 public class LatencyTestResource extends ServerResource
 {
@@ -37,7 +40,7 @@ public class LatencyTestResource extends ServerResource
 
     @Post
     @Put
-    public void postPingRequest(String pingRequest) throws IOException
+    public void postPingRequest(String pingRequest) throws Exception
     {
 	System.out.println(pingRequest);
 
@@ -95,6 +98,9 @@ public class LatencyTestResource extends ServerResource
 	System.out.println("gathered route ping request for " + start + " "
 		+ end);
 
+	MarketManager.getInstance().getLowLevelController().ping(start, end);
+	
+	
 	return;
     }
 
