@@ -95,7 +95,7 @@ public class LowLevelController implements IOFSwitchListener,
 
     private Future<OFFeaturesReply> future;
     protected static Logger log = LoggerFactory
-	    .getLogger(StaticFlowEntryPusher.class);
+	    .getLogger(LowLevelController.class);
 
     @Override
     public Collection<Class<? extends IFloodlightService>> getModuleServices()
@@ -383,10 +383,13 @@ public class LowLevelController implements IOFSwitchListener,
     {
 	try
 	{
+	    log.debug("\nTrying to add the following flowmod: \n"
+		    + flowMod.toString() + "\nto Switch\n" + sw.toString()
+		    + "\n");
 	    sw.write(flowMod, null);
 	    sw.flush();
 	}
-	catch (IOException e)
+	catch (Exception e)
 	{
 	    log.error("Tried to write OFFlowMod to {} but failed: {}",
 		    HexString.toHexString(sw.getId()), e.getMessage());
@@ -413,6 +416,7 @@ public class LowLevelController implements IOFSwitchListener,
 	 * isDone; }
 	 */
 
+	@SuppressWarnings("unused")
 	public synchronized long getEnd()
 	{
 	    return end;
@@ -511,13 +515,20 @@ public class LowLevelController implements IOFSwitchListener,
 	ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
 	actionsTo.add(outputTo);
 	// match
-	OFMatch match = new OFMatch();
+	OFMatch match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL);
 	try
 	{
-	    match.setNetworkDestination(IPv4.toIPv4Address(InetAddress
-		    .getLocalHost().getHostAddress()));
+	    /*
+	     * match.setNetworkDestination(IPv4.toIPv4Address(InetAddress
+	     * .getLocalHost().getHostAddress()));
+	     */
+	    match.setNetworkDestination(IPv4.toIPv4Address("213.213.231.231"));
 	    match.setNetworkSource(IPv4.toIPv4Address(InetAddress
 		    .getLocalHost().getHostAddress()));
+
+	    log.debug("\n should have added addresses into match succefully!: "
+		    + InetAddress.getLocalHost().getHostAddress());
+
 	}
 	catch (Exception e)
 	{
@@ -525,6 +536,7 @@ public class LowLevelController implements IOFSwitchListener,
 	    throw e;
 	}
 	match.setDataLayerType(Ethernet.TYPE_IPv4);
+	log.debug("set match " + match.toString());
 
 	// flow mod
 	OFFlowMod flowMod = (OFFlowMod) floodlightProvider
@@ -532,7 +544,9 @@ public class LowLevelController implements IOFSwitchListener,
 	flowMod.setType(OFType.FLOW_MOD);
 
 	flowMod.setActions(actionsTo);
+
 	flowMod.setMatch(match);
+	log.debug("match in flowmod is now : " + flowMod.getMatch().toString());
 
 	writeFlowModToSwitch(startSw, flowMod);
 	sendBarrier(startSw);
