@@ -38,6 +38,7 @@ import org.openflow.protocol.OFQueueProp.OFQueuePropType;
 import org.openflow.protocol.Wildcards;
 import org.openflow.protocol.Wildcards.Flag;
 import org.openflow.protocol.action.OFAction;
+import org.openflow.protocol.action.OFActionNetworkLayerAddress;
 import org.openflow.protocol.action.OFActionOutput;
 import org.openflow.util.HexString;
 import org.openflow.util.U16;
@@ -508,7 +509,6 @@ public class LowLevelController implements IOFSwitchListener,
 
 	// get the first switch
 	int index = 0;
-
 	NodePortTuple first = switchesPorts.get(index);
 	long nodePid = first.getNodeId();
 	IOFSwitch startSw = switches.get(nodePid);
@@ -533,11 +533,17 @@ public class LowLevelController implements IOFSwitchListener,
 	OFFlowMod flowMod = (OFFlowMod) floodlightProvider
 		.getOFMessageFactory().getMessage(OFType.FLOW_MOD);
 
-	flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
+	flowMod.setIdleTimeout(Short.MAX_VALUE)
+		.setHardTimeout(Short.MAX_VALUE)
 		.setBufferId(OFPacketOut.BUFFER_ID_NONE)
 		.setCookie(AppCookie.makeCookie(0, 0))
-		.setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
-		.setActions(actionsTo).setLengthU(OFFlowMod.MINIMUM_LENGTH);
+		.setCommand(OFFlowMod.OFPFC_ADD)
+		.setMatch(match)
+		.setActions(actionsTo)
+		.setLengthU(
+			OFFlowMod.MINIMUM_LENGTH
+				+ OFActionNetworkLayerAddress.MINIMUM_LENGTH
+				+ OFActionOutput.MINIMUM_LENGTH);
 	flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
 
 	log.debug("match in flowmod is now : " + flowMod.getMatch().toString());
@@ -547,6 +553,8 @@ public class LowLevelController implements IOFSwitchListener,
 
 	// set the middle ones that are on same switch
 	index++;
+
+	log.debug("settel first switch!");
 
 	while (index < switchesPorts.size() - 1)
 	{
