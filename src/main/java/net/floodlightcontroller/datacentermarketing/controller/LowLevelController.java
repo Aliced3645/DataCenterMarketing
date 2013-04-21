@@ -478,6 +478,7 @@ public class LowLevelController implements IOFSwitchListener,
 
     public void ping(long start, long end) throws Exception
     {
+    System.out.println("Pinging!!");
 	routesBenchMarks.clear();
 	// get the routes
 	ArrayList<Route> routes = getNonLoopPaths(start, end);
@@ -496,11 +497,13 @@ public class LowLevelController implements IOFSwitchListener,
 	// for the first one, we make a packet and send it to the first switch
 	// the last switch send the packet back, as required by an action
 
-	// checks for validation
+	// checks for validatiu
 	List<NodePortTuple> switchesPorts = rt.getPath();
-	if (switchesPorts.size() < 2)
+	
+	if ( switchesPorts == null && switchesPorts.size() < 2)
 	{
 	    debug("Route length is not right.");
+	    return;
 	}
 	if (switchesPorts.size() % 2 == 1)
 	{
@@ -514,12 +517,13 @@ public class LowLevelController implements IOFSwitchListener,
 	IOFSwitch startSw = switches.get(nodePid);
 
 	// action
-	OFAction outputTo = new OFActionOutput().setPort(first.getPortId());
-	outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
+	OFAction outputTo = new OFActionOutput(first.getPortId(), (short)1500);
+	//outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
 					    // controller
 	// action list
 	ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
 	actionsTo.add(outputTo);
+	
 	// match on the in and out ip
 	OFMatch match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL
 		& (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
@@ -542,8 +546,9 @@ public class LowLevelController implements IOFSwitchListener,
 		.setActions(actionsTo)
 		.setLengthU(
 			OFFlowMod.MINIMUM_LENGTH
-				+ OFActionNetworkLayerAddress.MINIMUM_LENGTH
+				//+ OFActionNetworkLayerAddress.MINIMUM_LENGTH
 				+ OFActionOutput.MINIMUM_LENGTH);
+	
 	flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
 
 	log.debug("match in flowmod is now : " + flowMod.getMatch().toString());
@@ -576,8 +581,8 @@ public class LowLevelController implements IOFSwitchListener,
 	    actionsTo.clear();
 	    flowMod = (OFFlowMod) floodlightProvider.getOFMessageFactory()
 		    .getMessage(OFType.FLOW_MOD);
-	    outputTo = new OFActionOutput().setPort(egressPortPid);
-	    outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
+	    outputTo = new OFActionOutput(egressPortPid, (short)1500);
+	    //outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
 	    // controller
 
 	    actionsTo.add(outputTo);
@@ -596,7 +601,7 @@ public class LowLevelController implements IOFSwitchListener,
 		    .setActions(actionsTo)
 		    .setLengthU(
 			    OFFlowMod.MINIMUM_LENGTH
-				    + OFActionNetworkLayerAddress.MINIMUM_LENGTH
+				//    + OFActionNetworkLayerAddress.MINIMUM_LENGTH
 				    + OFActionOutput.MINIMUM_LENGTH);
 	    flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
 
@@ -610,10 +615,11 @@ public class LowLevelController implements IOFSwitchListener,
 	NodePortTuple last = switchesPorts.get(index);
 	nodePid = last.getNodeId();
 	IOFSwitch endSw = switches.get(nodePid);
-
-	outputTo = new OFActionOutput().setPort(OFPort.OFPP_CONTROLLER
-		.getValue());
-	outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
+	
+	outputTo = new OFActionOutput(OFPort.OFPP_CONTROLLER.getValue(), (short)1500);
+	//outputTo = new OFActionOutput().setPort(OFPort.OFPP_CONTROLLER
+	//	.getValue());
+	//outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
 					    // controller
 
 	actionsTo.clear();
@@ -633,7 +639,7 @@ public class LowLevelController implements IOFSwitchListener,
 		.setActions(actionsTo)
 		.setLengthU(
 			OFFlowMod.MINIMUM_LENGTH
-				+ OFActionNetworkLayerAddress.MINIMUM_LENGTH
+		//		+ OFActionNetworkLayerAddress.MINIMUM_LENGTH
 				+ OFActionOutput.MINIMUM_LENGTH);
 	flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
 
@@ -655,6 +661,7 @@ public class LowLevelController implements IOFSwitchListener,
 	OFPacketOut probeMsg = new OFPacketOut();
 	probeMsg.setBufferId(OFPacketOut.BUFFER_ID_NONE);// our data is in the
 	probeMsg.setPacketData(probe.serialize());
+	//probeMsg.setActions(actions)
 
 	// record the time
 	routesBenchMarks.put(rt.toString(), new TimePair(System.nanoTime(), 0));
