@@ -520,7 +520,7 @@ public class LowLevelController implements IOFSwitchListener,
 	// action list
 	ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
 	actionsTo.add(outputTo);
-	// match
+	// match on the in and out ip
 	OFMatch match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL
 		& (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
 	match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
@@ -554,7 +554,7 @@ public class LowLevelController implements IOFSwitchListener,
 	// set the middle ones that are on same switch
 	index++;
 
-	log.debug("settel first switch!");
+	log.debug("settle first switch!");
 
 	while (index < switchesPorts.size() - 1)
 	{
@@ -576,30 +576,29 @@ public class LowLevelController implements IOFSwitchListener,
 	    actionsTo.clear();
 	    flowMod = (OFFlowMod) floodlightProvider.getOFMessageFactory()
 		    .getMessage(OFType.FLOW_MOD);
-	    flowMod.setType(OFType.FLOW_MOD);
 	    outputTo = new OFActionOutput().setPort(egressPortPid);
 	    outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
 	    // controller
 
 	    actionsTo.add(outputTo);
-	    match = new OFMatch();
+	    match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL
+		    & (~OFMatch.OFPFW_NW_SRC_MASK)
+		    & (~OFMatch.OFPFW_NW_DST_MASK));
+	    match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
+	    match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
 
-	    try
-	    {
-		match.setInputPort(ingressPortPid);
-		match.setNetworkDestination(IPv4.toIPv4Address(InetAddress
-			.getLocalHost().getHostAddress()));
-		match.setNetworkSource(IPv4.toIPv4Address(InetAddress
-			.getLocalHost().getHostAddress()));
-	    }
-	    catch (Exception e)
-	    {
-		debug("error geting local controler iP!");
-		throw e;
-	    }
-	    match.setDataLayerType(Ethernet.TYPE_IPv4);
-	    flowMod.setActions(actionsTo);
-	    flowMod.setMatch(match);
+	    flowMod.setIdleTimeout(Short.MAX_VALUE)
+		    .setHardTimeout(Short.MAX_VALUE)
+		    .setBufferId(OFPacketOut.BUFFER_ID_NONE)
+		    .setCookie(AppCookie.makeCookie(0, 0))
+		    .setCommand(OFFlowMod.OFPFC_ADD)
+		    .setMatch(match)
+		    .setActions(actionsTo)
+		    .setLengthU(
+			    OFFlowMod.MINIMUM_LENGTH
+				    + OFActionNetworkLayerAddress.MINIMUM_LENGTH
+				    + OFActionOutput.MINIMUM_LENGTH);
+	    flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
 
 	    writeFlowModToSwitch(sw, flowMod);
 	    sendBarrier(sw);
@@ -617,26 +616,25 @@ public class LowLevelController implements IOFSwitchListener,
 	actionsTo.clear();
 	actionsTo.add(outputTo);
 
-	match = new OFMatch();
-	try
-	{
-	    match.setInputPort(last.getPortId());
-	    match.setNetworkDestination(IPv4.toIPv4Address(InetAddress
-		    .getLocalHost().getHostAddress()));
-	    match.setNetworkSource(IPv4.toIPv4Address(InetAddress
-		    .getLocalHost().getHostAddress()));
-	    match.setDataLayerType(Ethernet.TYPE_IPv4);
-	}
-	catch (Exception e)
-	{
-	    debug("error geting local controler iP!");
-	    throw e;
-	}
-	flowMod = (OFFlowMod) floodlightProvider.getOFMessageFactory()
-		.getMessage(OFType.FLOW_MOD);
-	flowMod.setType(OFType.FLOW_MOD);
-	flowMod.setActions(actionsTo);
-	flowMod.setMatch(match);
+	match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL
+		& (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
+	match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
+	match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
+
+	flowMod.setIdleTimeout(Short.MAX_VALUE)
+		.setHardTimeout(Short.MAX_VALUE)
+		.setBufferId(OFPacketOut.BUFFER_ID_NONE)
+		.setCookie(AppCookie.makeCookie(0, 0))
+		.setCommand(OFFlowMod.OFPFC_ADD)
+		.setMatch(match)
+		.setActions(actionsTo)
+		.setLengthU(
+			OFFlowMod.MINIMUM_LENGTH
+				+ OFActionNetworkLayerAddress.MINIMUM_LENGTH
+				+ OFActionOutput.MINIMUM_LENGTH);
+	flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
+
+	writeFlowModToSwitch(endSw, flowMod);
 
 	writeFlowModToSwitch(endSw, flowMod);
 	sendBarrier(endSw);
