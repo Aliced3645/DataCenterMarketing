@@ -554,7 +554,7 @@ public class LowLevelController implements IOFSwitchListener,
 	// set the middle ones that are on same switch
 	index++;
 
-	log.debug("settle first switch!");
+	log.debug("\nsettle first switch!");
 
 	while (index < switchesPorts.size() - 1)
 	{
@@ -603,6 +603,9 @@ public class LowLevelController implements IOFSwitchListener,
 	    writeFlowModToSwitch(sw, flowMod);
 	    sendBarrier(sw);
 	}
+
+	log.debug("\nsettle middle switches!");
+
 	// last port
 	NodePortTuple last = switchesPorts.get(index);
 	nodePid = last.getNodeId();
@@ -639,10 +642,12 @@ public class LowLevelController implements IOFSwitchListener,
 	writeFlowModToSwitch(endSw, flowMod);
 	sendBarrier(endSw);
 
+	log.debug("\nsettle end switch!");
+
 	// send the probe packet which is an ip v4 packet we made up
 	IPv4 probe = new IPv4();
-	probe.setSourceAddress(InetAddress.getLocalHost().getHostAddress());
-	probe.setDestinationAddress(InetAddress.getLocalHost().getHostAddress());
+	probe.setSourceAddress("1.2.3.4");
+	probe.setDestinationAddress("1.2.3.4");
 	// put the identifier string in the body
 	probe.setPayload(new Data(rt.toString().getBytes()));
 
@@ -662,7 +667,7 @@ public class LowLevelController implements IOFSwitchListener,
 
 	startSw.write(probeMsg, null);// TODO context?
 
-	debug("\n\n\n\n\n\npacket out, now wait for inmessage");
+	log.debug("\n\n\n\n\n\npacket out, now wait for inmessage");
 
 	return;
     }
