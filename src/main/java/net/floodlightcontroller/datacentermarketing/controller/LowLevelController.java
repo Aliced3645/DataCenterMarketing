@@ -2,6 +2,7 @@ package net.floodlightcontroller.datacentermarketing.controller;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,6 +35,8 @@ import org.openflow.protocol.OFQueueProp;
 import org.openflow.protocol.OFType;
 import org.openflow.protocol.OFVendor;
 import org.openflow.protocol.OFQueueProp.OFQueuePropType;
+import org.openflow.protocol.Wildcards;
+import org.openflow.protocol.Wildcards.Flag;
 import org.openflow.protocol.action.OFAction;
 import org.openflow.protocol.action.OFActionOutput;
 import org.openflow.util.HexString;
@@ -43,6 +46,8 @@ import org.openflow.vendor.openflow.OFQueueDeleteVendorData;
 import org.openflow.vendor.openflow.OFQueueModifyVendorData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Wildcard;
 
 import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
@@ -54,6 +59,7 @@ import net.floodlightcontroller.core.module.FloodlightModuleContext;
 import net.floodlightcontroller.core.module.FloodlightModuleException;
 import net.floodlightcontroller.core.module.IFloodlightModule;
 import net.floodlightcontroller.core.module.IFloodlightService;
+import net.floodlightcontroller.core.util.AppCookie;
 import net.floodlightcontroller.counter.ICounterStoreService;
 import net.floodlightcontroller.datacentermarketing.MarketManager;
 import net.floodlightcontroller.devicemanager.IDevice;
@@ -515,37 +521,25 @@ public class LowLevelController implements IOFSwitchListener,
 	ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
 	actionsTo.add(outputTo);
 	// match
-	OFMatch match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL);
-	try
-	{
-	    /*
-	     * match.setNetworkDestination(IPv4.toIPv4Address(InetAddress
-	     * .getLocalHost().getHostAddress()));
-	     */
-	    match.setNetworkDestination(IPv4.toIPv4Address("213.213.231.231"));
-	    match.setNetworkSource(IPv4.toIPv4Address(InetAddress
-		    .getLocalHost().getHostAddress()));
+	OFMatch match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL
+		& (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
+	match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
+	match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
 
-	    log.debug("\n should have added addresses into match succefully!: "
-		    + InetAddress.getLocalHost().getHostAddress());
-
-	}
-	catch (Exception e)
-	{
-	    debug("error geting local controler iP!");
-	    throw e;
-	}
-	match.setDataLayerType(Ethernet.TYPE_IPv4);
+	// match.setDataLayerType(Ethernet.TYPE_IPv4);
 	log.debug("set match " + match.toString());
 
 	// flow mod
 	OFFlowMod flowMod = (OFFlowMod) floodlightProvider
 		.getOFMessageFactory().getMessage(OFType.FLOW_MOD);
-	flowMod.setType(OFType.FLOW_MOD);
 
-	flowMod.setActions(actionsTo);
+	flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
+		.setBufferId(OFPacketOut.BUFFER_ID_NONE)
+		.setCookie(AppCookie.makeCookie(0, 0))
+		.setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
+		.setActions(actionsTo).setLengthU(OFFlowMod.MINIMUM_LENGTH);
+	flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
 
-	flowMod.setMatch(match);
 	log.debug("match in flowmod is now : " + flowMod.getMatch().toString());
 
 	writeFlowModToSwitch(startSw, flowMod);
@@ -694,7 +688,7 @@ public class LowLevelController implements IOFSwitchListener,
 	}
 	catch (Exception e)
 	{
-	    debug("Exception : " + e.toString());
+	    /* debug("Exception : " + e.toString()); */
 	    return;
 	}
 
