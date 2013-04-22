@@ -48,7 +48,6 @@ import org.openflow.vendor.openflow.OFQueueModifyVendorData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
 import net.floodlightcontroller.core.IOFMessageListener;
@@ -478,7 +477,7 @@ public class LowLevelController implements IOFSwitchListener,
 
     public void ping(long start, long end) throws Exception
     {
-    System.out.println("Pinging!!");
+	System.out.println("Pinging!!");
 	routesBenchMarks.clear();
 	// get the routes
 	ArrayList<Route> routes = getNonLoopPaths(start, end);
@@ -499,8 +498,8 @@ public class LowLevelController implements IOFSwitchListener,
 
 	// checks for validatiu
 	List<NodePortTuple> switchesPorts = rt.getPath();
-	
-	if ( switchesPorts == null && switchesPorts.size() < 2)
+
+	if (switchesPorts == null && switchesPorts.size() < 2)
 	{
 	    debug("Route length is not right.");
 	    return;
@@ -517,24 +516,25 @@ public class LowLevelController implements IOFSwitchListener,
 	IOFSwitch startSw = switches.get(nodePid);
 
 	// action
-	OFAction outputTo = new OFActionOutput(first.getPortId(), (short)1500);
-	//outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
-					    // controller
+	OFAction outputTo = new OFActionOutput(first.getPortId(), (short) 1500);
+	// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
+	// controller
 	// action list
 	ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
 	actionsTo.add(outputTo);
-	
+
 	// match on the in and out ip
-	//OFMatch match = new OFMatch().setWildcards(((Integer)startSw.getAttribute(IOFSwitch.PROP_FASTWILDCARDS)).intValue()
-    //        & ~OFMatch.OFPFW_NW_SRC_MASK & ~OFMatch.OFPFW_NW_DST_MASK /*& ~OFMatch.OFPFW_DL_TYPE*/) ;
-	//match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
-	//match.setNetworkProtocol((byte)0x806);
-	//match.setDataLayerType(U16.t(Integer.valueOf(
-	//	    "0x800".replaceFirst("0x", ""), 16)));
-	//match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
-	String matchString = "nw_dst=1.2.3.4" +","
-			+"nw_src=1.2.3.4,"
-            + "dl_type="+0x800;
+	// OFMatch match = new
+	// OFMatch().setWildcards(((Integer)startSw.getAttribute(IOFSwitch.PROP_FASTWILDCARDS)).intValue()
+	// & ~OFMatch.OFPFW_NW_SRC_MASK & ~OFMatch.OFPFW_NW_DST_MASK /*&
+	// ~OFMatch.OFPFW_DL_TYPE*/) ;
+	// match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
+	// match.setNetworkProtocol((byte)0x806);
+	// match.setDataLayerType(U16.t(Integer.valueOf(
+	// "0x800".replaceFirst("0x", ""), 16)));
+	// match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
+	String matchString = "nw_dst=1.2.3.4" + "," + "nw_src=1.2.3.4,"
+		+ "dl_type=" + 0x800;
 	OFMatch match = new OFMatch();
 	match.fromString(matchString);
 	// match.setDataLayerType(Ethernet.TYPE_IPv4);
@@ -544,18 +544,14 @@ public class LowLevelController implements IOFSwitchListener,
 	OFFlowMod flowMod = (OFFlowMod) floodlightProvider
 		.getOFMessageFactory().getMessage(OFType.FLOW_MOD);
 
-	flowMod.setIdleTimeout(Short.MAX_VALUE)
-		.setHardTimeout(Short.MAX_VALUE)
+	flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
 		.setBufferId(OFPacketOut.BUFFER_ID_NONE)
 		.setCookie(AppCookie.makeCookie(0, 0))
-		.setCommand(OFFlowMod.OFPFC_ADD)
-		.setMatch(match)
-		.setActions(actionsTo)
-		.setLengthU(
-			OFFlowMod.MINIMUM_LENGTH
-				//+ OFActionNetworkLayerAddress.MINIMUM_LENGTH
-				+ OFActionOutput.MINIMUM_LENGTH);
-	
+		.setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
+		.setActions(actionsTo).setLengthU(OFFlowMod.MINIMUM_LENGTH
+		// + OFActionNetworkLayerAddress.MINIMUM_LENGTH
+			+ OFActionOutput.MINIMUM_LENGTH);
+
 	flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
 
 	log.debug("match in flowmod is now : " + flowMod.getMatch().toString());
@@ -588,28 +584,27 @@ public class LowLevelController implements IOFSwitchListener,
 	    actionsTo.clear();
 	    flowMod = (OFFlowMod) floodlightProvider.getOFMessageFactory()
 		    .getMessage(OFType.FLOW_MOD);
-	    outputTo = new OFActionOutput(egressPortPid, (short)1500);
-	    //outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
+	    outputTo = new OFActionOutput(egressPortPid, (short) 1500);
+	    // outputTo.setLength(Short.MAX_VALUE);// we want whole packet back
+	    // to
 	    // controller
 
 	    actionsTo.add(outputTo);
-	/*    match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL
-		    & (~OFMatch.OFPFW_NW_SRC_MASK)
-		    & (~OFMatch.OFPFW_NW_DST_MASK));
-	    match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
-	    match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));*/
+	    /*
+	     * match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL &
+	     * (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
+	     * match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
+	     * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
+	     */
 
 	    flowMod.setIdleTimeout(Short.MAX_VALUE)
 		    .setHardTimeout(Short.MAX_VALUE)
 		    .setBufferId(OFPacketOut.BUFFER_ID_NONE)
 		    .setCookie(AppCookie.makeCookie(0, 0))
-		    .setCommand(OFFlowMod.OFPFC_ADD)
-		    .setMatch(match)
-		    .setActions(actionsTo)
-		    .setLengthU(
-			    OFFlowMod.MINIMUM_LENGTH
-				//    + OFActionNetworkLayerAddress.MINIMUM_LENGTH
-				    + OFActionOutput.MINIMUM_LENGTH);
+		    .setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
+		    .setActions(actionsTo).setLengthU(OFFlowMod.MINIMUM_LENGTH
+		    // + OFActionNetworkLayerAddress.MINIMUM_LENGTH
+			    + OFActionOutput.MINIMUM_LENGTH);
 	    flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
 
 	    writeFlowModToSwitch(sw, flowMod);
@@ -622,32 +617,31 @@ public class LowLevelController implements IOFSwitchListener,
 	NodePortTuple last = switchesPorts.get(index);
 	nodePid = last.getNodeId();
 	IOFSwitch endSw = switches.get(nodePid);
-	System.out.println(65533 + " " + 0xfffd + " " + (short)0xfffd);
-	outputTo = new OFActionOutput(OFPort.OFPP_CONTROLLER.getValue(), (short)1500);
-	//outputTo = new OFActionOutput().setPort(OFPort.OFPP_CONTROLLER
-	//	.getValue());
-	//outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
-					    // controller
+	System.out.println(65533 + " " + 0xfffd + " " + (short) 0xfffd);
+	outputTo = new OFActionOutput(OFPort.OFPP_CONTROLLER.getValue(),
+		(short) 1500);
+	// outputTo = new OFActionOutput().setPort(OFPort.OFPP_CONTROLLER
+	// .getValue());
+	// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
+	// controller
 
 	actionsTo.clear();
 	actionsTo.add(outputTo);
 
-/*	match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL
-		& (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
-	match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
-	match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));*/
+	/*
+	 * match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL &
+	 * (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
+	 * match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
+	 * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
+	 */
 
-	flowMod.setIdleTimeout(Short.MAX_VALUE)
-		.setHardTimeout(Short.MAX_VALUE)
+	flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
 		.setBufferId(OFPacketOut.BUFFER_ID_NONE)
 		.setCookie(AppCookie.makeCookie(0, 0))
-		.setCommand(OFFlowMod.OFPFC_ADD)
-		.setMatch(match)
-		.setActions(actionsTo)
-		.setLengthU(
-			OFFlowMod.MINIMUM_LENGTH
-		//		+ OFActionNetworkLayerAddress.MINIMUM_LENGTH
-				+ OFActionOutput.MINIMUM_LENGTH);
+		.setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
+		.setActions(actionsTo).setLengthU(OFFlowMod.MINIMUM_LENGTH
+		// + OFActionNetworkLayerAddress.MINIMUM_LENGTH
+			+ OFActionOutput.MINIMUM_LENGTH);
 	flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
 
 	writeFlowModToSwitch(endSw, flowMod);
@@ -668,7 +662,7 @@ public class LowLevelController implements IOFSwitchListener,
 	OFPacketOut probeMsg = new OFPacketOut();
 	probeMsg.setBufferId(OFPacketOut.BUFFER_ID_NONE);// our data is in the
 	probeMsg.setPacketData(probe.serialize());
-	//probeMsg.setActions(actions)
+	// probeMsg.setActions(actions)
 
 	// record the time
 	routesBenchMarks.put(rt.toString(), new TimePair(System.nanoTime(), 0));
@@ -679,7 +673,20 @@ public class LowLevelController implements IOFSwitchListener,
 	probeMsg.setLength(U16.t(OFPacketOut.MINIMUM_LENGTH
 		+ probeMsg.getActionsLength() + probeMsg.getPacketData().length));
 
-	startSw.write(probeMsg, null);// TODO context?
+	// startSw.write(probeMsg, null);// TODO context?
+	try
+	{
+	    log.debug("\nTrying to add the following flowmod: \n"
+		    + flowMod.toString() + "\nto Switch\n" + startSw.toString()
+		    + "\n");
+	    startSw.write(probeMsg, null);
+	    startSw.flush();
+	}
+	catch (Exception e)
+	{
+	    log.error("Tried to write OFFlowMod to {} but failed: {}",
+		    HexString.toHexString(startSw.getId()), e.getMessage());
+	}
 
 	log.debug("\n\n\n\n\n\npacket out, now wait for inmessage");
 
