@@ -48,7 +48,6 @@ import org.openflow.vendor.openflow.OFQueueModifyVendorData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Wildcard;
 
 import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
@@ -594,11 +593,11 @@ public class LowLevelController implements IOFSwitchListener,
 	    // controller
 
 	    actionsTo.add(outputTo);
-	    match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL
+	/*    match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL
 		    & (~OFMatch.OFPFW_NW_SRC_MASK)
 		    & (~OFMatch.OFPFW_NW_DST_MASK));
 	    match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
-	    match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
+	    match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));*/
 
 	    flowMod.setIdleTimeout(Short.MAX_VALUE)
 		    .setHardTimeout(Short.MAX_VALUE)
@@ -633,10 +632,10 @@ public class LowLevelController implements IOFSwitchListener,
 	actionsTo.clear();
 	actionsTo.add(outputTo);
 
-	match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL
+/*	match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL
 		& (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
 	match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
-	match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
+	match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));*/
 
 	flowMod.setIdleTimeout(Short.MAX_VALUE)
 		.setHardTimeout(Short.MAX_VALUE)

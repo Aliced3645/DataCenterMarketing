@@ -18,7 +18,6 @@ import org.restlet.resource.Post;
 import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
 
-import com.sun.corba.se.spi.ior.MakeImmutable;
 
 public class LatencyTestResource extends ServerResource
 {
