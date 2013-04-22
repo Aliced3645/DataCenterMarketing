@@ -66,6 +66,7 @@ import net.floodlightcontroller.datacentermarketing.MarketManager;
 import net.floodlightcontroller.devicemanager.IDevice;
 import net.floodlightcontroller.devicemanager.IDeviceService;
 import net.floodlightcontroller.devicemanager.SwitchPort;
+import net.floodlightcontroller.packet.ARP;
 import net.floodlightcontroller.packet.Data;
 import net.floodlightcontroller.packet.Ethernet;
 import net.floodlightcontroller.packet.IPv4;
@@ -525,11 +526,18 @@ public class LowLevelController implements IOFSwitchListener,
 	actionsTo.add(outputTo);
 	
 	// match on the in and out ip
-	OFMatch match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL
-		& (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
-	match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
-	match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
-
+	//OFMatch match = new OFMatch().setWildcards(((Integer)startSw.getAttribute(IOFSwitch.PROP_FASTWILDCARDS)).intValue()
+    //        & ~OFMatch.OFPFW_NW_SRC_MASK & ~OFMatch.OFPFW_NW_DST_MASK /*& ~OFMatch.OFPFW_DL_TYPE*/) ;
+	//match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
+	//match.setNetworkProtocol((byte)0x806);
+	//match.setDataLayerType(U16.t(Integer.valueOf(
+	//	    "0x800".replaceFirst("0x", ""), 16)));
+	//match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
+	String matchString = "nw_dst=1.2.3.4" +","
+			+"nw_src=1.2.3.4,"
+            + "dl_type="+0x800;
+	OFMatch match = new OFMatch();
+	match.fromString(matchString);
 	// match.setDataLayerType(Ethernet.TYPE_IPv4);
 	log.debug("set match " + match.toString());
 
@@ -615,7 +623,7 @@ public class LowLevelController implements IOFSwitchListener,
 	NodePortTuple last = switchesPorts.get(index);
 	nodePid = last.getNodeId();
 	IOFSwitch endSw = switches.get(nodePid);
-	
+	System.out.println(65533 + " " + 0xfffd + " " + (short)0xfffd);
 	outputTo = new OFActionOutput(OFPort.OFPP_CONTROLLER.getValue(), (short)1500);
 	//outputTo = new OFActionOutput().setPort(OFPort.OFPP_CONTROLLER
 	//	.getValue());
@@ -696,7 +704,6 @@ public class LowLevelController implements IOFSwitchListener,
 		routesBenchMarks.get(id).setEnd(System.nanoTime());
 		debug("\n\n\n\n\n\n\n\n\nActually worked! : " + id);
 		// TODO tear down the route
-
 	    }
 	    else
 	    {
