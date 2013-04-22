@@ -84,8 +84,7 @@ import net.floodlightcontroller.topology.NodePortTuple;
 //In this project, there must be one to one relation
 
 public class LowLevelController implements IOFSwitchListener,
-	IOFMessageListener, IFloodlightModule
-{
+	IOFMessageListener, IFloodlightModule {
 
     protected IFloodlightProviderService controller;
     protected IDeviceService deviceManager;
@@ -104,22 +103,19 @@ public class LowLevelController implements IOFSwitchListener,
 	    .getLogger(LowLevelController.class);
 
     @Override
-    public Collection<Class<? extends IFloodlightService>> getModuleServices()
-    {
+    public Collection<Class<? extends IFloodlightService>> getModuleServices() {
 	// TODO Auto-generated method stub
 	return null;
     }
 
     @Override
-    public Map<Class<? extends IFloodlightService>, IFloodlightService> getServiceImpls()
-    {
+    public Map<Class<? extends IFloodlightService>, IFloodlightService> getServiceImpls() {
 	// TODO Auto-generated method stub
 	return null;
     }
 
     @Override
-    public Collection<Class<? extends IFloodlightService>> getModuleDependencies()
-    {
+    public Collection<Class<? extends IFloodlightService>> getModuleDependencies() {
 	// TODO Auto-generated method stub
 	Collection<Class<? extends IFloodlightService>> l = new ArrayList<Class<? extends IFloodlightService>>();
 	l.add(IFloodlightProviderService.class);
@@ -132,8 +128,7 @@ public class LowLevelController implements IOFSwitchListener,
 	return l;
     }
 
-    private void buildDatacenterMarketing()
-    {
+    private void buildDatacenterMarketing() {
 	/* attach this module to MarketManager class */
 	MarketManager marketManager = MarketManager.getInstance();
 	marketManager.setLowLevelController(this);
@@ -143,8 +138,7 @@ public class LowLevelController implements IOFSwitchListener,
 
     @Override
     public void init(FloodlightModuleContext context)
-	    throws FloodlightModuleException
-    {
+	    throws FloodlightModuleException {
 	// TODO Auto-generated method stub
 	for (int i = 0; i < 100; i++)
 	    System.out.println("INITING!!!!!!!!!!!");
@@ -158,14 +152,11 @@ public class LowLevelController implements IOFSwitchListener,
 	routingManager = context.getServiceImpl(IRoutingService.class);
 	counterStore = context.getServiceImpl(ICounterStoreService.class);
 
-	try
-	{
+	try {
 	    switches = new HashMap<Long, IOFSwitch>();
 	    devices = new HashMap<Long, IDevice>();
 
-	}
-	catch (Exception e)
-	{
+	} catch (Exception e) {
 	    e.printStackTrace();
 	}
 
@@ -173,8 +164,7 @@ public class LowLevelController implements IOFSwitchListener,
     }
 
     @Override
-    public void startUp(FloodlightModuleContext context)
-    {
+    public void startUp(FloodlightModuleContext context) {
 	// TODO Auto-generated method stub
 	controller.addOFSwitchListener(this);
 	controller.addOFMessageListener(OFType.QUEUE_GET_CONFIG_REPLY, this);
@@ -185,47 +175,40 @@ public class LowLevelController implements IOFSwitchListener,
     }
 
     @Override
-    public void addedSwitch(IOFSwitch sw)
-    {
+    public void addedSwitch(IOFSwitch sw) {
 	// update the switches collection
 	switches.put(sw.getId(), sw);
     }
 
     @Override
-    public void removedSwitch(IOFSwitch sw)
-    {
+    public void removedSwitch(IOFSwitch sw) {
 	// TODO Auto-generated method stub
 	switches.remove(sw.getId());
     }
 
     @Override
-    public void switchPortChanged(Long switchId)
-    {
+    public void switchPortChanged(Long switchId) {
 	// TODO Auto-generated method stub
 
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
 	// TODO Auto-generated method stub
 	return "LowLevelController";
     }
 
-    public Map<Long, IOFSwitch> getSwitches()
-    {
+    public Map<Long, IOFSwitch> getSwitches() {
 	return switches;
     }
 
-    public Map<Long, IDevice> getDevices()
-    {
+    public Map<Long, IDevice> getDevices() {
 	return devices;
     }
 
     // send queue queries to port
     private void sendQueueQuery(IOFSwitch ofSwitch, short portNumber)
-	    throws IOException
-    {
+	    throws IOException {
 	OFQueueGetConfigRequest queueQueryMessage = new OFQueueGetConfigRequest();
 	queueQueryMessage.setPortNumber(portNumber);
 	ofSwitch.write(queueQueryMessage, null);
@@ -234,13 +217,11 @@ public class LowLevelController implements IOFSwitchListener,
 
     // basic functionality begins here..
     public void updateSwitches() throws IOException, InterruptedException,
-	    ExecutionException
-    {
+	    ExecutionException {
 
 	switches.clear();
 
-	if (controller == null)
-	{
+	if (controller == null) {
 	    System.out.println("Controller is null");
 	    return;
 	}
@@ -252,8 +233,7 @@ public class LowLevelController implements IOFSwitchListener,
 	Set<Entry<Long, IOFSwitch>> s = switchesMap.entrySet();
 	Iterator<Entry<Long, IOFSwitch>> it = s.iterator();
 
-	while (it.hasNext())
-	{
+	while (it.hasNext()) {
 
 	    Entry<Long, IOFSwitch> entry = it.next();
 	    IOFSwitch ofSwitch = entry.getValue();
@@ -267,19 +247,16 @@ public class LowLevelController implements IOFSwitchListener,
 
     }
 
-    public void updateDevices()
-    {
+    public void updateDevices() {
 	devices.clear();
-	if (deviceManager == null)
-	{
+	if (deviceManager == null) {
 	    System.out.println("DeviceManager is null");
 	    return;
 	}
 	Collection<? extends IDevice> devicesSet = deviceManager
 		.getAllDevices();
 	Iterator<? extends IDevice> iterator = devicesSet.iterator();
-	while (iterator.hasNext())
-	{
+	while (iterator.hasNext()) {
 	    IDevice device = iterator.next();
 	    devices.put(device.getDeviceKey(), device);
 
@@ -291,8 +268,7 @@ public class LowLevelController implements IOFSwitchListener,
     // using topology interface and routing service Floodlight provides
 
     public ArrayList<Route> getNonLoopPaths(long srcID, long destID)
-	    throws IOException, InterruptedException, ExecutionException
-    {
+	    throws IOException, InterruptedException, ExecutionException {
 
 	updateDevices();
 	updateSwitches();
@@ -313,10 +289,8 @@ public class LowLevelController implements IOFSwitchListener,
 	SwitchPort[] srcSwitchPorts = srcDev.getAttachmentPoints();
 	SwitchPort[] destSwitchPorts = destDev.getAttachmentPoints();
 
-	for (SwitchPort sourceSwitchPort : srcSwitchPorts)
-	{
-	    for (SwitchPort destSwitchPort : destSwitchPorts)
-	    {
+	for (SwitchPort sourceSwitchPort : srcSwitchPorts) {
+	    for (SwitchPort destSwitchPort : destSwitchPorts) {
 		ArrayList<Route> someRoutes = routingManager.getRoutes(
 			sourceSwitchPort.getSwitchDPID(),
 			destSwitchPort.getSwitchDPID(), true);
@@ -370,8 +344,7 @@ public class LowLevelController implements IOFSwitchListener,
     /**
      * debug information
      */
-    private void debug(String str)
-    {
+    private void debug(String str) {
 	System.out.println("LowLevelController: " + str);
     }
 
@@ -385,18 +358,14 @@ public class LowLevelController implements IOFSwitchListener,
      */
     @LogMessageDoc(level = "ERROR", message = "Tried to write OFFlowMod to {switch} but got {error}", explanation = "An I/O error occured while trying to write a "
 	    + "static flow to a switch", recommendation = LogMessageDoc.CHECK_SWITCH)
-    private void writeFlowModToSwitch(IOFSwitch sw, OFFlowMod flowMod)
-    {
-	try
-	{
+    private void writeFlowModToSwitch(IOFSwitch sw, OFFlowMod flowMod) {
+	try {
 	    log.debug("\nTrying to add the following flowmod: \n"
 		    + flowMod.toString() + "\nto Switch\n" + sw.toString()
 		    + "\n");
 	    sw.write(flowMod, null);
 	    sw.flush();
-	}
-	catch (Exception e)
-	{
+	} catch (Exception e) {
 	    log.error("Tried to write OFFlowMod to {} but failed: {}",
 		    HexString.toHexString(sw.getId()), e.getMessage());
 	}
@@ -409,8 +378,7 @@ public class LowLevelController implements IOFSwitchListener,
      * 
      */
 
-    private class TimePair
-    {
+    private class TimePair {
 	public long start;
 	private long end;
 	private boolean isDone;
@@ -423,19 +391,16 @@ public class LowLevelController implements IOFSwitchListener,
 	 */
 
 	@SuppressWarnings("unused")
-	public synchronized long getEnd()
-	{
+	public synchronized long getEnd() {
 	    return end;
 	}
 
-	public synchronized void setEnd(long end)
-	{
+	public synchronized void setEnd(long end) {
 	    this.end = end;
 	    isDone = true;
 	}
 
-	public TimePair(long s, long e)
-	{
+	public TimePair(long s, long e) {
 	    start = s;
 	    end = s;
 	}
@@ -443,15 +408,12 @@ public class LowLevelController implements IOFSwitchListener,
     }
 
     public boolean installRoute(long srcID, long destID, Route rt,
-	    long bandwidth) throws Exception
-    {
+	    long bandwidth) throws Exception {
 	List<NodePortTuple> switchesPorts = rt.getPath();
-	if (switchesPorts.size() < 2)
-	{
+	if (switchesPorts.size() < 2) {
 	    debug("Route length is not right.");
 	}
-	if (switchesPorts.size() % 2 == 1)
-	{
+	if (switchesPorts.size() % 2 == 1) {
 	    debug("mismatched switch in-out port number!");
 	}
 	int index = 0;
@@ -464,8 +426,7 @@ public class LowLevelController implements IOFSwitchListener,
 	match.setDataLayerDestination(destDev.getMACAddressString());
 	match.setDataLayerSource(srcDev.getMACAddressString());
 
-	while (index < switchesPorts.size())
-	{
+	while (index < switchesPorts.size()) {
 
 	}
 
@@ -475,21 +436,28 @@ public class LowLevelController implements IOFSwitchListener,
     // bench marks cache
     private HashMap<String, TimePair> routesBenchMarks = new HashMap();
 
-    public void ping(long start, long end) throws Exception
-    {
+    public void ping(long start, long end) throws Exception {
 	System.out.println("Pinging!!");
 	routesBenchMarks.clear();
 	// get the routes
 	ArrayList<Route> routes = getNonLoopPaths(start, end);
-	for (Route rt : routes)
-	{
-	    probeLatency(rt);
+	if (routes != null) {
+	    if (routes.size() <= 0) {
+
+		log.debug("\n\nDid not get routes, try again later");
+		return;
+	    }
+
+	    for (Route rt : routes) {
+		probeLatency(rt);
+	    }
+	} else {
+	    log.debug("\n\nDid not get routes, try again later");
 	}
 
     }
 
-    private void probeLatency(Route rt) throws Exception
-    {
+    private void probeLatency(Route rt) throws Exception {
 
 	// TODO check cache
 
@@ -499,13 +467,11 @@ public class LowLevelController implements IOFSwitchListener,
 	// checks for validatiu
 	List<NodePortTuple> switchesPorts = rt.getPath();
 
-	if (switchesPorts == null && switchesPorts.size() < 2)
-	{
+	if (switchesPorts == null && switchesPorts.size() < 2) {
 	    debug("Route length is not right.");
 	    return;
 	}
-	if (switchesPorts.size() % 2 == 1)
-	{
+	if (switchesPorts.size() % 2 == 1) {
 	    debug("mismatched switch in-out port number!");
 	}
 
@@ -513,8 +479,8 @@ public class LowLevelController implements IOFSwitchListener,
 	int index = 0;
 	NodePortTuple first = switchesPorts.get(index);
 	long nodePid = first.getNodeId();
+	short startPort = first.getPortId();
 	IOFSwitch startSw = switches.get(nodePid);
-
 	// action
 	OFAction outputTo = new OFActionOutput(first.getPortId(), (short) 1500);
 	// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
@@ -564,8 +530,7 @@ public class LowLevelController implements IOFSwitchListener,
 
 	log.debug("\nsettle first switch!");
 
-	while (index < switchesPorts.size() - 1)
-	{
+	while (index < switchesPorts.size() - 1) {
 	    // get the switch
 	    NodePortTuple firstInPair = switchesPorts.get(index);
 	    nodePid = firstInPair.getNodeId();
@@ -576,8 +541,7 @@ public class LowLevelController implements IOFSwitchListener,
 	    short egressPortPid = secondInPair.getPortId();
 	    index++;
 
-	    if (firstInPair.getNodeId() != secondInPair.getNodeId())
-	    {
+	    if (firstInPair.getNodeId() != secondInPair.getNodeId()) {
 		debug("mismatched switch id!");
 	    }
 
@@ -651,39 +615,74 @@ public class LowLevelController implements IOFSwitchListener,
 
 	log.debug("\nsettle end switch!");
 
-	// send the probe packet which is an ip v4 packet we made up
+	/*
+	 * // send the probe packet which is an ip v4 packet we made up IPv4
+	 * probe = new IPv4(); probe.setSourceAddress("1.2.3.4");
+	 * probe.setDestinationAddress("1.2.3.4"); // put the identifier string
+	 * in the body probe.setPayload(new Data(rt.toString().getBytes()));
+	 */
+
 	IPv4 probe = new IPv4();
-	probe.setSourceAddress("1.2.3.4");
-	probe.setDestinationAddress("1.2.3.4");
-	// put the identifier string in the body
-	probe.setPayload(new Data(rt.toString().getBytes()));
+	probe = (IPv4) probe.setVersion((byte) 4).setDiffServ((byte) 0)
+		.setIdentification((short) 188).setFlags((byte) 0)
+		.setFragmentOffset((short) 0).setTtl((byte) 250)
+		.setProtocol(IPv4.PROTOCOL_UDP).setChecksum((short) 0)
+		.setSourceAddress("1.2.3.4").setDestinationAddress("1.2.3.4")
+		.setPayload(new Data(rt.toString().getBytes()));
+
+	IOFSwitch iofSwitch = floodlightProvider.getSwitches().get(startSw);
+	// OFPhysicalPort ofpPort = iofSwitch.getPort((short) 2);
+	Ethernet ethernet = (Ethernet) new Ethernet()
+		.setSourceMACAddress("01:00:00:00:00:16")
+		.setDestinationMACAddress("02:00:00:00:00:16")
+		.setEtherType(Ethernet.TYPE_IPv4).setPayload(probe);
 
 	// packet out ofoutmessage
-	OFPacketOut probeMsg = new OFPacketOut();
-	probeMsg.setBufferId(OFPacketOut.BUFFER_ID_NONE);// our data is in the
-	probeMsg.setPacketData(probe.serialize());
-	// probeMsg.setActions(actions)
+	/*
+	 * OFPacketOut probeMsg = new OFPacketOut();
+	 * probeMsg.setBufferId(OFPacketOut.BUFFER_ID_NONE);// our data is in
+	 * the probeMsg.setPacketData(ethernet.serialize()); //
+	 * probeMsg.setActions(actions) // last step set length
+	 * probeMsg.setLength(U16.t(OFPacketOut.MINIMUM_LENGTH +
+	 * probeMsg.getActionsLength() + probeMsg.getPacketData().length));
+	 */
 
+	// needs to create a packet and send to switch
+	OFPacketOut packetOutMessage = (OFPacketOut) floodlightProvider
+		.getOFMessageFactory().getMessage(OFType.PACKET_OUT);
+
+	short packetOutLength = (short) OFPacketOut.MINIMUM_LENGTH; // starting
+								    // length
+
+	// set buffer id to NONE
+	packetOutMessage.setBufferId(OFPacketOut.BUFFER_ID_NONE);
+
+	packetOutMessage.setInPort(OFPort.OFPP_NONE);
+
+	packetOutMessage
+		.setActionsLength((short) OFActionOutput.MINIMUM_LENGTH);
+	packetOutLength += OFActionOutput.MINIMUM_LENGTH;
+
+	// set actions
+	List<OFAction> actions = new ArrayList<OFAction>(1);
+	actions.add(new OFActionOutput((short) 11, (short) 0));
+
+	packetOutMessage.setActions(actions);
+
+	byte[] packetData = /* action.getPacket(); */ethernet.serialize();
+	packetOutMessage.setPacketData(packetData);
+	packetOutLength += (short) packetData.length;
+	packetOutMessage.setLength(packetOutLength);
 	// record the time
 	routesBenchMarks.put(rt.toString(), new TimePair(System.nanoTime(), 0));
 
-	// send it out
-
-	// last step set length
-	probeMsg.setLength(U16.t(OFPacketOut.MINIMUM_LENGTH
-		+ probeMsg.getActionsLength() + probeMsg.getPacketData().length));
-
-	// startSw.write(probeMsg, null);// TODO context?
-	try
-	{
+	try {
 	    log.debug("\nTrying to add the following flowmod: \n"
 		    + flowMod.toString() + "\nto Switch\n" + startSw.toString()
 		    + "\n");
-	    startSw.write(probeMsg, null);
+	    startSw.write(packetOutMessage, null);
 	    startSw.flush();
-	}
-	catch (Exception e)
-	{
+	} catch (Exception e) {
 	    log.error("Tried to write OFFlowMod to {} but failed: {}",
 		    HexString.toHexString(startSw.getId()), e.getMessage());
 	}
@@ -693,47 +692,36 @@ public class LowLevelController implements IOFSwitchListener,
 	return;
     }
 
-    private void finishRouteBenchMark(OFPacketIn msg)
-    {
+    private void finishRouteBenchMark(OFPacketIn msg) {
 
 	// get the data out of the msg
-	try
-	{
+	try {
 	    IPv4 probe = new IPv4();
 	    probe.deserialize(msg.getPacketData(), 0,
 		    msg.getPacketData().length);
 	    String id = ((Data) probe.getPayload()).toString();
 
-	    if (routesBenchMarks.containsKey(id))
-	    {
+	    if (routesBenchMarks.containsKey(id)) {
 		// update the back time
 		routesBenchMarks.get(id).setEnd(System.nanoTime());
 		debug("\n\n\n\n\n\n\n\n\nActually worked! : " + id);
 		// TODO tear down the route
-	    }
-	    else
-	    {
+	    } else {
 		debug("None idetified id: " + id);
 
 	    }
-	}
-	catch (Exception e)
-	{
+	} catch (Exception e) {
 	    /* debug("Exception : " + e.toString()); */
 	    return;
 	}
 
     }
 
-    private void sendBarrier(IOFSwitch sw)
-    {
+    private void sendBarrier(IOFSwitch sw) {
 	OFBarrierRequest m = new OFBarrierRequest();
-	try
-	{
+	try {
 	    sw.write(m, null);
-	}
-	catch (IOException e)
-	{
+	} catch (IOException e) {
 	    log.error("Tried to write to switch {} but got {}", sw.getId(),
 		    e.getMessage());
 	}
@@ -742,26 +730,22 @@ public class LowLevelController implements IOFSwitchListener,
     }
 
     @Override
-    public boolean isCallbackOrderingPrereq(OFType type, String name)
-    {
+    public boolean isCallbackOrderingPrereq(OFType type, String name) {
 	// TODO Auto-generated method stub
 	return false;
     }
 
     @Override
-    public boolean isCallbackOrderingPostreq(OFType type, String name)
-    {
+    public boolean isCallbackOrderingPostreq(OFType type, String name) {
 	// TODO Auto-generated method stub
 	return false;
     }
 
     @Override
     public net.floodlightcontroller.core.IListener.Command receive(
-	    IOFSwitch sw, OFMessage msg, FloodlightContext cntx)
-    {
+	    IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
 
-	switch (msg.getType())
-	{
+	switch (msg.getType()) {
 	// get the reply, update related hash tables for queue/port/switch
 	// management
 
@@ -775,14 +759,12 @@ public class LowLevelController implements IOFSwitchListener,
 
 	    System.out.println("Number of queues: " + queues.size());
 
-	    for (OFPacketQueue queue : queues)
-	    {
+	    for (OFPacketQueue queue : queues) {
 		long qid = queue.getQueueId();
 		List<OFQueueProp> props = queue.getProperties();
 		System.out.println(" qid = " + qid);
 		System.out.println(" num props = " + props.size());
-		for (OFQueueProp prop : props)
-		{
+		for (OFQueueProp prop : props) {
 		    System.out.println(" type = " + prop.getType());
 		    System.out.println(" rate = " + prop.getRate());
 		}
@@ -814,17 +796,14 @@ public class LowLevelController implements IOFSwitchListener,
 	return Command.CONTINUE;
     }
 
-    private void getAllQueueConfigs(IOFSwitch sw)
-    {
+    private void getAllQueueConfigs(IOFSwitch sw) {
 	OFQueueGetConfigRequest m = new OFQueueGetConfigRequest();
 
 	Collection<OFPhysicalPort> ports = sw.getPorts();
 
-	for (OFPhysicalPort port : ports)
-	{
+	for (OFPhysicalPort port : ports) {
 	    if (U16.f(port.getPortNumber()) >= U16
-		    .f(OFPort.OFPP_MAX.getValue()))
-	    {
+		    .f(OFPort.OFPP_MAX.getValue())) {
 		continue;
 	    }
 
@@ -833,12 +812,9 @@ public class LowLevelController implements IOFSwitchListener,
 
 	    m.setPortNumber(port.getPortNumber());
 
-	    try
-	    {
+	    try {
 		sw.write(m, null);
-	    }
-	    catch (IOException e)
-	    {
+	    } catch (IOException e) {
 		System.out.println("Tried to write to switch "
 			+ sw.getStringId() + "but got " + e.getMessage());
 	    }
@@ -847,8 +823,7 @@ public class LowLevelController implements IOFSwitchListener,
 	sw.flush();
     }
 
-    private void sendOFVendorData(IOFSwitch sw, OFOpenFlowVendorData data)
-    {
+    private void sendOFVendorData(IOFSwitch sw, OFOpenFlowVendorData data) {
 	OFVendor msg = (OFVendor) this.controller.getOFMessageFactory()
 		.getMessage(OFType.VENDOR);
 	msg.setVendor(OFOpenFlowVendorData.OF_VENDOR_ID);
@@ -856,12 +831,9 @@ public class LowLevelController implements IOFSwitchListener,
 	msg.setVendorData(data);
 	msg.setLengthU(OFVendor.MINIMUM_LENGTH + data.getLength());
 
-	try
-	{
+	try {
 	    sw.write(msg, null);
-	}
-	catch (IOException e)
-	{
+	} catch (IOException e) {
 	    System.out.println("Tried to write to switch " + sw.getStringId()
 		    + "but got " + e.getMessage());
 	}
@@ -870,8 +842,7 @@ public class LowLevelController implements IOFSwitchListener,
     }
 
     private void createQueue(IOFSwitch sw, short portNumber, int queueId,
-	    short rate)
-    {
+	    short rate) {
 	OFQueueProp prop = new OFQueueProp();
 	prop.setType(OFQueuePropType.OFPQT_MIN_RATE);
 	prop.setRate(rate);
@@ -887,8 +858,7 @@ public class LowLevelController implements IOFSwitchListener,
 	sendOFVendorData(sw, queueModifyData);
     }
 
-    private void deleteQueue(IOFSwitch sw, short portNumber, int queueId)
-    {
+    private void deleteQueue(IOFSwitch sw, short portNumber, int queueId) {
 	OFPacketQueue queue = new OFPacketQueue(queueId);
 
 	OFQueueDeleteVendorData queueDeleteData = new OFQueueDeleteVendorData();
@@ -921,16 +891,14 @@ public class LowLevelController implements IOFSwitchListener,
     // Code borrowed from QueueCreator.
 
     // add an entry in the switch's flow table
-    public boolean addFlowEntry()
-    {
+    public boolean addFlowEntry() {
 
 	return false;
     }
 
     // really assign routes for a flow (with queue creation)
 
-    public boolean designateActualRoutes()
-    {
+    public boolean designateActualRoutes() {
 
 	return false;
     }
@@ -939,23 +907,19 @@ public class LowLevelController implements IOFSwitchListener,
     // specified switch
 
     public Collection<MaxBandwidth> getPortMaxBandwidthForSwitch(Long switchID,
-	    short portNumber)
-    {
+	    short portNumber) {
 	IOFSwitch ofSwitch = switches.get(switchID);
 	OFPhysicalPort port = ofSwitch.getPort(portNumber);
 	int currentFeatures = port.getCurrentFeatures();
 	LinkedList<MaxBandwidth> maxBandwidths = new LinkedList<MaxBandwidth>();
 	// test first 10 bits
 	int i = 0;
-	while (i <= 9)
-	{
+	while (i <= 9) {
 	    MaxBandwidth mb = null;
 	    int mask = 1 << i;
 	    int result = currentFeatures & mask;
-	    if (result != 0)
-	    {
-		switch (i)
-		{
+	    if (result != 0) {
+		switch (i) {
 		case 0:
 		    mb = new MaxBandwidth(10, BandwidthUnit.Megabyte, false);
 		    break;
@@ -988,11 +952,46 @@ public class LowLevelController implements IOFSwitchListener,
 		    break;
 		}
 	    }
-	    if (mb != null)
-	    {
+	    if (mb != null) {
 		maxBandwidths.add(mb);
 	    }
 	}
 	return maxBandwidths;
     }
 }
+
+/*
+ * EXAM make a packetout and send with actions
+ * 
+ * // needs to create a packet and send to switch OFPacketOut packetOutMessage =
+ * (OFPacketOut) floodlightProvider.
+ * getOFMessageFactory().getMessage(OFType.PACKET_OUT);
+ * 
+ * short packetOutLength = (short)OFPacketOut.MINIMUM_LENGTH; // starting length
+ * 
+ * // set buffer id to NONE
+ * packetOutMessage.setBufferId(OFPacketOut.BUFFER_ID_NONE);
+ * 
+ * packetOutMessage.setInPort(OFPort.OFPP_NONE);
+ * 
+ * packetOutMessage.setActionsLength((short)OFActionOutput.MINIMUM_LENGTH);
+ * packetOutLength += OFActionOutput.MINIMUM_LENGTH;
+ * 
+ * // set actions List<OFAction> actions = new ArrayList<OFAction>(1);
+ * actions.add(new OFActionOutput((short) 11, (short) 0));
+ * 
+ * packetOutMessage.setActions(actions);
+ * 
+ * byte[] packetData = action.getPacket();
+ * packetOutMessage.setPacketData(packetData); packetOutLength +=
+ * (short)packetData.length;
+ * 
+ * // finally, set the total length packetOutMessage.setLength(packetOutLength);
+ * 
+ * // and write it out IOFSwitch sw = getSwitchEntryFirst(); try {
+ * counterStore.updatePktOutFMCounterStore(sw, packetOutMessage);
+ * sw.write(packetOutMessage, null);
+ * 
+ * } catch (IOException e) { log.error("Failed to write {} to switch {}: {}",
+ * new Object[]{ packetOutMessage, sw, e }); }
+ */
