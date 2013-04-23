@@ -67,8 +67,10 @@ import net.floodlightcontroller.core.util.SingletonTask;
 import net.floodlightcontroller.core.web.CoreWebRoutable;
 import net.floodlightcontroller.counter.ICounterStoreService;
 import net.floodlightcontroller.debugcounter.IDebugCounterService;
+import net.floodlightcontroller.devicemanager.internal.DeviceManagerImpl;
 import net.floodlightcontroller.flowcache.IFlowCacheService;
 import net.floodlightcontroller.packet.Ethernet;
+import net.floodlightcontroller.packet.IPv4;
 import net.floodlightcontroller.perfmon.IPktInProcessingTimeService;
 import net.floodlightcontroller.restserver.IRestApiService;
 import net.floodlightcontroller.storage.IResultSet;
@@ -610,9 +612,11 @@ public class Controller implements IFloodlightProviderService,
                 else {
                     loadlevel = LoadMonitor.LoadLevel.OK;
                 }
-
+                
                 for (OFMessage ofm : msglist) {
-                    try {
+  
+                	
+                	try {
                         if (overload_drop &&
                             !loadlevel.equals(LoadMonitor.LoadLevel.OK)) {
                             switch (ofm.getType()) {
@@ -650,7 +654,7 @@ public class Controller implements IFloodlightProviderService,
                             }
                         }
 
-                        // Do the actual packet processing
+
                         processOFMessage(ofm);
 
                     }
@@ -936,7 +940,8 @@ public class Controller implements IFloodlightProviderService,
         protected void processOFMessage(OFMessage m)
                 throws IOException, SwitchStateException {
             boolean shouldHandleMessage = false;
-
+            // Do the actual packet processing
+            
             switch (m.getType()) {
                 case HELLO:
                     if (log.isTraceEnabled())
@@ -1060,6 +1065,7 @@ public class Controller implements IFloodlightProviderService,
             }
 
             if (shouldHandleMessage) {
+
                 // WARNING: sw is null if handshake is not complete
                 if (!state.hsState.equals(HandshakeState.READY)) {
                     log.debug("Ignoring message type {} received " +
@@ -1068,7 +1074,7 @@ public class Controller implements IFloodlightProviderService,
                 } else {
                     sw.getListenerReadLock().lock();
                     try {
-
+                    	
                         if (sw.isConnected()) {
                             // Only dispatch message if the switch is in the
                             // activeSwitch map and if the switches role is
@@ -1196,7 +1202,8 @@ public class Controller implements IFloodlightProviderService,
         switch (m.getType()) {
             case PACKET_IN:
                 OFPacketIn pi = (OFPacketIn)m;
-
+                
+                
                 if (pi.getPacketData().length <= 0) {
                     log.error("Ignoring PacketIn (Xid = " + pi.getXid() +
                               ") because the data field is empty.");
@@ -1204,6 +1211,7 @@ public class Controller implements IFloodlightProviderService,
                 }
 
                 if (Controller.ALWAYS_DECODE_ETH) {
+                	
                     eth = new Ethernet();
                     eth.deserialize(pi.getPacketData(), 0,
                             pi.getPacketData().length);
@@ -1247,13 +1255,29 @@ public class Controller implements IFloodlightProviderService,
                                 continue;
                             }
                         }
-
+                        
                         pktinProcTime.recordStartTimeComp(listener);
                         cmd = listener.receive(sw, m, bc);
                         pktinProcTime.recordEndTimeComp(listener);
 
-                        if (Command.STOP.equals(cmd)) {
-                            break;
+                        if (Command.STOP.equals(cmd)){
+                        	OFPacketIn p = (OFPacketIn)m;
+                        	//it is dropping packets..
+                        	//System.out.println("Hey STOP again.. " + listener.getName());
+                        	if(listener.getName().equals("devicemanager")){
+	                        	IPv4 probe = new IPv4();
+	                        	eth = new Ethernet();
+	                			eth.deserialize(p.getPacketData(), 0, p.getPacketData().length);
+	                			probe.deserialize(eth.getPayload().serialize(), 0, eth.getPayload()
+	                					.serialize().length);
+	                			//if(listener.getName().equals(arg0))
+	                			if(probe.getSourceAddress() != IPv4.toIPv4Address("1.2.3.4")){
+	                				break;
+	                			}
+                        	}
+                        	else
+                        		break;
+                        	
                         }
                     }
                     pktinProcTime.recordEndTimePktIn(sw, m, bc);

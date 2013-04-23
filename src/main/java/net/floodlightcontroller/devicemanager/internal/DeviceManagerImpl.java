@@ -805,7 +805,7 @@ IFlowReconcileListener, IInfoProvider, IHAListener {
         Ethernet eth =
                 IFloodlightProviderService.bcStore.
                 get(cntx,IFloodlightProviderService.CONTEXT_PI_PAYLOAD);
-
+        
         // Extract source entity information
         Entity srcEntity =
                 getSourceEntityFromPacket(eth, sw.getId(), pi.getInPort());
