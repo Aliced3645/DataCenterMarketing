@@ -68,6 +68,7 @@ import net.floodlightcontroller.packet.ARP;
 import net.floodlightcontroller.packet.Data;
 import net.floodlightcontroller.packet.Ethernet;
 import net.floodlightcontroller.packet.IPv4;
+import net.floodlightcontroller.packet.UDP;
 import net.floodlightcontroller.packetstreamer.thrift.SwitchPortTuple;
 import net.floodlightcontroller.routing.IRoutingService;
 import net.floodlightcontroller.routing.Route;
@@ -454,7 +455,6 @@ public class LowLevelController implements IOFSwitchListener,
 	} else {
 	    log.debug("\n\nDid not get routes, try again later");
 	}
-
     }
 
     private void probeLatency(Route rt) throws Exception {
@@ -629,7 +629,7 @@ public class LowLevelController implements IOFSwitchListener,
 		.setProtocol(IPv4.PROTOCOL_UDP).setChecksum((short) 0)
 		.setSourceAddress("1.2.3.4").setDestinationAddress("1.2.3.4")
 		.setPayload(new Data(rt.toString().getBytes()));
-
+		
 	IOFSwitch iofSwitch = floodlightProvider.getSwitches().get(startSw);
 	// OFPhysicalPort ofpPort = iofSwitch.getPort((short) 2);
 	Ethernet ethernet = (Ethernet) new Ethernet()
@@ -656,16 +656,14 @@ public class LowLevelController implements IOFSwitchListener,
 
 	// set buffer id to NONE
 	packetOutMessage.setBufferId(OFPacketOut.BUFFER_ID_NONE);
-
 	packetOutMessage.setInPort(OFPort.OFPP_NONE);
-
 	packetOutMessage
 		.setActionsLength((short) OFActionOutput.MINIMUM_LENGTH);
 	packetOutLength += OFActionOutput.MINIMUM_LENGTH;
 
 	// set actions
 	List<OFAction> actions = new ArrayList<OFAction>(1);
-	actions.add(new OFActionOutput((short) 11, (short) 0));
+	actions.add(new OFActionOutput((short) 1, (short) 0));
 
 	packetOutMessage.setActions(actions);
 
@@ -696,9 +694,12 @@ public class LowLevelController implements IOFSwitchListener,
 
 	// get the data out of the msg
 	try {
+	    Ethernet eth = new Ethernet();
+	    eth.deserialize(msg.getPacketData(), 0, msg.getPacketData().length);
+
 	    IPv4 probe = new IPv4();
-	    probe.deserialize(msg.getPacketData(), 0,
-		    msg.getPacketData().length);
+	    probe.deserialize(eth.getPayload().serialize(), 0, eth.getPayload()
+		    .serialize().length);
 	    String id = ((Data) probe.getPayload()).toString();
 
 	    if (routesBenchMarks.containsKey(id)) {
@@ -707,7 +708,7 @@ public class LowLevelController implements IOFSwitchListener,
 		debug("\n\n\n\n\n\n\n\n\nActually worked! : " + id);
 		// TODO tear down the route
 	    } else {
-		debug("None idetified id: " + id);
+		debug("\n\n\n\n\n\n\n\n\n\nNone idetified id:\n\n\n\n\n\n\n\n\n\n " + id);
 
 	    }
 	} catch (Exception e) {
