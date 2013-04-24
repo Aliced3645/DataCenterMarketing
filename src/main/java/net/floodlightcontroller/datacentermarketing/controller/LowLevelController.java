@@ -300,6 +300,9 @@ public class LowLevelController implements IOFSwitchListener,
 
 	}
 
+	
+	
+	
 	public void updateDevices() {
 		devices.clear();
 		if (deviceManager == null) {

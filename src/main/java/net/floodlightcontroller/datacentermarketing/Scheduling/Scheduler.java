@@ -3,13 +3,17 @@
  */
 package net.floodlightcontroller.datacentermarketing.Scheduling;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import net.floodlightcontroller.core.IOFSwitch;
+import net.floodlightcontroller.datacentermarketing.MarketManager;
 import net.floodlightcontroller.routing.Route;
 import net.floodlightcontroller.topology.NodePortTuple;
 
@@ -42,6 +46,35 @@ public class Scheduler {
 
     }
 
+    /**
+     * request the lowlevel controller to update the switches clear the records
+     * in scheduler report new topology
+     * 
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    public void update() throws IOException, InterruptedException,
+	    ExecutionException {
+	MarketManager.getInstance().getLowLevelController().updateSwitches();
+	initializeWithIOFSwitches(MarketManager.getInstance()
+		.getLowLevelController().getSwitches());
+	report();
+    }
+
+    public void report() {
+	System.out.println("NIB records:\n");
+	System.out.println("NIB switches:\n");
+	Set<Long> keys = switchesInfo.keySet();
+
+	for (Long key : keys) {
+	    System.out.print("key" + key);
+	    System.out.println(switchesInfo.get(key));
+
+	}
+
+    }
+
     private void debug(String x) {
 	System.out.println("NIB debug: " + x + "\n");
     }
@@ -56,6 +89,7 @@ public class Scheduler {
 	if (switches == null || switches.size() == 0) {
 	    return;
 	}
+	switchesInfo.clear();
 	Iterator<Long> it = switches.keySet().iterator();
 
 	while (it.hasNext()) {
@@ -67,6 +101,10 @@ public class Scheduler {
 	}
 
     }
+
+    public boolean partiallyUpdate() {
+	return false;
+    };
 
     /*
      * validate to see if a repute is feasible in current scheduler
@@ -96,9 +134,8 @@ public class Scheduler {
 	if (!validateRoute(rt, null))
 	    return false;
 
-	
-	//TODO
-	
+	// TODO
+
 	return true;
     }
 

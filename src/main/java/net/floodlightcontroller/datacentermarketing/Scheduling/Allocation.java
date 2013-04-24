@@ -10,6 +10,10 @@ package net.floodlightcontroller.datacentermarketing.Scheduling;
  */
 public class Allocation implements Comparable<Allocation> {
 
+    public Allocation() {
+	super();
+    }
+
     long from = 0;
     long to = 0;
     float bandwidth = 0;// MByte

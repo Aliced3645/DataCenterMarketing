@@ -18,14 +18,11 @@ import org.restlet.resource.Post;
 import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
 
-
-public class LatencyTestResource extends ServerResource
-{
+public class LatencyTestResource extends ServerResource {
     // get the latency between hosts
 
     @Get("json")
-    public LinkedList<RouteLatency> retriveResults()
-    {
+    public LinkedList<RouteLatency> retriveResults() {
 
 	System.out.println("wuhhhaa\n\n\n\n\n\n\n\n");
 
@@ -39,8 +36,12 @@ public class LatencyTestResource extends ServerResource
 
     @Post
     @Put
-    public void postPingRequest(String pingRequest) throws Exception
-    {
+    public void postPingRequest(String pingRequest) throws Exception {
+
+	// TODO move to other router
+	net.floodlightcontroller.datacentermarketing.Scheduling.Scheduler
+		.getInstance().update();
+
 	System.out.println(pingRequest);
 
 	MappingJsonFactory f = new MappingJsonFactory();
@@ -49,47 +50,37 @@ public class LatencyTestResource extends ServerResource
 	// these 2 fields must be filled in the JSON request
 	boolean bSID = false, bDID = false;
 	long start = -1, end = -1;
-	try
-	{
+	try {
 	    jp = f.createJsonParser(pingRequest);
-	}
-	catch (JsonParseException e)
-	{
+	} catch (JsonParseException e) {
 	    throw new IOException(e);
 	}
 
 	jp.nextToken();
-	if (jp.getCurrentToken() != JsonToken.START_OBJECT)
-	{
+	if (jp.getCurrentToken() != JsonToken.START_OBJECT) {
 	    throw new IOException("Expected START_OBJECT");
 	}
 
-	while (jp.nextToken() != JsonToken.END_OBJECT)
-	{
+	while (jp.nextToken() != JsonToken.END_OBJECT) {
 
-	    if (jp.getCurrentToken() != JsonToken.FIELD_NAME)
-	    {
+	    if (jp.getCurrentToken() != JsonToken.FIELD_NAME) {
 		throw new IOException("Expected FIELD_NAME");
 		// System.out.println(jp.getText());
 	    }
 
 	    String name = jp.getCurrentName();
 
-	    if (name == "SID")
-	    {
+	    if (name == "SID") {
 		jp.nextToken();
 		start = jp.getLongValue();
 		bSID = true;
-	    }
-	    else if (name == "DID")
-	    {
+	    } else if (name == "DID") {
 		jp.nextToken();
 		end = jp.getLongValue();
 		bDID = true;
 	    }
 
-	    else
-	    {
+	    else {
 		jp.nextToken();
 	    }
 	}
@@ -98,8 +89,7 @@ public class LatencyTestResource extends ServerResource
 		+ end);
 
 	MarketManager.getInstance().getLowLevelController().ping(start, end);
-	
-	
+
 	return;
     }
 

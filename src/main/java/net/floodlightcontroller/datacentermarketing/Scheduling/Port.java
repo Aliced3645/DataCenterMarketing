@@ -25,10 +25,24 @@ public class Port {
     // the bandwidth of this port
     public float capacity = -1; // MBytes
 
-/*    public Port(int i) {
-	id = i;
-	full_populate();
-    }*/
+    /*
+     * public Port(int i) { id = i; full_populate(); }
+     */
+
+    @Override
+    public String toString() {
+	String toReturn = "";
+
+	toReturn += "Port No." + id + " ";
+
+	toReturn += "Port Type." + type + " ";
+
+	toReturn += "Port Capacity." + capacity + " MB ";
+
+	toReturn += "\n";
+
+	return toReturn;
+    }
 
     /**
      * Initialize the port according to the physical port
