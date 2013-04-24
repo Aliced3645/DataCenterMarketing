@@ -8,6 +8,6 @@ package net.floodlightcontroller.datacentermarketing.Scheduling;
  * 
  */
 public enum ADirection {
-	in, out;
+    IN, OUT;
 
 }

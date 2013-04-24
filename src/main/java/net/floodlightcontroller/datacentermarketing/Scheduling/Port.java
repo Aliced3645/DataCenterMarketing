@@ -5,46 +5,89 @@ package net.floodlightcontroller.datacentermarketing.Scheduling;
 
 import java.util.HashSet;
 
+import org.openflow.protocol.OFPhysicalPort;
+
 /**
  * @author openflow
  * 
  */
 
-public class Port
-{
+public class Port {
 
-    public int id = -1;
+    public short id = -1;
 
-    public Port_Type type = Port_Type.FULL_DUPLEX;
+    OFPhysicalPort phyPort = null;
+
+    public Port_Type type = null;
 
     public Queue[] queues;
 
     // the bandwidth of this port
-    public long capacity = -1; // not initialized
+    public float capacity = -1; // MBytes
 
-    public Port(int i)
-    {
+/*    public Port(int i) {
 	id = i;
+	full_populate();
+    }*/
+
+    /**
+     * Initialize the port according to the physical port
+     * 
+     * @param i
+     * @param p
+     */
+    public Port(short i, OFPhysicalPort p) {
+	id = i;
+	phyPort = p;
+	// get the capacity
+
+	int feature = p.getPeerFeatures();
+
+	if ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_10MB_HD.getValue()) > 0) {
+	    capacity = 10;
+	    this.type = Port_Type.HALF_DUPLEX;
+	} else if ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_10MB_FD
+		.getValue()) > 0) {
+	    capacity = 10;
+	    this.type = Port_Type.FULL_DUPLEX;
+	} else if ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_100MB_HD
+		.getValue()) > 0) {
+	    capacity = 100;
+	    this.type = Port_Type.HALF_DUPLEX;
+	} else if ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_100MB_FD
+		.getValue()) > 0) {
+	    capacity = 100;
+	    this.type = Port_Type.FULL_DUPLEX;
+	} else if ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_1GB_HD
+		.getValue()) > 0) {
+	    capacity = 1000;
+	    this.type = Port_Type.HALF_DUPLEX;
+	} else if ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_1GB_FD
+		.getValue()) > 0) {
+	    capacity = 1000;
+	    this.type = Port_Type.FULL_DUPLEX;
+	} else if ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_10GB_FD
+		.getValue()) > 0) {
+	    capacity = 10000;
+	    this.type = Port_Type.FULL_DUPLEX;
+	}
+
 	full_populate();
     }
 
-    public void full_populate()
-    {
+    public void full_populate() {
 
 	queues = new Queue[Default.QUEUE_NUM_PER_PORT];
-	for (int a = 0; a < queues.length; a++)
-	{
+	for (int a = 0; a < queues.length; a++) {
 	    queues[a] = new Queue();
 
 	}
     }
 
-    public void full_populate(int queue_size)
-    {
+    public void full_populate(int queue_size) {
 
 	queues = new Queue[queue_size];
-	for (int a = 0; a < queues.length; a++)
-	{
+	for (int a = 0; a < queues.length; a++) {
 	    queues[a] = new Queue();
 
 	}
@@ -60,29 +103,20 @@ public class Port
      * queue' allocation does not overlap with qta, remember it for possible
      * allocation. If we have finish checking all the queues, return
      */
-    public HashSet<Integer> possibleQ(Allocation allocation)
-    {
+    public HashSet<Integer> possibleQ(Allocation allocation) {
 
 	HashSet<Integer> s = new HashSet<Integer>();
 	long usedBandWidth = 0;
-	for (int a = 0; a < queues.length; a++)
-	{
+	for (int a = 0; a < queues.length; a++) {
 	    Allocation allocated = queues[a].get_overlap(allocation);
-	    if (allocated == null)
-	    {
+	    if (allocated == null) {
 		s.add(a);
-	    }
-	    else
-	    {
-		if (allocated.direction != allocation.direction)
-		{
+	    } else {
+		if (allocated.direction != allocation.direction) {
 		    return null;
-		}
-		else
-		{
+		} else {
 		    usedBandWidth += allocated.bandwidth;
-		    if (usedBandWidth + allocation.bandwidth > capacity)
-		    {
+		    if (usedBandWidth + allocation.bandwidth > capacity) {
 			return null;
 		    }
 		}
@@ -91,21 +125,17 @@ public class Port
 	return s.size() > 0 ? s : null;
     }
 
-    public int reserve(Allocation allocation)
-    {
+    public int reserve(Allocation allocation) {
 	HashSet<Integer> ps = possibleQ(allocation);
 	if (ps == null)
 	    return -1;
 	int randomQueue = ps.iterator().next();
 
-	try
-	{
+	try {
 	    queues[randomQueue].reserve(allocation);
 	    return randomQueue;
 
-	}
-	catch (Exception e)
-	{
+	} catch (Exception e) {
 	    System.out.println("Hmmm??? " + e.getMessage() + " : "
 		    + e.toString());
 
