@@ -1,6 +1,9 @@
 package net.floodlightcontroller.datacentermarketing.controller;
 
 import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
@@ -16,6 +19,13 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.JsonSerializer;
+import org.codehaus.jackson.map.MappingJsonFactory;
+import org.codehaus.jackson.map.SerializerProvider;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.openflow.protocol.OFBarrierRequest;
 import org.openflow.protocol.OFEchoRequest;
 import org.openflow.protocol.OFError;
@@ -48,6 +58,9 @@ import org.openflow.vendor.openflow.OFQueueModifyVendorData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.cedarsoftware.util.io.JsonReader;
+import com.cedarsoftware.util.io.JsonWriter;
+
 import net.floodlightcontroller.core.FloodlightContext;
 import net.floodlightcontroller.core.IFloodlightProviderService;
 import net.floodlightcontroller.core.IOFMessageListener;
@@ -61,6 +74,8 @@ import net.floodlightcontroller.core.module.IFloodlightService;
 import net.floodlightcontroller.core.util.AppCookie;
 import net.floodlightcontroller.counter.ICounterStoreService;
 import net.floodlightcontroller.datacentermarketing.MarketManager;
+import net.floodlightcontroller.datacentermarketing.logic.BidRequest;
+import net.floodlightcontroller.datacentermarketing.messagepasser.BidRequestJSONSerializer;
 import net.floodlightcontroller.devicemanager.IDevice;
 import net.floodlightcontroller.devicemanager.IDeviceService;
 import net.floodlightcontroller.devicemanager.SwitchPort;
@@ -102,7 +117,44 @@ public class LowLevelController implements IOFSwitchListener,
 	private Future<OFFeaturesReply> future;
 	protected static Logger log = LoggerFactory
 			.getLogger(LowLevelController.class);
+	
+	
+	//the payload of the ping packet
+	//records the route and a boolean on whether its entries should be deleted
+	class PingPayloadJSONSerializer extends JsonSerializer<PingPayload>{
 
+		@Override
+		public void serialize(PingPayload pingPayLoad, JsonGenerator jGen,
+				SerializerProvider arg2) throws IOException,
+				JsonProcessingException {
+			// TODO Auto-generated method stub
+			jGen.writeStartObject();
+			jGen.writeObject(pingPayLoad);
+			jGen.writeEndObject();
+		}
+	}
+	
+	@JsonSerialize(using=PingPayloadJSONSerializer.class)
+	class PingPayload{
+		public String routeString;
+		public boolean deleteRoute;
+		public PingPayload(String routeJSONString, boolean _deleteRoute){
+			routeString = routeJSONString;
+			deleteRoute = _deleteRoute;
+		}
+		public String toString(){
+			char ifDeleteChar = (deleteRoute == true? 'y' : 'n');
+			return ifDeleteChar + routeString;
+		}
+	}
+	/*
+	private BidRequest pingPayloadJsonStringToPingPayload(String pingPayloadString) throws IOException{
+		BidRequest bidRequest = new BidRequest();
+        MappingJsonFactory f = new MappingJsonFactory();
+        JsonParser jp;
+	}
+	*/
+	
 	@Override
 	public Collection<Class<? extends IFloodlightService>> getModuleServices() {
 		// TODO Auto-generated method stub
@@ -383,7 +435,7 @@ public class LowLevelController implements IOFSwitchListener,
 		public long start;
 		private long end;
 		private boolean isDone;
-
+		
 		/*
 		 * public synchronized boolean isDone() { return isDone; }
 		 * 
@@ -447,20 +499,19 @@ public class LowLevelController implements IOFSwitchListener,
 		ArrayList<Route> routes = getNonLoopPaths(start, end);
 		if (routes != null) {
 			if (routes.size() <= 0) {
-
 				log.debug("\n\nDid not get routes, try again later");
 				return;
 			}
 
 			for (Route rt : routes) {
-				probeLatency(rt);
+				probeLatency(rt,false);
 			}
 		} else {
 			log.debug("\n\nDid not get routes, try again later");
 		}
 	}
 
-	private void probeLatency(Route rt) throws Exception {
+	private void probeLatency(Route rt, boolean whetherDelete) throws Exception {
 
 		// TODO check cache
 
@@ -491,7 +542,8 @@ public class LowLevelController implements IOFSwitchListener,
 		// action list
 		ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
 		actionsTo.add(outputTo);
-
+		
+		
 		// match on the in and out ip
 		// OFMatch match = new
 		// OFMatch().setWildcards(((Integer)startSw.getAttribute(IOFSwitch.PROP_FASTWILDCARDS)).intValue()
@@ -512,7 +564,7 @@ public class LowLevelController implements IOFSwitchListener,
 		// flow mod
 		OFFlowMod flowMod = (OFFlowMod) floodlightProvider
 				.getOFMessageFactory().getMessage(OFType.FLOW_MOD);
-
+		
 		flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
 				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
 				.setCookie(AppCookie.makeCookie(0, 0))
@@ -613,7 +665,6 @@ public class LowLevelController implements IOFSwitchListener,
 
 		writeFlowModToSwitch(endSw, flowMod);
 
-		writeFlowModToSwitch(endSw, flowMod);
 		sendBarrier(endSw);
 
 		log.debug("\nsettle end switch!");
@@ -624,15 +675,22 @@ public class LowLevelController implements IOFSwitchListener,
 		 * probe.setDestinationAddress("1.2.3.4"); // put the identifier string
 		 * in the body probe.setPayload(new Data(rt.toString().getBytes()));
 		 */
-
+		
 		IPv4 probe = new IPv4();
+		String routeJSONString = JsonWriter.objectToJson(rt);
+		PingPayload ppl = new PingPayload(routeJSONString, whetherDelete);
+		String pplString = ppl.toString();
+		System.out.println("PPL: " + pplString);
+		//Route rtt = (Route)JsonReader.toJava(content);
+		//System.out.println("JSON...!!" + content);
+		//System.out.println("ROUTE...!!!" + rtt);
 		probe = (IPv4) probe.setVersion((byte) 4).setDiffServ((byte) 0)
 				.setIdentification((short) 188).setFlags((byte) 0)
 				.setFragmentOffset((short) 0).setTtl((byte) 250)
 				/* .setProtocol(IPv4.PROTOCOL_UDP) */.setChecksum((short) 0)
 				.setSourceAddress("1.2.3.4").setDestinationAddress("1.2.3.4")
-				.setPayload(new Data(rt.toString().getBytes()));
-
+				.setPayload(new Data(pplString.getBytes()));
+		
 		IOFSwitch iofSwitch = floodlightProvider.getSwitches().get(startSw);
 		Ethernet ethernet = (Ethernet) new Ethernet()
 				.setSourceMACAddress(
@@ -694,23 +752,171 @@ public class LowLevelController implements IOFSwitchListener,
 		return;
 	}
 
+	private void deleteRouteEntries(Route rt){
+		List<NodePortTuple> switchesPorts = rt.getPath();
+		
+		if (switchesPorts == null && switchesPorts.size() < 2) {
+			debug("Route length is not right.");
+			return;
+		}
+		if (switchesPorts.size() % 2 == 1) {
+			debug("mismatched switch in-out port number!");
+		}
+
+		// get the first switch
+		int index = 0;
+		NodePortTuple first = switchesPorts.get(index);
+		long nodePid = first.getNodeId();
+		short startPort = first.getPortId();
+		IOFSwitch startSw = switches.get(nodePid);
+		// action
+		OFAction outputTo = new OFActionOutput(first.getPortId(), (short) 1500);
+		// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
+		// controller
+		// action list
+		ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
+		actionsTo.add(outputTo);
+		
+		String matchString = "nw_dst=1.2.3.4" + "," + "nw_src=1.2.3.4,"
+				+ "dl_type=" + 0x800;
+		OFMatch match = new OFMatch();
+		match.fromString(matchString);
+		// match.setDataLayerType(Ethernet.TYPE_IPv4);
+		log.debug("set match " + match.toString());
+
+		// flow mod
+		OFFlowMod flowMod = (OFFlowMod) floodlightProvider
+				.getOFMessageFactory().getMessage(OFType.FLOW_MOD);
+		
+		flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
+				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
+				.setCookie(AppCookie.makeCookie(0, 0))
+				.setCommand(OFFlowMod.OFPFC_DELETE).setMatch(match)
+				.setOutPort(OFPort.OFPP_NONE)
+				.setLengthU(OFFlowMod.MINIMUM_LENGTH);
+
+		flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
+
+		log.debug("match in flowmod is now : " + flowMod.getMatch().toString());
+
+		writeFlowModToSwitch(startSw, flowMod);
+		sendBarrier(startSw);
+
+		// set the middle ones that are on same switch
+		index++;
+
+		log.debug("\nRemoved first switch!");
+
+		while (index < switchesPorts.size() - 1) {
+			// get the switch
+			NodePortTuple firstInPair = switchesPorts.get(index);
+			nodePid = firstInPair.getNodeId();
+			IOFSwitch sw = switches.get(nodePid);
+			short ingressPortPid = firstInPair.getPortId();
+			index++;
+			NodePortTuple secondInPair = switchesPorts.get(index);
+			short egressPortPid = secondInPair.getPortId();
+			index++;
+
+			if (firstInPair.getNodeId() != secondInPair.getNodeId()) {
+				debug("mismatched switch id!");
+			}
+
+			actionsTo.clear();
+			flowMod = (OFFlowMod) floodlightProvider.getOFMessageFactory()
+					.getMessage(OFType.FLOW_MOD);
+			outputTo = new OFActionOutput(egressPortPid, (short) 1500);
+			// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back
+			// to
+			// controller
+
+			actionsTo.add(outputTo);
+			/*
+			 * match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL &
+			 * (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
+			 * match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
+			 * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
+			 */
+
+			flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
+				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
+				.setCookie(AppCookie.makeCookie(0, 0))
+				.setCommand(OFFlowMod.OFPFC_DELETE).setMatch(match)
+				.setOutPort(OFPort.OFPP_NONE)
+				.setLengthU(OFFlowMod.MINIMUM_LENGTH);
+			
+			flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
+
+			writeFlowModToSwitch(sw, flowMod);
+			sendBarrier(sw);
+		}
+
+		log.debug("\nRemoved middle switches!");
+
+		// last port
+		NodePortTuple last = switchesPorts.get(index);
+		nodePid = last.getNodeId();
+		IOFSwitch endSw = switches.get(nodePid);
+		System.out.println(65533 + " " + 0xfffd + " " + (short) 0xfffd);
+		outputTo = new OFActionOutput(OFPort.OFPP_CONTROLLER.getValue(),
+				(short) 1500);
+		// outputTo = new OFActionOutput().setPort(OFPort.OFPP_CONTROLLER
+		// .getValue());
+		// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
+		// controller
+
+		actionsTo.clear();
+		actionsTo.add(outputTo);
+
+		/*
+		 * match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL &
+		 * (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
+		 * match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
+		 * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
+		 */
+
+		flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
+			.setBufferId(OFPacketOut.BUFFER_ID_NONE)
+			.setCookie(AppCookie.makeCookie(0, 0))
+			.setCommand(OFFlowMod.OFPFC_DELETE).setMatch(match)
+			.setOutPort(OFPort.OFPP_NONE)
+			.setLengthU(OFFlowMod.MINIMUM_LENGTH);
+		
+		flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
+
+		writeFlowModToSwitch(endSw, flowMod);
+		sendBarrier(endSw);
+
+		log.debug("\nRemoved end switch!");
+		
+	}
+	
 	private void finishRouteBenchMark(OFPacketIn msg) {
 
 		// get the data out of the msg
 		try {
 			Ethernet eth = new Ethernet();
 			eth.deserialize(msg.getPacketData(), 0, msg.getPacketData().length);
-
 			IPv4 probe = new IPv4();
 			probe.deserialize(eth.getPayload().serialize(), 0, eth.getPayload()
 					.serialize().length);
-			String id = new String(probe.getPayload().serialize());
-
+			String payloadString = new String(probe.getPayload().serialize());
+			char firstChar = payloadString.charAt(0);
+			boolean toDelete = firstChar == 'y'? true : false;
+			String routeJson = payloadString.substring(1);
+			Route route = (Route)JsonReader.toJava(routeJson);
+			String id = route.toString();
+			
 			if (routesBenchMarks.containsKey(id)) {
 				// update the back time
 				routesBenchMarks.get(id).setEnd(System.nanoTime());
 				debug("Probe Lentency:" + routesBenchMarks.get(id).getDifference() + "\n");
+				debug("Ping packet content: " + id);
 				// TODO tear down the route
+				if(toDelete == true){
+					deleteRouteEntries(route);
+				}
+				
 			} else {
 				debug("None idetified id:"+ id);
 			}
