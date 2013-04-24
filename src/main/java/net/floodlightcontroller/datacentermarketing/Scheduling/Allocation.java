@@ -12,8 +12,14 @@ public class Allocation implements Comparable<Allocation> {
 
     long from = 0;
     long to = 0;
-    float bandwidth = 0;//MByte
+    float bandwidth = 0;// MByte
     ADirection direction = null;
+
+    public String toString() {
+	return "Allocation : from" + from + " to " + to + " bandwitdh "
+		+ bandwidth + " direction " + direction;
+
+    }
 
     public Allocation(long from, long to, float bandwidth, ADirection direction) {
 	super();
@@ -35,10 +41,9 @@ public class Allocation implements Comparable<Allocation> {
 
 	return false;
     }
-    
-    public boolean sameDirection(Allocation alloc)
-    {
-	return this.direction==alloc.direction;
+
+    public boolean sameDirection(Allocation alloc) {
+	return this.direction == alloc.direction;
     }
 
     public long getFrom() {
