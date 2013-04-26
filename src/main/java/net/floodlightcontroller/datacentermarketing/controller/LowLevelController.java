@@ -494,14 +494,17 @@ public class LowLevelController implements IOFSwitchListener,
 		// action list
 		ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
 		actionsTo.add(outputTo);
-		
-		//get the ID of source and destination
+
+		// get the ID of source and destination
 		IDevice sourceDevice = devices.get(srcID);
 		IDevice destDevice = devices.get(destID);
-		
-		//something not sure right now
-		String matchString = "nw_dst=" + IPv4.fromIPv4Address(destDevice.getIPv4Addresses()[0]) + "," + "nw_src=" + 
-		  IPv4.fromIPv4Address(sourceDevice.getIPv4Addresses()[0]) + ","+ "dl_type=" + 0x800;
+
+		// something not sure right now
+		String matchString = "nw_dst="
+				+ IPv4.fromIPv4Address(destDevice.getIPv4Addresses()[0]) + ","
+				+ "nw_src="
+				+ IPv4.fromIPv4Address(sourceDevice.getIPv4Addresses()[0])
+				+ "," + "dl_type=" + 0x800;
 		OFMatch match = new OFMatch();
 		match.fromString(matchString);
 		// match.setDataLayerType(Ethernet.TYPE_IPv4);
@@ -615,11 +618,164 @@ public class LowLevelController implements IOFSwitchListener,
 		 * probe.setDestinationAddress("1.2.3.4"); // put the identifier string
 		 * in the body probe.setPayload(new Data(rt.toString().getBytes()));
 		 */
-		
+
 		log.debug("\nRule Installed");
 
-
 		return false;
+	}
+
+	private void deleteRouteEntriesForFlow(Route rt, long srcID, long destID) {
+
+		if (rt == null) {
+			debug("no route was presented to install");
+			return;
+		}
+
+		List<NodePortTuple> switchesPorts = rt.getPath();
+
+		if (switchesPorts == null && switchesPorts.size() < 2) {
+			debug("Route length is not right.");
+			return;
+		}
+		if (switchesPorts.size() % 2 == 1) {
+			debug("mismatched switch in-out port number!");
+		}
+
+		// get the first switch
+		int index = 0;
+		NodePortTuple first = switchesPorts.get(index);
+		long nodePid = first.getNodeId();
+		short startPort = first.getPortId();
+		IOFSwitch startSw = switches.get(nodePid);
+		// action
+		OFAction outputTo = new OFActionOutput(first.getPortId(), (short) 1500);
+		// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
+		// controller
+		// action list
+		ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
+		actionsTo.add(outputTo);
+
+		// get the ID of source and destination
+		IDevice sourceDevice = devices.get(srcID);
+		IDevice destDevice = devices.get(destID);
+
+		// something not sure right now
+		String matchString = "nw_dst="
+				+ IPv4.fromIPv4Address(destDevice.getIPv4Addresses()[0]) + ","
+				+ "nw_src="
+				+ IPv4.fromIPv4Address(sourceDevice.getIPv4Addresses()[0])
+				+ "," + "dl_type=" + 0x800;
+		OFMatch match = new OFMatch();
+		match.fromString(matchString);
+		// match.setDataLayerType(Ethernet.TYPE_IPv4);
+		log.debug("set match " + match.toString());
+
+		// flow mod
+		OFFlowMod flowMod = (OFFlowMod) floodlightProvider
+				.getOFMessageFactory().getMessage(OFType.FLOW_MOD);
+
+		flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
+				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
+				.setCookie(AppCookie.makeCookie(0, 0))
+				.setCommand(OFFlowMod.OFPFC_DELETE).setMatch(match)
+				.setOutPort(OFPort.OFPP_NONE)
+				.setLengthU(OFFlowMod.MINIMUM_LENGTH);
+
+		flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
+
+		log.debug("match in flowmod is now : " + flowMod.getMatch().toString());
+
+		writeFlowModToSwitch(startSw, flowMod);
+		sendBarrier(startSw);
+
+		// set the middle ones that are on same switch
+		index++;
+
+		log.debug("\nRemoved first switch!");
+
+		while (index < switchesPorts.size() - 1) {
+			// get the switch
+			NodePortTuple firstInPair = switchesPorts.get(index);
+			nodePid = firstInPair.getNodeId();
+			IOFSwitch sw = switches.get(nodePid);
+			short ingressPortPid = firstInPair.getPortId();
+			index++;
+			NodePortTuple secondInPair = switchesPorts.get(index);
+			short egressPortPid = secondInPair.getPortId();
+			index++;
+
+			if (firstInPair.getNodeId() != secondInPair.getNodeId()) {
+				debug("mismatched switch id!");
+			}
+
+			actionsTo.clear();
+			flowMod = (OFFlowMod) floodlightProvider.getOFMessageFactory()
+					.getMessage(OFType.FLOW_MOD);
+			outputTo = new OFActionOutput(egressPortPid, (short) 1500);
+			// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back
+			// to
+			// controller
+
+			actionsTo.add(outputTo);
+			/*
+			 * match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL &
+			 * (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
+			 * match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
+			 * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
+			 */
+
+			flowMod.setIdleTimeout(Short.MAX_VALUE)
+					.setHardTimeout(Short.MAX_VALUE)
+					.setBufferId(OFPacketOut.BUFFER_ID_NONE)
+					.setCookie(AppCookie.makeCookie(0, 0))
+					.setCommand(OFFlowMod.OFPFC_DELETE).setMatch(match)
+					.setOutPort(OFPort.OFPP_NONE)
+					.setLengthU(OFFlowMod.MINIMUM_LENGTH);
+
+			flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
+
+			writeFlowModToSwitch(sw, flowMod);
+			sendBarrier(sw);
+		}
+
+		log.debug("\nRemoved middle switches!");
+
+		// last port
+		NodePortTuple last = switchesPorts.get(index);
+		nodePid = last.getNodeId();
+		IOFSwitch endSw = switches.get(nodePid);
+		outputTo = new OFActionOutput(OFPort.OFPP_CONTROLLER.getValue(),
+				(short) 1500);
+		// outputTo = new OFActionOutput().setPort(OFPort.OFPP_CONTROLLER
+		// .getValue());
+		// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
+		// controller
+
+		actionsTo.clear();
+		actionsTo.add(outputTo);
+
+		/*
+		 * match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL &
+		 * (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
+		 * match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
+		 * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
+		 */
+
+		flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
+				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
+				.setCookie(AppCookie.makeCookie(0, 0))
+				.setCommand(OFFlowMod.OFPFC_DELETE).setMatch(match)
+				.setOutPort(OFPort.OFPP_NONE)
+				.setLengthU(OFFlowMod.MINIMUM_LENGTH);
+
+		flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
+
+		writeFlowModToSwitch(endSw, flowMod);
+		sendBarrier(endSw);
+
+		log.debug("\nRemoved end switch!");
+
+		return;
 	}
 
 	// bench marks cache
