@@ -466,26 +466,7 @@ public class LowLevelController implements IOFSwitchListener,
 
     public boolean installRoute(long srcID, long destID, Route rt,
 	    long bandwidth) throws Exception {
-	List<NodePortTuple> switchesPorts = rt.getPath();
-	if (switchesPorts.size() < 2) {
-	    debug("Route length is not right.");
-	}
-	if (switchesPorts.size() % 2 == 1) {
-	    debug("mismatched switch in-out port number!");
-	}
-	int index = 0;
-	IOFSwitch startSW = null;
-	// get devices
-	IDevice srcDev = devices.get(srcID);
-	IDevice destDev = devices.get(destID);
-	// set up match rule
-	OFMatch match = new OFMatch();
-	match.setDataLayerDestination(destDev.getMACAddressString());
-	match.setDataLayerSource(srcDev.getMACAddressString());
-
-	while (index < switchesPorts.size()) {
-
-	}
+    		
 
 	return false;
     }
@@ -505,7 +486,7 @@ public class LowLevelController implements IOFSwitchListener,
 	    }
 
 	    for (Route rt : routes) {
-		probeLatency(rt, false);
+		probeLatency(rt, true);
 	    }
 	} else {
 	    log.debug("\n\nDid not get routes, try again later");
@@ -550,16 +531,6 @@ public class LowLevelController implements IOFSwitchListener,
 	ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
 	actionsTo.add(outputTo);
 
-	// match on the in and out ip
-	// OFMatch match = new
-	// OFMatch().setWildcards(((Integer)startSw.getAttribute(IOFSwitch.PROP_FASTWILDCARDS)).intValue()
-	// & ~OFMatch.OFPFW_NW_SRC_MASK & ~OFMatch.OFPFW_NW_DST_MASK /*&
-	// ~OFMatch.OFPFW_DL_TYPE*/) ;
-	// match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
-	// match.setNetworkProtocol((byte)0x806);
-	// match.setDataLayerType(U16.t(Integer.valueOf(
-	// "0x800".replaceFirst("0x", ""), 16)));
-	// match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
 	String matchString = "nw_dst=1.2.3.4" + "," + "nw_src=1.2.3.4,"
 		+ "dl_type=" + 0x800;
 	OFMatch match = new OFMatch();
@@ -758,6 +729,7 @@ public class LowLevelController implements IOFSwitchListener,
 	return;
     }
 
+    
     private void deleteRouteEntries(Route rt) {
 	List<NodePortTuple> switchesPorts = rt.getPath();
 
@@ -864,7 +836,6 @@ public class LowLevelController implements IOFSwitchListener,
 	NodePortTuple last = switchesPorts.get(index);
 	nodePid = last.getNodeId();
 	IOFSwitch endSw = switches.get(nodePid);
-	System.out.println(65533 + " " + 0xfffd + " " + (short) 0xfffd);
 	outputTo = new OFActionOutput(OFPort.OFPP_CONTROLLER.getValue(),
 		(short) 1500);
 	// outputTo = new OFActionOutput().setPort(OFPort.OFPP_CONTROLLER
@@ -902,6 +873,8 @@ public class LowLevelController implements IOFSwitchListener,
 
 	// get the data out of the msg
 	try {
+		
+		
 	    Ethernet eth = new Ethernet();
 	    eth.deserialize(msg.getPacketData(), 0, msg.getPacketData().length);
 	    IPv4 probe = new IPv4();
