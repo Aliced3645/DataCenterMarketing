@@ -38,10 +38,6 @@ public class LatencyTestResource extends ServerResource {
     @Put
     public void postPingRequest(String pingRequest) throws Exception {
 
-	// TODO move to other router
-	net.floodlightcontroller.datacentermarketing.Scheduling.Scheduler
-		.getInstance().update();
-
 	System.out.println(pingRequest);
 
 	MappingJsonFactory f = new MappingJsonFactory();
@@ -89,6 +85,10 @@ public class LatencyTestResource extends ServerResource {
 		+ end);
 
 	MarketManager.getInstance().getLowLevelController().ping(start, end);
+
+	// TODO move to other router
+	net.floodlightcontroller.datacentermarketing.Scheduling.Scheduler
+		.getInstance().update();
 
 	return;
     }

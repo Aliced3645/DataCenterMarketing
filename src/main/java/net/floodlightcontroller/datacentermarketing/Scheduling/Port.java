@@ -54,12 +54,20 @@ public class Port {
      * @param i
      * @param p
      */
+    public void debug(String str) {
+	System.out.println("debug port: " + str);
+    }
+
     public Port(long swId, short i, OFPhysicalPort p) {
 	id = i;
 	phyPort = p;
 	// call low level controller
+	debug("getting bd for port");
+
 	Collection<MaxBandwidth> mbs = MarketManager.getInstance()
 		.getLowLevelController().getPortMaxBandwidthForSwitch(swId, i);
+
+	debug("got bd for port");
 
 	assert (mbs.size() == 1);// TODO
 

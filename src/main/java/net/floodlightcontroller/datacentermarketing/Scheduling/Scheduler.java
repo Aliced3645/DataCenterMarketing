@@ -56,9 +56,16 @@ public class Scheduler {
      */
     public void update() throws IOException, InterruptedException,
 	    ExecutionException {
+
+	debug("low level update switches");
 	MarketManager.getInstance().getLowLevelController().updateSwitches();
+
+	debug("scheduler getting switches");
 	initializeWithIOFSwitches(MarketManager.getInstance()
 		.getLowLevelController().getSwitches());
+
+	debug("ready to report...");
+
 	report();
     }
 
