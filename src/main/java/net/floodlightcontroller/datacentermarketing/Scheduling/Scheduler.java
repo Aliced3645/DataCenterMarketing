@@ -114,9 +114,18 @@ public class Scheduler {
     };
 
     /*
-     * validate to see if a repute is feasible in current scheduler
+     * validate to see if a repute is feasible in current scheduler, if yes,
+     * reserve it
+     * 
+     * note the queue will be selected randomly
      */
-    public boolean validateRoute(Route rt, Allocation alloc) {
+
+    public boolean validateAndReserveRoute(Route rt, Allocation alloc) {
+	return validateAndReserveRoute(rt, alloc, true);
+    }
+
+    public boolean validateAndReserveRoute(Route rt, Allocation alloc,
+	    boolean reserve) {
 
 	// we need to validate all the possible queue reservations
 	List<NodePortTuple> switchPorts = rt.getPath();
@@ -130,6 +139,11 @@ public class Scheduler {
 	    HashSet<Integer> ps = switchesInfo.get(switchNum).getPort(portNum)
 		    .possibleQ(alloc);
 
+	    if (reserve) {
+		assert (switchesInfo.get(switchNum).getPort(portNum)
+			.reserve(alloc) >= 0);
+	    }
+
 	    if (ps != null)
 		return false;
 
@@ -138,7 +152,7 @@ public class Scheduler {
     }
 
     public boolean registerRoute(Route rt) {
-	if (!validateRoute(rt, null))
+	if (!validateAndReserveRoute(rt, null))
 	    return false;
 
 	// TODO

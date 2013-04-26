@@ -62,12 +62,12 @@ public class Port {
 	id = i;
 	phyPort = p;
 	// call low level controller
-	debug("getting bd for port");
+	// debug("getting bd for port");
 
 	Collection<MaxBandwidth> mbs = MarketManager.getInstance()
 		.getLowLevelController().getPortMaxBandwidthForSwitch(swId, i);
 
-	debug("got bd for port");
+	// debug("got bd for port");
 
 	assert (mbs.size() == 1);// TODO
 

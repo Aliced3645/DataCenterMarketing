@@ -42,7 +42,7 @@ public class FirstComeFirstServeStrategy implements AuctioneerStrategy{
 				alloc.setBandwidth(bidRequest.getMinBandwidth());
 				alloc.setFrom((long)bidRequest.getStartTime());
 				alloc.setTo((long)bidRequest.getEndTime());
-				if(Scheduler.getInstance().validateRoute(route, alloc)){
+				if(Scheduler.getInstance().validateAndReserveRoute(route, alloc)){
 					//successfully allocated
 					result.setResult(true);
 					break;
