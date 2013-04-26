@@ -1141,7 +1141,7 @@ public class LowLevelController implements IOFSwitchListener,
 	LinkedList<MaxBandwidth> maxBandwidths = new LinkedList<MaxBandwidth>();
 	// test first 10 bits
 	int i = 0;
-	while (i <= 9) {
+ 	while (i <= 9) {
 	    MaxBandwidth mb = null;
 	    int mask = 1 << i;
 	    int result = currentFeatures & mask;
@@ -1182,6 +1182,7 @@ public class LowLevelController implements IOFSwitchListener,
 	    if (mb != null) {
 		maxBandwidths.add(mb);
 	    }
+	    i ++;
 	}
 	return maxBandwidths;
     }
