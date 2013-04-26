@@ -3,7 +3,11 @@
  */
 package net.floodlightcontroller.datacentermarketing.Scheduling;
 
+import java.util.Collection;
 import java.util.HashSet;
+
+import net.floodlightcontroller.datacentermarketing.MarketManager;
+import net.floodlightcontroller.datacentermarketing.controller.MaxBandwidth;
 
 import org.openflow.protocol.OFPhysicalPort;
 
@@ -50,42 +54,46 @@ public class Port {
      * @param i
      * @param p
      */
-    public Port(short i, OFPhysicalPort p) {
+    public Port(long swId, short i, OFPhysicalPort p) {
 	id = i;
 	phyPort = p;
-	// get the capacity
+	// call low level controller
+	Collection<MaxBandwidth> mbs = MarketManager.getInstance()
+		.getLowLevelController().getPortMaxBandwidthForSwitch(swId, i);
 
-	int feature = p.getPeerFeatures();
+	assert (mbs.size() == 1);// TODO
 
-	if ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_10MB_HD.getValue()) > 0) {
-	    capacity = 10;
-	    this.type = Port_Type.HALF_DUPLEX;
-	} else if ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_10MB_FD
-		.getValue()) > 0) {
-	    capacity = 10;
-	    this.type = Port_Type.FULL_DUPLEX;
-	} else if ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_100MB_HD
-		.getValue()) > 0) {
-	    capacity = 100;
-	    this.type = Port_Type.HALF_DUPLEX;
-	} else if ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_100MB_FD
-		.getValue()) > 0) {
-	    capacity = 100;
-	    this.type = Port_Type.FULL_DUPLEX;
-	} else if ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_1GB_HD
-		.getValue()) > 0) {
-	    capacity = 1000;
-	    this.type = Port_Type.HALF_DUPLEX;
-	} else if ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_1GB_FD
-		.getValue()) > 0) {
-	    capacity = 1000;
-	    this.type = Port_Type.FULL_DUPLEX;
-	} else if ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_10GB_FD
-		.getValue()) > 0) {
-	    capacity = 10000;
-	    this.type = Port_Type.FULL_DUPLEX;
+	// record the current bandwidth
+	MaxBandwidth mb = mbs.iterator().next();
+	capacity = mb.toMB();
+
+	if (mb.isFullDuplex()) {
+	    type = Port_Type.FULL_DUPLEX;
+	} else {
+	    type = Port_Type.HALF_DUPLEX;
 	}
 
+	/*
+	 * id = i; phyPort = p; // get the capacity
+	 * 
+	 * int feature = p.getPeerFeatures();
+	 * 
+	 * if ((feature &
+	 * OFPhysicalPort.OFPortFeatures.OFPPF_10MB_HD.getValue()) > 0) {
+	 * capacity = 10; this.type = Port_Type.HALF_DUPLEX; } else if ((feature
+	 * & OFPhysicalPort.OFPortFeatures.OFPPF_10MB_FD .getValue()) > 0) {
+	 * capacity = 10; this.type = Port_Type.FULL_DUPLEX; } else if ((feature
+	 * & OFPhysicalPort.OFPortFeatures.OFPPF_100MB_HD .getValue()) > 0) {
+	 * capacity = 100; this.type = Port_Type.HALF_DUPLEX; } else if
+	 * ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_100MB_FD .getValue())
+	 * > 0) { capacity = 100; this.type = Port_Type.FULL_DUPLEX; } else if
+	 * ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_1GB_HD .getValue()) >
+	 * 0) { capacity = 1000; this.type = Port_Type.HALF_DUPLEX; } else if
+	 * ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_1GB_FD .getValue()) >
+	 * 0) { capacity = 1000; this.type = Port_Type.FULL_DUPLEX; } else if
+	 * ((feature & OFPhysicalPort.OFPortFeatures.OFPPF_10GB_FD .getValue())
+	 * > 0) { capacity = 10000; this.type = Port_Type.FULL_DUPLEX; }
+	 */
 	full_populate();
     }
 

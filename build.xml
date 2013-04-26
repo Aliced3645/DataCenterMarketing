@@ -69,6 +69,7 @@
         <include name="guava-13.0.1.jar" />
         <include name="findbugs-annotations-2.0.1.jar" />
         <include name="findbugs-jsr305-2.0.1.jar" />
+    	<include name="json-io-2.0.1.jar" />
     </patternset>
 
     <path id="classpath">

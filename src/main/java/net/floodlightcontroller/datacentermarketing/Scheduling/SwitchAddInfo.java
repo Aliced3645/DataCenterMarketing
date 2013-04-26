@@ -58,7 +58,7 @@ public class SwitchAddInfo {
 	int index = 0;
 	for (OFPhysicalPort port : swPorts) {
 
-	    this.ports[index] = new Port(port.getPortNumber(), port);
+	    this.ports[index] = new Port(id, port.getPortNumber(), port);
 	    index++;
 	}
 
