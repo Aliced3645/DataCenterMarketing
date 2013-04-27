@@ -30,6 +30,7 @@ public class BidResult {
 	
 	private LinkedList<Allocation> allocations;
 	
+	
 	public LinkedList<Allocation> getAllocations(){
 		return allocations;
 	}

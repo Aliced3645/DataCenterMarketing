@@ -126,13 +126,24 @@ public class BidRequestResource extends ServerResource {
 		@Post
 		@Put
 		//public void postBidRequest(BidRequest bidRequest){
-		public void postBidRequest(String bidRequestString) throws IOException{
+		public void postBidRequest(String bidRequestString) throws Exception{
 			//System.out.println(bidRequestString);
 			BidRequest bidRequest = this.requestJsonStringToBidRequest(bidRequestString);
 			if(bidRequest == null){
 				System.out.println("JSON String format not satisfied");
 				return;
 			}
+			//check the latency request,
+			//if the latency request is smaller than the result of ping, 
+			//the request will also be rejected.
+			//Then it will filter all routes which have greater latency
+			bidRequest.verifyPossibleRoutesByLatency();
+			if(bidRequest.getPossibleRoutes().isEmpty()){
+				//no possilbe routes 
+				return;
+			}
+			
+			
 			//generate the URL Hash for this User/BidRequest
 			bidRequest.getBidder().setLastRequest(bidRequest);
 			RESTQuerier querier = RESTQuerier.getInstance();

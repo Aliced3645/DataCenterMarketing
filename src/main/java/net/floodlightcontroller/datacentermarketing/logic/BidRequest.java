@@ -1,10 +1,17 @@
 package net.floodlightcontroller.datacentermarketing.logic;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.concurrent.ExecutionException;
 
+import net.floodlightcontroller.datacentermarketing.MarketManager;
 import net.floodlightcontroller.datacentermarketing.messagepasser.BidRequestJSONSerializer;
 import net.floodlightcontroller.datacentermarketing.messagepasser.BidResultJSONSerializer;
+import net.floodlightcontroller.routing.Route;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(using=BidRequestJSONSerializer.class)
@@ -25,10 +32,64 @@ public class BidRequest implements Serializable{
 	//a key-value pair list for resource and required amount
 	private HashMap<Resource, Float> requiredResources;
 	
-	public BidRequest(){
-		this.requiredResources = new HashMap<Resource, Float>();
+	/**
+	 * the collection of feasible routes 
+	 * which passed the latency check
+	 */
+	
+	private Collection<Route> verifiedRoutes;
+	public Collection<Route> getPossibleRoutes(){
+		return verifiedRoutes;
+	}
+	
+	//Set by the latency verification process
+	private long probedLatency;
+	
+	public synchronized long getProbedLatency() {
+		return probedLatency;
 	}
 
+	public synchronized void setProbedLatency(long probedLatency) {
+		this.probedLatency = probedLatency;
+	}
+
+	/**
+	 * Must be called when got the request
+	 * @throws Exception 
+	 */
+	public void verifyPossibleRoutesByLatency() throws Exception{
+		ArrayList<Route> possibleRoutes = MarketManager.getInstance().getNonLoopPaths(sourceID, destID);
+		if(possibleRoutes == null || possibleRoutes.isEmpty() )
+			return;
+		
+		Auctioneer.getInstance().setCurrentRequestWaitingLatencyVerification(this);
+		//For each route, ping for them.
+		for(Route rt : possibleRoutes){
+			//probe one time now
+			MarketManager.getInstance().getLowLevelController().probeLatency(rt, true);
+			
+			synchronized(this){
+				this.wait(); // block until being waken up
+			}
+			/**
+			 * waken up, now the probed latency has been set
+			 */
+			System.out.println("\n\n\nWAKEN UP!!!!! " +this.probedLatency +"\n\n\n");
+			// compare the latency
+			float requiredLatency = this.requiredResources.get(Resource.LATENCY);
+			if(requiredLatency > this.probedLatency){
+				//pass
+				verifiedRoutes.add(rt);
+			}
+		}
+		return;
+	}
+	
+	public BidRequest(){
+		this.requiredResources = new HashMap<Resource, Float>();
+		this.verifiedRoutes = new LinkedList<Route>();
+	}
+	
 	public BidRequest(Bidder _bidder, long _sourceID, long _destID, float _bidValue, HashMap<Resource, Float> _requiredResources){
 		this.bidder = _bidder;
 		this.bidValue = _bidValue;
@@ -121,5 +182,6 @@ public class BidRequest implements Serializable{
 	public float getData(){
 		return requiredResources.get(Resource.DATA);
 	}
+
 	
 }
