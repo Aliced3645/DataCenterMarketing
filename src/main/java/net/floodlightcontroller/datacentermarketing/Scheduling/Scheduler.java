@@ -54,7 +54,7 @@ public class Scheduler {
      * @throws InterruptedException
      * @throws IOException
      */
-    public void update() throws IOException, InterruptedException,
+    public void refreshTopo() throws IOException, InterruptedException,
 	    ExecutionException {
 
 	debug("low level update switches");
@@ -168,8 +168,8 @@ public class Scheduler {
 	    NodePortTuple np = switchPorts.get(a);
 	    // validate this port is ok for reservation
 	    /* to do : get numbers */
-	    int switchNum = 01;
-	    int portNum = 1;
+	    long switchNum = np.getNodeId();
+	    short portNum = np.getPortId();
 
 	    Port p = switchesInfo.get(switchNum).getPort(portNum);
 
