@@ -6,6 +6,7 @@ public enum Resource {
 	MAX_RATE,
 	START_TIME,
 	END_TIME,
-	DATA
+	DATA,
+	LATENCY
 	
 }

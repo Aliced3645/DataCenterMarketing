@@ -33,6 +33,7 @@ parser.add_argument('-max', dest='maxRate', action='store', help='maximum requir
 parser.add_argument('-data', dest='data', action='store', help='data to transmit')
 parser.add_argument('-start', dest='start', action='store', help='start time')
 parser.add_argument('-end', dest='end', action='store', help='end time')
+parser.add_argument('-latency', dest='latency', action='store', help='min latency requirement')
 parser.add_argument('-bid', dest='action', action='store_const', const='bid',
         default='bid', help='action: bid, queray, result')
 parser.add_argument('-ping', dest='action', action='store_const', const='ping',
@@ -56,6 +57,7 @@ if args.action == 'bid':
     data = args.data
     start = args.start
     end = args.end
+    latency = args.latency
 
     if bidderID is None:
         print 'BidderID not filled'
@@ -79,14 +81,17 @@ if args.action == 'bid':
         print 'Start time is not filled'
         sys.exit()
     if end is None:
-        print'End time is not filled'
+        print 'End time is not filled'
+        sys.exit()
+    if latency is None:
+        print 'Latency s not filled'
         sys.exit()
 
     # all fields are submitted, construct the REST qurey string
-    json = " '{\"Bidder\":\"%s\", \"Value\":%s, \"SID\":%s, \"DID\":%s, \"MinRate\":%s, \"Data\":%s,\"Start\":%s, \"End\":%s" %(bidderID, value, srcID, destID, minRate, data, start, end)
+    json = " '{\"Bidder\":\"%s\", \"Value\":%s, \"SID\":%s, \"DID\":%s, \"MinRate\":%s, \"Data\":%s,\"Start\":%s, \"End\":%s, \"Latency\":%s" %(bidderID, value, srcID, destID, minRate, data, start, end, latency)
 
     if maxRate is not None:
-        json += " \"MaxRate\":%s " %(maxRate)
+        json += ", \"MaxRate\":%s " %(maxRate)
     json += "}'"
     #print json
     uri = "http://%s/marketing/request/%s" %(args.controllerRestIp, bidderID)

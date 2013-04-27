@@ -43,6 +43,8 @@ public class BidRequestJSONSerializer extends JsonSerializer<BidRequest>{
 					jGen.writeNumberField("Start Time", entry.getValue());
 				case END_TIME:
 					jGen.writeNumberField("End Time", entry.getValue());
+				case LATENCY:
+					jGen.writeNumberField("Latency", entry.getValue());
 				default:
 					continue;
 			}
