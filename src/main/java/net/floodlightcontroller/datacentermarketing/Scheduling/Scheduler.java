@@ -32,13 +32,24 @@ public class Scheduler {
     private HashMap<Long, SwitchAddInfo> switchesInfo;
 
     private static Scheduler instance = null;
+    private static SchedulerVisualizer showMan;
 
-    private Scheduler() {
+    private Scheduler() throws IOException, InterruptedException,
+	    ExecutionException {
 	switchesInfo = new HashMap<Long, SwitchAddInfo>();
 	// TODO how to initialize all the switches?
+
+	// needs update
+	refreshTopo();
+
+	// show UI
+	showMan = new SchedulerVisualizer();
+	Thread showManThread = new Thread(showMan, "showman");
+	showManThread.start();
     }
 
-    public static Scheduler getInstance() {
+    public static Scheduler getInstance() throws IOException,
+	    InterruptedException, ExecutionException {
 	if (instance == null)
 	    instance = new Scheduler();
 
@@ -121,7 +132,7 @@ public class Scheduler {
      */
 
     public boolean validateAndReserveRoute(Route rt, Allocation alloc) {
-    	return validateAndReserveRoute(rt, alloc, true);
+	return validateAndReserveRoute(rt, alloc, true);
     }
 
     public boolean validateAndReserveRoute(Route rt, Allocation alloc,
@@ -174,8 +185,7 @@ public class Scheduler {
 	    Port p = switchesInfo.get(switchNum).getPort(portNum);
 
 	    price += p.estimatePrice(alloc);
-	    
-	    
+
 	}
 
 	return price;
