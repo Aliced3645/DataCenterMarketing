@@ -20,7 +20,19 @@ public class Auctioneer {
 
 	private boolean busyFlag = false;
 	public static int round = 0;
+	
+	public BidRequest currentRequestWaitingLatencyVerification;
+	
+	
+	public synchronized BidRequest getCurrentRequestWaitingLatencyVerification() {
+		return currentRequestWaitingLatencyVerification;
+	}
 
+	public synchronized void setCurrentRequestWaitingLatencyVerification(
+			BidRequest currentRequestWaitingLatencyVerification) {
+		this.currentRequestWaitingLatencyVerification = currentRequestWaitingLatencyVerification;
+	}
+	
 	public void setBusy() {
 		// busy if calculating the bidding for this round
 		this.busyFlag = true;

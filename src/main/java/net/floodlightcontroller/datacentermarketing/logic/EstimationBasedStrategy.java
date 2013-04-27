@@ -2,6 +2,7 @@ package net.floodlightcontroller.datacentermarketing.logic;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -86,7 +87,7 @@ public class EstimationBasedStrategy implements AuctioneerStrategy{
 			BidResult result = new BidResult();
 			result.setResult(false);
 			BidRequest bidRequest = requestEntry.getValue();
-			ArrayList<Route> possibleRoutes = MarketManager.getInstance().getNonLoopPaths(bidRequest.getSourceID(), bidRequest.getDestID());
+			Collection<Route> possibleRoutes = bidRequest.getPossibleRoutes();
 			/**
 			 * First check feasibility for all routes
 			 * For each possible route, select one with highest competitiveness
@@ -96,6 +97,7 @@ public class EstimationBasedStrategy implements AuctioneerStrategy{
 				toReturn.clear();
 				return toReturn;
 			}
+
 			float highestCompetitiveness = Integer.MIN_VALUE;
 			BidRequestVersusEstimation bestOne = null;
 			for(Route route : possibleRoutes){

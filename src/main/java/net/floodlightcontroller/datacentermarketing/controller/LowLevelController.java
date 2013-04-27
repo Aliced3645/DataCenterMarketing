@@ -74,6 +74,7 @@ import net.floodlightcontroller.core.module.IFloodlightService;
 import net.floodlightcontroller.core.util.AppCookie;
 import net.floodlightcontroller.counter.ICounterStoreService;
 import net.floodlightcontroller.datacentermarketing.MarketManager;
+import net.floodlightcontroller.datacentermarketing.logic.Auctioneer;
 import net.floodlightcontroller.datacentermarketing.logic.BidRequest;
 import net.floodlightcontroller.datacentermarketing.messagepasser.BidRequestJSONSerializer;
 import net.floodlightcontroller.devicemanager.IDevice;
@@ -800,7 +801,7 @@ public class LowLevelController implements IOFSwitchListener,
 		}
 	}
 
-	private void probeLatency(Route rt, boolean whetherDelete) throws Exception {
+	public void probeLatency(Route rt, boolean whetherDelete) throws Exception {
 
 		// TODO check cache
 
@@ -1179,7 +1180,7 @@ public class LowLevelController implements IOFSwitchListener,
 
 		// get the data out of the msg
 		try {
-
+			
 			Ethernet eth = new Ethernet();
 			eth.deserialize(msg.getPacketData(), 0, msg.getPacketData().length);
 			IPv4 probe = new IPv4();
@@ -1202,7 +1203,14 @@ public class LowLevelController implements IOFSwitchListener,
 				if (toDelete == true) {
 					deleteRouteEntriesForPing(route);
 				}
-
+				
+				//wake up the bidRequest and set the latency
+				BidRequest waitingRequest = Auctioneer.getInstance().getCurrentRequestWaitingLatencyVerification();
+				synchronized(waitingRequest){
+					waitingRequest.setProbedLatency(routesBenchMarks.get(id).getDifference());
+					waitingRequest.notify();
+				}
+			
 			} else {
 				debug("None idetified id:" + id);
 			}

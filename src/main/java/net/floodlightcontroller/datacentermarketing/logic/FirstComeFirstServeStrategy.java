@@ -2,6 +2,7 @@ package net.floodlightcontroller.datacentermarketing.logic;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -32,7 +33,7 @@ public class FirstComeFirstServeStrategy implements AuctioneerStrategy{
 			result.setResult(false);
 			BidRequest bidRequest = requestEntry.getValue();
 			//get all possible routes
-			ArrayList<Route> possibleRoutes = MarketManager.getInstance().getNonLoopPaths(bidRequest.getSourceID(), bidRequest.getDestID());
+			Collection<Route> possibleRoutes = bidRequest.getPossibleRoutes();
 			if(possibleRoutes == null){
 				//failed to establish
 				toReturn.clear();
