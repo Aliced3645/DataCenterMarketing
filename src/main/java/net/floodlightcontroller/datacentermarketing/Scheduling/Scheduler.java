@@ -155,23 +155,24 @@ public class Scheduler {
      * @param rt
      *            the route to be allocated
      * @param alloc
-     *            bandwidth in MB
+     *            bandwidth in MB, from and to , the direction should be null
+     *            for now
      * @return
      */
-    public float estimatePrice(Route rt, float alloc) {
+    public float estimatePrice(Route rt, Allocation alloc) {
 	float price = 0f;
 
 	return price;
 
     }
 
-    public boolean registerRoute(Route rt) {
-	if (!validateAndReserveRoute(rt, null))
-	    return false;
-
-	// TODO
-
-	return true;
-    }
+    /*
+     * public boolean registerRoute(Route rt) { if (!validateAndReserveRoute(rt,
+     * null)) return false;
+     * 
+     * // TODO
+     * 
+     * return true; }
+     */
 
 }
