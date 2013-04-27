@@ -124,7 +124,7 @@ public class Port {
 
     }
 
-    /*
+    /**
      * test if an reservation is feasible
      * 
      * Naive Algo : check all queues for the following case: If a queue's
@@ -134,23 +134,46 @@ public class Port {
      * allocation. If we have finish checking all the queues, return
      */
     public HashSet<Integer> possibleQ(Allocation allocation) {
+	/*
+	 * HashSet<Integer> s = new HashSet<Integer>(); long usedBandWidth = 0;
+	 * for (int a = 0; a < queues.length; a++) { Allocation allocated =
+	 * queues[a].get_overlap(allocation); if (allocated == null) { s.add(a);
+	 * } else { if (allocated.direction != allocation.direction) { return
+	 * null; } else { usedBandWidth += allocated.bandwidth; if
+	 * (usedBandWidth + allocation.bandwidth > capacity) { return null; } }
+	 * } } return s.size() > 0 ? s : null;
+	 */
+	return possibleQ(allocation, null);
+    }
+
+    public HashSet<Integer> possibleQ(Allocation allocation,
+	    Holder<Float> usedBandwidthHolder) {
 
 	HashSet<Integer> s = new HashSet<Integer>();
-	long usedBandWidth = 0;
+	float usedBandWidth = 0;
 	for (int a = 0; a < queues.length; a++) {
 	    Allocation allocated = queues[a].get_overlap(allocation);
 	    if (allocated == null) {
 		s.add(a);
 	    } else {
 		if (allocated.direction != allocation.direction) {
+		    if (usedBandwidthHolder != null) {
+			usedBandwidthHolder.setHd(0f);
+		    }
 		    return null;
 		} else {
 		    usedBandWidth += allocated.bandwidth;
 		    if (usedBandWidth + allocation.bandwidth > capacity) {
+			if (usedBandwidthHolder != null) {
+			    usedBandwidthHolder.setHd(0f);
+			}
 			return null;
 		    }
 		}
 	    }
+	}
+	if (usedBandwidthHolder != null) {
+	    usedBandwidthHolder.setHd(usedBandWidth);
 	}
 	return s.size() > 0 ? s : null;
     }
@@ -171,6 +194,49 @@ public class Port {
 
 	}
 	return -1;
+    }
+
+    /**
+     * get the estimated price on a port for an allocation
+     * 
+     * @param alloc
+     * @return
+     */
+    float estimatePrice(Allocation alloc) {
+	float price = 0f;
+
+	Holder<Float> hd = new Holder<Float>(0f);
+	HashSet<Integer> possibleQ = possibleQ(alloc, hd);
+
+	// assert(possibleQ!=null && possibleQ.size()>0);
+
+	// if not possible, gives a impossible price
+	if (possibleQ == null || possibleQ.size() == 0)
+	    return Float.MAX_VALUE;
+
+	float price1 = 1f / (possibleQ.size());
+
+	float price2 = alloc.getBandwidth() / (capacity - hd.getHd());
+
+	price = price1 > price2 ? price1 : price2;
+
+	return price;
+    }
+
+    private class Holder<T> {
+	private T hd;
+
+	public T getHd() {
+	    return hd;
+	}
+
+	public void setHd(T hd) {
+	    this.hd = hd;
+	}
+
+	public Holder(T in) {
+	    hd = in;
+	}
     }
 
     /*
