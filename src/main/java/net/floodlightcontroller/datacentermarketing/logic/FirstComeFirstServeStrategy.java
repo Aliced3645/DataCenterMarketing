@@ -35,6 +35,7 @@ public class FirstComeFirstServeStrategy implements AuctioneerStrategy{
 			ArrayList<Route> possibleRoutes = MarketManager.getInstance().getNonLoopPaths(bidRequest.getSourceID(), bidRequest.getDestID());
 			if(possibleRoutes == null){
 				//failed to establish
+				toReturn.clear();
 				return toReturn;
 			}
 			for(Route route : possibleRoutes){
