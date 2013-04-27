@@ -21,6 +21,7 @@ class BidRequestVersusEstimation implements Comparable{
 	
 	float competitiveness; 
 	BidRequest bidRequest;
+	Route route;
 	
 	public synchronized float getCompetitiveness() {
 		return competitiveness;
@@ -35,10 +36,19 @@ class BidRequestVersusEstimation implements Comparable{
 		this.bidRequest = bidRequest;
 	}
 	
-	public BidRequestVersusEstimation(float _competitiveness, BidRequest _bidRequest){
+	public BidRequestVersusEstimation(float _competitiveness, BidRequest _bidRequest, Route _route){
 		this.competitiveness = _competitiveness;
 		this.bidRequest = _bidRequest;
+		this.route = _route;
 	}
+	
+	public synchronized Route getRoute() {
+		return route;
+	}
+	public synchronized void setRoute(Route route) {
+		this.route = route;
+	}
+	
 	
 	@Override
 	public int compareTo(Object right) {
@@ -101,16 +111,71 @@ public class EstimationBasedStrategy implements AuctioneerStrategy{
 					float competitiveness = bidRequest.getBidValue() / estimatedValue;
 					if(competitiveness > highestCompetitiveness){
 						highestCompetitiveness = competitiveness;
-						bestOne = new 
+						bestOne = new BidRequestVersusEstimation(competitiveness, bidRequest, route);
 					}
-					
 					break;
 				}
 			}
-			
 			/** 
 			 * If no route is installable....
 			 */
+			if(highestCompetitiveness == Integer.MIN_VALUE){
+				/**
+				 * Result is set false to this bid
+				 */
+				result.setResult(false);
+				result.setBidder(bidRequest.getBidder());
+				result.setRound(Auctioneer.round);
+				result.getBidder().setLatestResult(result);
+				toReturn.put(result.getBidder().getBidderID(), result);
+			}
+			else{
+				/** get one feasible route, create
+				 *  the ranking class
+				 */
+				competitivenessRank.offer(bestOne);
+				
+			}
+		}
+		
+		
+		/**
+		 * All possible requests have been ranked 
+		 * Now allocate from them according to the rank
+		 */
+		while(!competitivenessRank.isEmpty()){
+			BidRequestVersusEstimation competitiveBid = competitivenessRank.poll();
+			// whether it is still feasible? 
+			// If yes, then reserve the route and bandwidth.
+			BidRequest bidRequest = competitiveBid.getBidRequest();
+			Allocation alloc = new Allocation();
+			alloc.setBandwidth(bidRequest.getMinBandwidth());
+			alloc.setFrom((long)bidRequest.getStartTime());
+			alloc.setTo((long)bidRequest.getEndTime());
+			
+			BidResult result = new BidResult();
+
+			
+			if(Scheduler.getInstance().validateAndReserveRoute(competitiveBid.getRoute(), alloc,true)){
+				/**
+				 *  Allocation succeed! 
+				 *  set the result as success
+				 */
+				result.setResult(true);
+				result.setBidder(bidRequest.getBidder());
+				result.setRound(Auctioneer.round);
+				result.getBidder().setLatestResult(result);
+			}
+			else{
+				/**
+				 * Allocation failed
+				 * set the result as failure
+				 */
+				result.setResult(false);
+				result.setBidder(bidRequest.getBidder());
+				result.setRound(Auctioneer.round);
+				result.getBidder().setLatestResult(result);			
+			}
 			
 		}
 		
