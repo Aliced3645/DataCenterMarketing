@@ -28,7 +28,7 @@ public class BidRequest implements Serializable{
 	public BidRequest(){
 		this.requiredResources = new HashMap<Resource, Float>();
 	}
-	
+
 	public BidRequest(Bidder _bidder, long _sourceID, long _destID, float _bidValue, HashMap<Resource, Float> _requiredResources){
 		this.bidder = _bidder;
 		this.bidValue = _bidValue;
