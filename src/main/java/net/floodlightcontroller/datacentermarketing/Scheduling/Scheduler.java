@@ -39,13 +39,13 @@ public class Scheduler {
 	switchesInfo = new HashMap<Long, SwitchAddInfo>();
 	// TODO how to initialize all the switches?
 
-	// needs update
+	/*// needs update
 	refreshTopo();
 
 	// show UI
 	showMan = new SchedulerVisualizer();
 	Thread showManThread = new Thread(showMan, "showman");
-	showManThread.start();
+	showManThread.start();*/
     }
 
     public static Scheduler getInstance() throws IOException,

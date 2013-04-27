@@ -64,11 +64,11 @@ public class FlowUI extends JDialog {
      * Launch the application.
      */
     public static void main(String[] args) {
-	try {
+	/*try {
 	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	} catch (Exception e) {
 	    e.printStackTrace();
-	}
+	}*/
 	try {
 	    FlowUI dialog = new FlowUI();
 	    dialog.setTitle("Datacenter Control Panel");
