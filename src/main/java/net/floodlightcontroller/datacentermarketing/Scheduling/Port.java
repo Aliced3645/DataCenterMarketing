@@ -124,7 +124,7 @@ public class Port {
 
     }
 
-    /*
+    /**
      * test if an reservation is feasible
      * 
      * Naive Algo : check all queues for the following case: If a queue's
@@ -171,6 +171,18 @@ public class Port {
 
 	}
 	return -1;
+    }
+
+    /**
+     * get the estimated price on a port for an allocation
+     * 
+     * @param alloc
+     * @return
+     */
+    float estimatePrice(Allocation alloc) {
+	float price = 0f;
+
+	return price;
     }
 
     /*

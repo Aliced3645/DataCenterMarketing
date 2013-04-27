@@ -162,6 +162,22 @@ public class Scheduler {
     public float estimatePrice(Route rt, Allocation alloc) {
 	float price = 0f;
 
+	// we need to validate all the possible queue reservations
+	List<NodePortTuple> switchPorts = rt.getPath();
+	for (int a = 0; a < switchPorts.size(); a++) {
+	    NodePortTuple np = switchPorts.get(a);
+	    // validate this port is ok for reservation
+	    /* to do : get numbers */
+	    int switchNum = 01;
+	    int portNum = 1;
+
+	    Port p = switchesInfo.get(switchNum).getPort(portNum);
+
+	    price += p.estimatePrice(alloc);
+	    
+	    
+	}
+
 	return price;
 
     }
