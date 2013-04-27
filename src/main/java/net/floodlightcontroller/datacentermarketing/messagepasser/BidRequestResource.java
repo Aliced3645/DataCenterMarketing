@@ -33,7 +33,8 @@ public class BidRequestResource extends ServerResource {
 	        
 	        //these six fields must be filled in the JSON request
 	        boolean bBidder = false, bValue = false , bSID = false, bDID = false , 
-	        		bMinRate = false, bData = false, bStart = false, bEnd = false;
+	        		bMinRate = false, bData = false, bStart = false, bEnd = false,
+	        		bLatency = false;
 	        
 	        try {
 	            jp = f.createJsonParser(bidRequestString);
@@ -103,6 +104,11 @@ public class BidRequestResource extends ServerResource {
 	            	bidRequest.addRequestField(Resource.END_TIME, jp.getFloatValue());
 	            	bEnd = true;
 	            }
+	            else if(name == "Latency"){
+	            	jp.nextToken();
+	            	bidRequest.addRequestField(Resource.LATENCY, jp.getFloatValue());
+	            	bLatency = true;
+	            }
 	            
 	            else {
 	            	jp.nextToken();
@@ -110,7 +116,7 @@ public class BidRequestResource extends ServerResource {
 	        }     
 	        
 	        //check if the bidRequest is value by seeing whether minimum set of fields are filled
-	        if(bBidder && bValue && bMinRate && bSID && bDID && bData && bStart && bEnd)
+	        if(bBidder && bValue && bMinRate && bSID && bDID && bData && bStart && bEnd && bLatency)
 	        	return bidRequest;
 	        else
 	        	//not a valid bid request
@@ -123,8 +129,10 @@ public class BidRequestResource extends ServerResource {
 		public void postBidRequest(String bidRequestString) throws IOException{
 			//System.out.println(bidRequestString);
 			BidRequest bidRequest = this.requestJsonStringToBidRequest(bidRequestString);
-			if(bidRequest == null)
+			if(bidRequest == null){
+				System.out.println("JSON String format not satisfied");
 				return;
+			}
 			//generate the URL Hash for this User/BidRequest
 			bidRequest.getBidder().setLastRequest(bidRequest);
 			RESTQuerier querier = RESTQuerier.getInstance();
