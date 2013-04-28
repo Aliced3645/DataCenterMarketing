@@ -31,6 +31,7 @@ import javax.swing.event.ChangeEvent;
 
 import net.floodlightcontroller.datacentermarketing.FlowUI;
 import net.floodlightcontroller.datacentermarketing.MarketManager;
+import net.floodlightcontroller.datacentermarketing.logic.BiddingClock;
 
 import javax.swing.JMenuBar;
 
@@ -58,7 +59,7 @@ public class SchedulerUI extends JDialog {
 
     private int width = 1000;
 
-    long endTime = 1000;
+    long endTimeOffset = 1000;
 
     private class MainCanvas extends JPanel {
 
@@ -74,7 +75,13 @@ public class SchedulerUI extends JDialog {
 	public void paintComponent(Graphics g) {
 	    super.paintComponent(g);
 
-	    Scheduler.getInstance().visualize(g, width, endTime);
+	    Scheduler.getInstance()
+		    .visualize(
+			    g,
+			    width,
+			    endTimeOffset
+				    + BiddingClock.getInstance()
+					    .getCurrentTime());
 
 	}
     }
@@ -92,8 +99,7 @@ public class SchedulerUI extends JDialog {
 	menuBar.setToolTipText("Mwnu");
 	menuBar.setBounds(0, 0, 1000, 10);
 	getContentPane().add(menuBar, BorderLayout.NORTH);
-	
-	
+
 	MainCanvas mainFrame = new MainCanvas();
 
 	JScrollPane scrollPane = new JScrollPane(mainFrame,
@@ -102,8 +108,7 @@ public class SchedulerUI extends JDialog {
 
 	getContentPane().add(scrollPane, BorderLayout.CENTER);
 
-	
-	//control
+	// control
 	JPanel controlPane = new JPanel();
 	getContentPane().add(controlPane, BorderLayout.SOUTH);
 

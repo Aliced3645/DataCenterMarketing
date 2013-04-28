@@ -270,11 +270,13 @@ public class Port {
 	int usedHeight = 0;
 
 	for (Queue pt : qList) {
+	    pt.setPortCap(capacity);
+
 	    usedHeight += pt
 		    .visualize(g, vertical + usedHeight, width, endTime);
 	}
 
-	return usedHeight+1;
+	return usedHeight + 2;
 
     }
 

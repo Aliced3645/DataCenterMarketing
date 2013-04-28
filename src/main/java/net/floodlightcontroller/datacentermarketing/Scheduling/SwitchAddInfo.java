@@ -102,17 +102,20 @@ public class SwitchAddInfo {
 
     public int visualize(Graphics g, int vertical, int width, long endTime) {
 	System.out.print("....... siwtch visualizing!");
-	
+
 	List<Port> portList = Arrays.asList(ports);
 
 	int usedHeight = 0;
 
 	for (Port pt : portList) {
+	    if (pt.id < 0)
+		continue;
+
 	    usedHeight += pt
 		    .visualize(g, vertical + usedHeight, width, endTime);
 	}
 
-	return usedHeight+2;
+	return usedHeight + 3;
 
     }
 

@@ -46,6 +46,10 @@ public class Allocation implements Comparable<Allocation> {
 	return false;
     }
 
+    public long getDuration() {
+	return to - from;
+    }
+
     public boolean sameDirection(Allocation alloc) {
 	return this.direction == alloc.direction;
     }
