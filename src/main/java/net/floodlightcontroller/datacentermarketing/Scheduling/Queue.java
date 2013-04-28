@@ -1,8 +1,12 @@
 package net.floodlightcontroller.datacentermarketing.Scheduling;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 /*
  * Act like a c struct
@@ -57,6 +61,23 @@ public class Queue {
 		return a.compareTo(b);
 	    }
 	});
+    }
+
+    /* draw a line for the reserved bandwidth */
+    public int visualize(Graphics g, int vertical, int width, long endTime) {
+
+	//System.out.println("Queue visulizing!" + vertical + ";" + width);
+
+	Color back = g.getColor();
+
+	g.setColor(Color.ORANGE);
+
+	g.drawLine(0, vertical, width, vertical);
+
+	g.setColor(back);
+
+	return 3;
+
     }
 
 }

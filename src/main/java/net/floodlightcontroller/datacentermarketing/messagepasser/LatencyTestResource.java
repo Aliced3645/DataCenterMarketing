@@ -86,9 +86,11 @@ public class LatencyTestResource extends ServerResource {
 
 		MarketManager.getInstance().getLowLevelController().ping(start, end);
 
-		// TODO TOREMOVE move to other router
-		net.floodlightcontroller.datacentermarketing.Scheduling.Scheduler
-				.getInstance().refreshTopo();
+	/*
+	 * // TODO TOREMOVE move to other router
+	 * net.floodlightcontroller.datacentermarketing.Scheduling.Scheduler
+	 * .getInstance().refreshTopo();
+	 */
 
 		return;
 	}

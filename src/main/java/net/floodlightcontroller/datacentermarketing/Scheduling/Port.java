@@ -3,8 +3,11 @@
  */
 package net.floodlightcontroller.datacentermarketing.Scheduling;
 
+import java.awt.Graphics;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import net.floodlightcontroller.datacentermarketing.MarketManager;
 import net.floodlightcontroller.datacentermarketing.controller.MaxBandwidth;
@@ -63,24 +66,27 @@ public class Port {
 	phyPort = p;
 	// call low level controller
 	// debug("getting bd for port");
+	try {
+	    Collection<MaxBandwidth> mbs = MarketManager.getInstance()
+		    .getLowLevelController()
+		    .getPortMaxBandwidthForSwitch(swId, i);
+	    assert (mbs.size() == 1);// TODO
 
-	Collection<MaxBandwidth> mbs = MarketManager.getInstance()
-		.getLowLevelController().getPortMaxBandwidthForSwitch(swId, i);
+	    // debug("got bd for port");
 
-	// debug("got bd for port");
+	    // record the current bandwidth
+	    MaxBandwidth mb = mbs.iterator().next();
+	    capacity = mb.toMB();
 
-	assert (mbs.size() == 1);// TODO
+	    if (mb.isFullDuplex()) {
+		type = Port_Type.FULL_DUPLEX;
+	    } else {
+		type = Port_Type.HALF_DUPLEX;
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
 
-	// record the current bandwidth
-	MaxBandwidth mb = mbs.iterator().next();
-	capacity = mb.toMB();
-
-	if (mb.isFullDuplex()) {
-	    type = Port_Type.FULL_DUPLEX;
-	} else {
-	    type = Port_Type.HALF_DUPLEX;
 	}
-
 	/*
 	 * id = i; phyPort = p; // get the capacity
 	 * 
@@ -257,4 +263,19 @@ public class Port {
      * 
      * }
      */
+
+    public int visualize(Graphics g, int vertical, int width, long endTime) {
+	List<Queue> qList = Arrays.asList(queues);
+
+	int usedHeight = 0;
+
+	for (Queue pt : qList) {
+	    usedHeight += pt
+		    .visualize(g, vertical + usedHeight, width, endTime);
+	}
+
+	return usedHeight+1;
+
+    }
+
 }

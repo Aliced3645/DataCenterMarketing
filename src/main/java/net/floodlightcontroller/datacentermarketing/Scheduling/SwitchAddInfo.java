@@ -3,7 +3,11 @@
  */
 package net.floodlightcontroller.datacentermarketing.Scheduling;
 
+import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.openflow.protocol.OFPhysicalPort;
 
@@ -94,6 +98,22 @@ public class SwitchAddInfo {
 	    return null;
 
 	return ports[i];
+    }
+
+    public int visualize(Graphics g, int vertical, int width, long endTime) {
+	System.out.print("....... siwtch visualizing!");
+	
+	List<Port> portList = Arrays.asList(ports);
+
+	int usedHeight = 0;
+
+	for (Port pt : portList) {
+	    usedHeight += pt
+		    .visualize(g, vertical + usedHeight, width, endTime);
+	}
+
+	return usedHeight+2;
+
     }
 
 }

@@ -6,6 +6,12 @@ package net.floodlightcontroller.datacentermarketing.Scheduling;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.LayoutManager;
+
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.JRadioButton;
@@ -24,6 +30,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
 import net.floodlightcontroller.datacentermarketing.FlowUI;
+import net.floodlightcontroller.datacentermarketing.MarketManager;
+
+import javax.swing.JMenuBar;
 
 /**
  * @author mininet
@@ -31,30 +40,70 @@ import net.floodlightcontroller.datacentermarketing.FlowUI;
  */
 public class SchedulerUI extends JDialog {
 
-    public void main(String[] args) {
+    public void doRepaint() {
+
+	repaint();
+    }
+
+    /*
+     * public void step(String[] args) {
+     * 
+     * System.out.println("\n\n\t\t\33333333"); try {
+     * UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
+     * catch (Exception e) { e.printStackTrace(); } try { FlowUI dialog = new
+     * FlowUI(); dialog.setTitle("Datacenter Control Panel");
+     * dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+     * dialog.setVisible(true); } catch (Exception e) { e.printStackTrace(); } }
+     */
+
+    private int width = 1000;
+
+    long endTime = 1000;
+
+    private class MainCanvas extends JPanel {
+
+	public MainCanvas() {
+	    super();
+	    // TODO Auto-generated constructor stub
+	    setOpaque(false);
+	    setPreferredSize(new Dimension(600, 2000));
+	    setBackground(Color.BLACK);
+	    setBorder(BorderFactory.createLineBorder(Color.RED));
+	}
+
+	public void paintComponent(Graphics g) {
+	    super.paintComponent(g);
+
+	    Scheduler.getInstance().visualize(g, width, endTime);
+
+	}
+    }
+
+    public SchedulerUI() {
 	try {
 	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
-	try {
-	    FlowUI dialog = new FlowUI();
-	    dialog.setTitle("Datacenter Control Panel");
-	    dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-	    dialog.setVisible(true);
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
-    }
+	setBounds(150, 100, 1000, 600);
+	System.out.println("\n\n\t\t\t222222222");
 
-    public SchedulerUI() {
+	JMenuBar menuBar = new JMenuBar();
+	menuBar.setToolTipText("Mwnu");
+	menuBar.setBounds(0, 0, 1000, 10);
+	getContentPane().add(menuBar, BorderLayout.NORTH);
+	
+	
+	MainCanvas mainFrame = new MainCanvas();
 
-	JScrollPane scrollPane = new JScrollPane();
+	JScrollPane scrollPane = new JScrollPane(mainFrame,
+		JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+		JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
 	getContentPane().add(scrollPane, BorderLayout.CENTER);
 
-	JPanel mainFrame = new JPanel();
-	scrollPane.add(mainFrame);
-
+	
+	//control
 	JPanel controlPane = new JPanel();
 	getContentPane().add(controlPane, BorderLayout.SOUTH);
 

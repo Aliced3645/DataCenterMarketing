@@ -187,7 +187,8 @@ public class LowLevelController implements IOFSwitchListener,
 	return l;
     }
 
-    private void buildDatacenterMarketing() {
+    private void buildDatacenterMarketing() throws IOException,
+	    InterruptedException, ExecutionException {
 	/* attach this module to MarketManager class */
 	MarketManager marketManager = MarketManager.getInstance();
 	marketManager.setLowLevelController(this);
@@ -196,8 +197,7 @@ public class LowLevelController implements IOFSwitchListener,
     }
 
     @Override
-    public void init(FloodlightModuleContext context)
-	    throws FloodlightModuleException {
+    public void init(FloodlightModuleContext context) {
 	// TODO Auto-generated method stub
 	for (int i = 0; i < 100; i++)
 	    System.out.println("INITING!!!!!!!!!!!");
@@ -218,8 +218,12 @@ public class LowLevelController implements IOFSwitchListener,
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
+	try {
+	    buildDatacenterMarketing();
+	} catch (Exception e) {
+	    e.printStackTrace();
 
-	buildDatacenterMarketing();
+	}
     }
 
     @Override
@@ -805,13 +809,12 @@ public class LowLevelController implements IOFSwitchListener,
 	}
     }
 
+    // TODO check cache
 
-		// TODO check cache
+    // for the first one, we make a packet and send it to the first switch
+    // the last switch send the packet back, as required by an action
 
-		// for the first one, we make a packet and send it to the first switch
-		// the last switch send the packet back, as required by an action
-
-		// checks for validatiu
+    // checks for validatiu
     public void probeLatency(Route rt, boolean whetherDelete) throws Exception {
 
 	/*
@@ -1049,51 +1052,52 @@ public class LowLevelController implements IOFSwitchListener,
 	    log.error("Tried to write OFFlowMod to {} but failed: {}",
 		    HexString.toHexString(startSw.getId()), e.getMessage());
 	}
-	}
-    
+    }
 
-	private void finishRouteBenchMark(OFPacketIn msg) {
+    private void finishRouteBenchMark(OFPacketIn msg) {
 
-		// get the data out of the msg
-		try {
-			
-			Ethernet eth = new Ethernet();
-			eth.deserialize(msg.getPacketData(), 0, msg.getPacketData().length);
-			IPv4 probe = new IPv4();
-			probe.deserialize(eth.getPayload().serialize(), 0, eth.getPayload()
-					.serialize().length);
-			String payloadString = new String(probe.getPayload().serialize());
-			char firstChar = payloadString.charAt(0);
-			boolean toDelete = firstChar == 'y' ? true : false;
-			String routeJson = payloadString.substring(1);
-			Route route = (Route) JsonReader.toJava(routeJson);
-			String id = route.toString();
+	// get the data out of the msg
+	try {
 
-			if (routesBenchMarks.containsKey(id)) {
-				// update the back time
-				routesBenchMarks.get(id).setEnd(System.nanoTime());
-				debug("Probe Lentency:"
-						+ routesBenchMarks.get(id).getDifference() + "\n");
-				debug("Ping packet content: " + id);
-				// TODO tear down the route
-				if (toDelete == true) {
-					deleteRouteEntriesForPing(route);
-				}
-				
-				//wake up the bidRequest and set the latency
-				BidRequest waitingRequest = Auctioneer.getInstance().getCurrentRequestWaitingLatencyVerification();
-				synchronized(waitingRequest){
-					waitingRequest.setProbedLatency(routesBenchMarks.get(id).getDifference());
-					waitingRequest.notify();
-				}
-			
-			} else {
-				debug("None idetified id:" + id);
-			}
-		} catch (Exception e) {
-			/* debug("Exception : " + e.toString()); */
-			return;
+	    Ethernet eth = new Ethernet();
+	    eth.deserialize(msg.getPacketData(), 0, msg.getPacketData().length);
+	    IPv4 probe = new IPv4();
+	    probe.deserialize(eth.getPayload().serialize(), 0, eth.getPayload()
+		    .serialize().length);
+	    String payloadString = new String(probe.getPayload().serialize());
+	    char firstChar = payloadString.charAt(0);
+	    boolean toDelete = firstChar == 'y' ? true : false;
+	    String routeJson = payloadString.substring(1);
+	    Route route = (Route) JsonReader.toJava(routeJson);
+	    String id = route.toString();
+
+	    if (routesBenchMarks.containsKey(id)) {
+		// update the back time
+		routesBenchMarks.get(id).setEnd(System.nanoTime());
+		debug("Probe Lentency:"
+			+ routesBenchMarks.get(id).getDifference() + "\n");
+		debug("Ping packet content: " + id);
+		// TODO tear down the route
+		if (toDelete == true) {
+		    deleteRouteEntriesForPing(route);
 		}
+
+		// wake up the bidRequest and set the latency
+		BidRequest waitingRequest = Auctioneer.getInstance()
+			.getCurrentRequestWaitingLatencyVerification();
+		synchronized (waitingRequest) {
+		    waitingRequest.setProbedLatency(routesBenchMarks.get(id)
+			    .getDifference());
+		    waitingRequest.notify();
+		}
+
+	    } else {
+		debug("None idetified id:" + id);
+	    }
+	} catch (Exception e) {
+	    /* debug("Exception : " + e.toString()); */
+	    return;
+	}
 	log.debug("\npacket out, now wait for inmessage");
 
 	return;

@@ -3,7 +3,10 @@
  */
 package net.floodlightcontroller.datacentermarketing.Scheduling;
 
+import java.awt.Graphics;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -12,7 +15,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
+import com.sun.net.ssl.internal.www.protocol.https.Handler;
+
 import net.floodlightcontroller.core.IOFSwitch;
+import net.floodlightcontroller.core.module.FloodlightModuleContext;
+import net.floodlightcontroller.core.module.FloodlightModuleException;
+import net.floodlightcontroller.core.module.IFloodlightModule;
+import net.floodlightcontroller.core.module.IFloodlightService;
 import net.floodlightcontroller.datacentermarketing.MarketManager;
 import net.floodlightcontroller.routing.Route;
 import net.floodlightcontroller.topology.NodePortTuple;
@@ -39,20 +48,25 @@ public class Scheduler {
 	switchesInfo = new HashMap<Long, SwitchAddInfo>();
 	// TODO how to initialize all the switches?
 
-	/*// needs update
 	refreshTopo();
 
 	// show UI
 	showMan = new SchedulerVisualizer();
 	Thread showManThread = new Thread(showMan, "showman");
-	showManThread.start();*/
+	showManThread.start();
+
+	System.out.println("\n\n\n\t\t\t hello world!!!!");
+
     }
 
-    public static Scheduler getInstance() throws IOException,
-	    InterruptedException, ExecutionException {
-	if (instance == null)
-	    instance = new Scheduler();
-
+    public static Scheduler getInstance() {
+	if (instance == null) {
+	    try {
+		instance = new Scheduler();
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+	}
 	return instance;
 
     }
@@ -201,4 +215,24 @@ public class Scheduler {
      * return true; }
      */
 
+    public void visualize(Graphics g, int width, long endTime) {
+	ArrayList<SwitchAddInfo> switchList = new ArrayList<SwitchAddInfo>(
+		switchesInfo.values());
+
+	System.out.print("............................scheduler visualizing:"
+		+ switchList.size() + "\n");
+
+	if (switchesInfo.size() == 0) {
+	    try {
+		refreshTopo();
+	    } catch (Exception e) {
+	    }
+	}
+	// visualize youselves!
+	int vertical = 0;
+	for (SwitchAddInfo sw : switchList) {
+	    vertical += sw.visualize(g, vertical, width, endTime);
+	}
+
+    }
 }
