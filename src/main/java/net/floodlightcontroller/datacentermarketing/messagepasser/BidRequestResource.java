@@ -26,7 +26,7 @@ public class BidRequestResource extends ServerResource {
 		 * String Example: 
 		 * {"Bidder":"Shu", "Value":100, "SID":1, "DID":3, "MinRate":50, "MaxRate":100, "Data":100}
 		 */
-		private BidRequest requestJsonStringToBidRequest(String bidRequestString) throws IOException{
+		private static BidRequest requestJsonStringToBidRequest(String bidRequestString) throws IOException{
 			BidRequest bidRequest = new BidRequest();
 	        MappingJsonFactory f = new MappingJsonFactory();
 	        JsonParser jp;
@@ -126,9 +126,9 @@ public class BidRequestResource extends ServerResource {
 		@Post
 		@Put
 		//public void postBidRequest(BidRequest bidRequest){
-		public void postBidRequest(String bidRequestString) throws Exception{
+		public static void postBidRequest(String bidRequestString) throws Exception{
 			//System.out.println(bidRequestString);
-			BidRequest bidRequest = this.requestJsonStringToBidRequest(bidRequestString);
+			BidRequest bidRequest = requestJsonStringToBidRequest(bidRequestString);
 			if(bidRequest == null){
 				System.out.println("JSON String format not satisfied");
 				return;
@@ -146,9 +146,6 @@ public class BidRequestResource extends ServerResource {
 			
 			//generate the URL Hash for this User/BidRequest
 			bidRequest.getBidder().setLastRequest(bidRequest);
-			RESTQuerier querier = RESTQuerier.getInstance();
-			String URI = querier.getBidderURIForRequest(this.getReference());
-			querier.addBidder(URI, bidRequest.getBidder());
 			//push to the auctioneer
 			Auctioneer.getInstance().pushRequest(bidRequest);
 			

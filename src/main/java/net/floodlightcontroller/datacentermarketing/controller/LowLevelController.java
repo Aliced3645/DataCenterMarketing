@@ -81,6 +81,7 @@ import net.floodlightcontroller.datacentermarketing.Scheduling.Allocation;
 import net.floodlightcontroller.datacentermarketing.Scheduling.Scheduler;
 import net.floodlightcontroller.datacentermarketing.logic.BidRequest;
 import net.floodlightcontroller.datacentermarketing.messagepasser.BidRequestJSONSerializer;
+import net.floodlightcontroller.datacentermarketing.messagepasser.BidRequestResource;
 import net.floodlightcontroller.devicemanager.IDevice;
 import net.floodlightcontroller.devicemanager.IDeviceService;
 import net.floodlightcontroller.devicemanager.SwitchPort;
@@ -122,7 +123,7 @@ public class LowLevelController implements IOFSwitchListener,
     private Future<OFFeaturesReply> future;
     protected static Logger log = LoggerFactory
 	    .getLogger(LowLevelController.class);
-
+    private String previousContent = "";
     // the payload of the ping packet
     // records the route and a boolean on whether its entries should be deleted
     class PingPayloadJSONSerializer extends JsonSerializer<PingPayload> {
@@ -1275,17 +1276,34 @@ public class LowLevelController implements IOFSwitchListener,
 
 	case PACKET_IN:
 
-	    Ethernet eth = IFloodlightProviderService.bcStore.get(cntx,
-		    IFloodlightProviderService.CONTEXT_PI_PAYLOAD);
-	    IPv4 probe = new IPv4();
-	    probe.deserialize(eth.getPayload().serialize(), 0, eth.getPayload()
-		    .serialize().length);
-	    if (IPv4.toIPv4Address("1.2.3.4") == probe.getDestinationAddress()) {
-		finishRouteBenchMark((OFPacketIn) msg);
-	    }
+		Ethernet eth = IFloodlightProviderService.bcStore.get(cntx,
+				IFloodlightProviderService.CONTEXT_PI_PAYLOAD);
+		IPv4 probe = new IPv4();
+		probe.deserialize(eth.getPayload().serialize(), 0, eth.getPayload()
+				.serialize().length);
 
-	    break;
-
+		if (IPv4.toIPv4Address("1.2.3.4") == probe.getDestinationAddress()) {
+			finishRouteBenchMark((OFPacketIn) msg);
+		}
+		// request packet from client (from data plane)
+		else if (probe.getDestinationAddress() == IPv4
+				.toIPv4Address("10.0.0.10")) {
+			//parse the bid information
+			String payloadString = new String(probe.getPayload().serialize());
+			if(payloadString.equals(previousContent)) break;
+			else{
+				previousContent = payloadString;
+				//process the request
+				try {
+					BidRequestResource.postBidRequest(payloadString);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		break;
 	case QUEUE_GET_CONFIG_REPLY:
 
 	    System.out.println("Got a Queue Config Reply!!");
