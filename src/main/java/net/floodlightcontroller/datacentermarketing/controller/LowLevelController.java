@@ -1209,7 +1209,7 @@ public class LowLevelController implements IOFSwitchListener,
 
 		// set actions
 		List<OFAction> actions = new ArrayList<OFAction>(1);
-		actions.add(new OFActionOutput((short) 1, (short) 0));
+		actions.add(new OFActionOutput((short) first.getPortId(), (short) 0));
 
 		packetOutMessage.setActions(actions);
 
@@ -1252,7 +1252,7 @@ public class LowLevelController implements IOFSwitchListener,
 			if (routesBenchMarks.containsKey(id)) {
 				// update the back time
 				routesBenchMarks.get(id).setEnd(System.nanoTime());
-				debug("Probe Lentency:"
+				debug("\n\n\n====================================== . Probe Lentency:"
 						+ routesBenchMarks.get(id).getDifference() + "\n");
 				debug("Ping packet content: " + id);
 				// TODO tear down the route
