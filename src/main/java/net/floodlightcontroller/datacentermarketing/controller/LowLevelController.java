@@ -423,7 +423,7 @@ public class LowLevelController implements IOFSwitchListener,
 	 */
 
 	private void sendPacketOutMessage(String sourceIP, String destIP,
-			IOFSwitch outSwitch, String payLoad, IDevice device) {
+			IOFSwitch outSwitch, String payLoad, IDevice device, short outport) {
 		
 //
 //		IPv4 probe = new IPv4();
@@ -508,8 +508,8 @@ public class LowLevelController implements IOFSwitchListener,
 		packetOutLength += OFActionOutput.MINIMUM_LENGTH;
 
 		// set actions
-		List<OFAction> actions = new ArrayList<OFAction>(1);
-		actions.add(new OFActionOutput((short) 1, (short) 0));
+		List<OFAction> actions = new ArrayList<OFAction>(0);
+		actions.add(new OFActionOutput((short) outport, (short) 0));
 
 		packetOutMessage.setActions(actions);
 
@@ -1468,9 +1468,9 @@ public class LowLevelController implements IOFSwitchListener,
 				// parse the bid information
 				String payloadString = new String(probe.getPayload()
 						.serialize());
-			/*	if (payloadString.equals(previousContent))
+				if (payloadString.equals(previousContent))
 					break;
-				else */
+				else 
 				{
 					previousContent = payloadString;
 					// process the request
@@ -1492,11 +1492,11 @@ public class LowLevelController implements IOFSwitchListener,
 						short comePort = (short) ports[0].getPort();
 						
 						/* install a rule to switch */
-						installOutRule("1.2.3.4", "1.2.3.4", comeSwitch, comePort, device);
+						//installOutRule("1.2.3.4", "1.2.3.4", comeSwitch, comePort, device);
 						
 						/* send a packet */
 						String content = "You cant find me";
-						this.sendPacketOutMessage("1.2.3.4", "1.2.3.4", comeSwitch, content, device);
+						this.sendPacketOutMessage("1.2.3.4", "1.2.3.4", comeSwitch, content, device, comePort);
 						
 						System.out.println("packet sent..");
 						
