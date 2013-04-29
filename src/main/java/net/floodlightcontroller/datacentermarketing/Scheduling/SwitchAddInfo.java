@@ -101,7 +101,7 @@ public class SwitchAddInfo {
     }
 
     public int visualize(Graphics g, int vertical, int width, long endTime) {
-	System.out.print("....... siwtch visualizing!");
+	//System.out.print("....... siwtch visualizing!");
 
 	List<Port> portList = Arrays.asList(ports);
 

@@ -94,7 +94,7 @@ public class Queue {
 	    start += (endTime - start) * Math.random() * agg;
 	    end = (long) (start + (endTime - start) * Math.random() * agg);
 	    float bd = (float) (portCap * Math.random());
-	    System.out.println("bd to allocate" + bd);
+	    //System.out.println("bd to allocate" + bd);
 
 	    reservations.add(new Allocation(start, end, bd, ADirection.OUT));
 

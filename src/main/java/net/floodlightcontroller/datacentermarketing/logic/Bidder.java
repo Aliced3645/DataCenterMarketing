@@ -16,11 +16,23 @@ public class Bidder extends Thread{
 	
 	String bidderID;
 	
+	//The bidder is bound to a host machine ()
+	private long hostID;
+	
 	//the most recent bidding result
 	private BidResult latestResult;
 	private BidRequest lastRequest;
 	
 	
+	
+	public synchronized long getHostID() {
+		return hostID;
+	}
+
+	public synchronized void setHostID(long hostID) {
+		this.hostID = hostID;
+	}
+
 	public int hashCode(){
 		return bidderID.hashCode();//bidderID as a unique identifier
 	}

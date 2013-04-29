@@ -219,8 +219,8 @@ public class Scheduler {
 	ArrayList<SwitchAddInfo> switchList = new ArrayList<SwitchAddInfo>(
 		switchesInfo.values());
 
-	System.out.print("............................scheduler visualizing:"
-		+ switchList.size() + "\n");
+	//System.out.print("............................scheduler visualizing:"
+	//	+ switchList.size() + "\n");
 
 	if (switchesInfo.size() == 0) {
 	    try {

@@ -26,7 +26,7 @@ public class BidRequestResource extends ServerResource {
 		 * String Example: 
 		 * {"Bidder":"Shu", "Value":100, "SID":1, "DID":3, "MinRate":50, "MaxRate":100, "Data":100}
 		 */
-		private static BidRequest requestJsonStringToBidRequest(String bidRequestString) throws IOException{
+		public static BidRequest requestJsonStringToBidRequest(String bidRequestString) throws IOException{
 			BidRequest bidRequest = new BidRequest();
 	        MappingJsonFactory f = new MappingJsonFactory();
 	        JsonParser jp;
