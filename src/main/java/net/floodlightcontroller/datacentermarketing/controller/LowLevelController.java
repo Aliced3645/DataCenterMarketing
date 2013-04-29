@@ -423,7 +423,7 @@ public class LowLevelController implements IOFSwitchListener,
 	 */
 
 	private void sendPacketOutMessage(String sourceIP, String destIP,
-			IOFSwitch outSwitch, String payLoad) {
+			IOFSwitch outSwitch, String payLoad, IDevice device) {
 		
 //
 //		IPv4 probe = new IPv4();
@@ -485,12 +485,12 @@ public class LowLevelController implements IOFSwitchListener,
 				.setIdentification((short) 188).setFlags((byte) 0)
 				.setFragmentOffset((short) 0).setTtl((byte) 250)
 				/* .setProtocol(IPv4.PROTOCOL_UDP) */.setChecksum((short) 0)
-				.setSourceAddress(sourceIP).setDestinationAddress(destIP)
+				.setSourceAddress(sourceIP).setDestinationAddress(IPv4.fromIPv4Address(device.getIPv4Addresses()[0]))
 				.setPayload(new Data(payLoad.getBytes()));
 		
 		Ethernet ethernet = (Ethernet) new Ethernet()
 					.setSourceMACAddress(outSwitch.getPort((short) 1).getHardwareAddress())
-					.setDestinationMACAddress("ff:ff:ff:ff:ff:ff")
+					.setDestinationMACAddress(device.getMACAddressString())
 				.setEtherType(Ethernet.TYPE_IPv4).setPayload(probe);
 
 		// needs to create a packet and send to switch
@@ -531,7 +531,7 @@ public class LowLevelController implements IOFSwitchListener,
 	}
 
 	private void installOutRule(String sourceIP, String destIP,
-			IOFSwitch outSwitch, short port) throws IOException, InterruptedException, ExecutionException {
+			IOFSwitch outSwitch, short port, IDevice device) throws IOException, InterruptedException, ExecutionException {
 		
 //		updateSwitches();
 //		//IOFSwitch startSw = switches.get(1);
@@ -577,8 +577,9 @@ public class LowLevelController implements IOFSwitchListener,
 		ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
 		actionsTo.add(outputTo);
 
-		String matchString = "nw_dst=" + destIP + "," + "nw_src=" + sourceIP
-				+ "," + "dl_type=" + 0x800;
+		String matchString = "nw_src=" + sourceIP + "," + "nw_dst=" + 
+					IPv4.fromIPv4Address(device.getIPv4Addresses()[0])
+					+ "," + "dl_type=" + 0x800;
 		OFMatch match = new OFMatch();
 		match.fromString(matchString);
 		// match.setDataLayerType(Ethernet.TYPE_IPv4);
@@ -1467,9 +1468,9 @@ public class LowLevelController implements IOFSwitchListener,
 				// parse the bid information
 				String payloadString = new String(probe.getPayload()
 						.serialize());
-				if (payloadString.equals(previousContent))
+			/*	if (payloadString.equals(previousContent))
 					break;
-				else 
+				else */
 				{
 					previousContent = payloadString;
 					// process the request
@@ -1491,11 +1492,11 @@ public class LowLevelController implements IOFSwitchListener,
 						short comePort = (short) ports[0].getPort();
 						
 						/* install a rule to switch */
-						installOutRule("1.2.3.4", "1.2.3.4", comeSwitch, comePort);
+						installOutRule("1.2.3.4", "1.2.3.4", comeSwitch, comePort, device);
 						
 						/* send a packet */
 						String content = "You cant find me";
-						this.sendPacketOutMessage("1.2.3.4", "1.2.3.4", comeSwitch, content);
+						this.sendPacketOutMessage("1.2.3.4", "1.2.3.4", comeSwitch, content, device);
 						
 						System.out.println("packet sent..");
 						
