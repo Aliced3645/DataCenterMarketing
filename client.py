@@ -5,7 +5,7 @@ import sys
 import subprocess
 import json
 import argparse
-
+import random
 
 parser = argparse.ArgumentParser(description='Client')
 parser.add_argument('-interface', dest='interface', action='store', help='Network card Interface connected to swtich')
@@ -33,27 +33,35 @@ def constructBidString(value, destID, minRate, data, start, end, latency):
 
 def randomRequestGenerator():
     #random items to generate:
-    #
-    return
+    value = random.randint(0,1000)
+    destID = random.randint(0,allhosts - 1)
+    minRate = random.randint(0, 5000)
+    data = random.randint(0,50000)
+    start = random.randint(0,1000)
+    end = random.randint(start, 2000)
+    latency = random.randint(100000, 1000000)
+    
+    randomJson = constructBidString(value, destID, minRate, data, start, end, latency)
+    return randomJson
 
 #the second thread sniffing coming packets
 #def replyListener():
 
 
 if __name__ == "__main__":
-    print constructBidString(10, 5, 200, 2000, 10, 50, 10) 
+    print randomRequestGenerator()
     #send scapy packet ...
     #p = threading.Thread(target = replyListener)
     #p.daemon = True
     #p.start()
-    packet = Ether() / IP(dst="10.0.0.10") / constructBidString(10, 5, 200, 2000, 10, 50, 10) 
+    packet = Ether() / IP(dst="10.0.0.10") / randomRequestGenerator()
     # send
     sendp(packet, iface=interface)
     # listen for receiving packets
-    while True:
-        incoming = sniff(count=1, iface=interface)
-        print incoming
-        break
+    #while True:
+    #    incoming = sniff(count=1, iface=interface)
+    #    print incoming
+    #    break
     
 
         
