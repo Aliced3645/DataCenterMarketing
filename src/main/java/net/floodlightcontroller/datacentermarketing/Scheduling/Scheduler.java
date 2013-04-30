@@ -215,7 +215,7 @@ public class Scheduler {
      * return true; }
      */
 
-    public void visualize(Graphics g, int width, long endTime) {
+    public void visualize(Graphics g, int width, long endTime, int thick) {
 	ArrayList<SwitchAddInfo> switchList = new ArrayList<SwitchAddInfo>(
 		switchesInfo.values());
 
@@ -231,7 +231,7 @@ public class Scheduler {
 	// visualize youselves!
 	int vertical = 0;
 	for (SwitchAddInfo sw : switchList) {
-	    vertical += sw.visualize(g, vertical, width, endTime);
+	    vertical += sw.visualize(g, vertical, width, endTime, thick);
 	}
 
     }
