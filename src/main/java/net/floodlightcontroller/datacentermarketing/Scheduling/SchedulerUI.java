@@ -26,6 +26,9 @@ import javax.swing.UIManager;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
@@ -44,6 +47,13 @@ public class SchedulerUI extends JDialog {
 	public static volatile boolean showQueue = false;
 	public static volatile boolean showPort = false;
 	public static volatile boolean showSwitch = false;
+	public static volatile JTextField info;
+
+	// click position
+	public static volatile int x;
+	public static volatile int y;
+/*	public static volatile Boolean captured = false;
+	public static volatile Object highLighted = null;*/
 
 	private final int width = 1000;
 
@@ -106,12 +116,58 @@ public class SchedulerUI extends JDialog {
 		setBounds(150, 100, width, height);
 		System.out.println("\n\n\t\t\t222222222");
 
-		JMenuBar menuBar = new JMenuBar();
-		menuBar.setToolTipText("Mwnu");
-		menuBar.setBounds(0, 0, width, 10);
+		/*
+		 * JMenuBar menuBar = new J(); menuBar.setToolTipText("Mwnu");
+		 * menuBar.setBounds(0, 0, width, 10);
+		 */
+		JPanel menuBar = new JPanel();
+		info = new JTextField();
+		info.setPreferredSize(new Dimension(width, 30));
+		info.setEditable(false);
+		menuBar.add(info);
+
 		getContentPane().add(menuBar, BorderLayout.NORTH);
 
 		MainCanvas mainFrame = new MainCanvas();
+
+		mainFrame.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// here goes the code of calling setButtonText method of
+				// ButtonPanel component on which the event had occurred
+
+				x = e.getX();
+				y = e.getY();
+				info.setText(x + ": " + y);
+				//captured = false;
+				repaint();
+
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+		});
 
 		JScrollPane scrollPane = new JScrollPane(mainFrame,
 				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
@@ -177,20 +233,19 @@ public class SchedulerUI extends JDialog {
 		controlPane.add(scale);
 
 		final JSlider speed = new JSlider();
-		speed.setValue(1 );
-		speed.setMinimum(1 );
+		speed.setValue(1);
+		speed.setMinimum(1);
 		speed.setMaximum(15);
 		speed.setPaintTicks(true);
 		speed.setPaintLabels(true);
 		speed.setPaintLabels(true);
 		speed.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				endTimeOffset = speed.getValue()*1000;
+				endTimeOffset = speed.getValue() * 1000;
 				repaint();
 			}
 		});
 		speed.setToolTipText("scale");
 		controlPane.add(speed);
 	}
-
 }

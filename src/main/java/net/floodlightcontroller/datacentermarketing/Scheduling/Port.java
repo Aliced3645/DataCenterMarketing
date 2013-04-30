@@ -116,7 +116,7 @@ public class Port {
 
 		queues = new Queue[Default.QUEUE_NUM_PER_PORT];
 		for (int a = 0; a < queues.length; a++) {
-			queues[a] = new Queue();
+			queues[a] = new Queue(a);
 
 		}
 	}
@@ -125,7 +125,7 @@ public class Port {
 
 		queues = new Queue[queue_size];
 		for (int a = 0; a < queues.length; a++) {
-			queues[a] = new Queue();
+			queues[a] = new Queue(a);
 
 		}
 
@@ -163,7 +163,8 @@ public class Port {
 			if (allocated == null) {
 				s.add(a);
 			} else {
-				if (allocated.direction != allocation.direction && type==Port_Type.HALF_DUPLEX) {
+				if (allocated.direction != allocation.direction
+						&& type == Port_Type.HALF_DUPLEX) {
 					if (usedBandwidthHolder != null) {
 						usedBandwidthHolder.setHd(0f);
 					}
@@ -265,6 +266,14 @@ public class Port {
 	 * }
 	 */
 
+	public void outputAllocations() {
+		System.out.println("Allocation for port "+ id+":\n");
+		for (int a = 0; a < queues.length; a++) {
+			queues[a].outputAllocations();
+		}
+
+	}
+
 	public int visualize(Graphics g, int vertical, int width, long endTime,
 			int thick) {
 		List<Queue> qList = Arrays.asList(queues);
@@ -278,20 +287,29 @@ public class Port {
 					endTime, thick);
 		}
 
-		if (SchedulerUI.showPort) {
+		int y = SchedulerUI.y;
+		if (SchedulerUI.showPort
+				|| (y >= vertical && y <= vertical + usedHeight)) {
 			Color back = g.getColor();
-			g.setColor(Color.green);
+			if (y >= vertical && y <= vertical + usedHeight) {
+				SchedulerUI.info.setText(SchedulerUI.info.getText() + "Port :"
+						+ id);
+
+				g.setColor(Color.pink);
+
+				outputAllocations();
+
+			} else
+				g.setColor(Color.green);
 			g.fillRect(0, vertical + usedHeight, width, 1);
-			
-			
+
 			g.setColor(Color.yellow);
 			g.fillRect(width - 50, vertical, 10, usedHeight);
 			g.setColor(Color.red);
-			g.drawString(this.id+"", width - 50 , vertical+15);
-			
+			g.drawString(this.id + "", width - 50, vertical + 15);
+
 			g.setColor(back);
-			
-		 
+
 		}
 
 		return usedHeight + 2 * (1 + thick / 2);

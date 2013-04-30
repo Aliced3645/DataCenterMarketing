@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
+import org.easymock.internal.matchers.Captures;
 import org.python.modules.struct;
 
 import net.floodlightcontroller.datacentermarketing.MarketManager;
@@ -19,6 +20,11 @@ import net.floodlightcontroller.datacentermarketing.logic.BiddingClock;
  */
 
 public class Queue {
+	public Queue(int id) {
+		super();
+		this.id = (short) id;
+	}
+
 	public short id = -1;
 
 	/*
@@ -104,19 +110,41 @@ public class Queue {
 
 	}
 
+	public void outputAllocations()
+	{
+		System.out.println("\tThe allocation of Queue "+ (id+1)+":\n ");
+		for(Allocation alloc: reservations)
+		{
+			System.out.print(alloc+"\n");
+			
+			
+		}
+		
+		
+		
+	}
+	
+	
+	
 	/* draw a line for the reserved bandwidth */
 	public int visualize(Graphics g, int vertical, int width, long endTime,
 			int thick) {
 		// for test only
-		//addRandomAllocation(width, endTime);
+		// addRandomAllocation(width, endTime);
 
 		// System.out.println("Queue visulizing!" + vertical + ";" + width);
 
 		Color back = g.getColor();
 
 		// step draw back ground
-		if (SchedulerUI.showQueue) {
-			g.setColor(Color.white);
+		int y = SchedulerUI.y;
+		if (SchedulerUI.showQueue || (y >= vertical && y <= vertical + thick)) {
+			if (y >= vertical && y <= vertical + thick) {
+				SchedulerUI.info.setText("Queue :" + id);
+
+				g.setColor(Color.cyan);
+			} else
+				g.setColor(Color.lightGray);
 			g.fillRect(0, vertical, width, thick);
 		}
 		if (reservations != null) {
@@ -132,6 +160,37 @@ public class Queue {
 			}
 		}
 		g.setColor(back);
+
+		/*
+		 * if the click has not been captured by an allocation check if is
+		 * captured by this
+		 */
+
+		/*
+		 * if (!SchedulerUI.captured) { int y = SchedulerUI.y; if (y >= vertical
+		 * && y <= vertical + thick) { SchedulerUI.info.setText("Queue :" + id);
+		 * SchedulerUI.captured = true; SchedulerUI.highLighted=this;
+		 * 
+		 * 
+		 * back = g.getColor();
+		 * 
+		 * // step draw back ground
+		 * 
+		 * g.setColor(Color.cyan); g.fillRect(0, vertical, width, thick);
+		 * 
+		 * if (reservations != null) { // now draw the allocations for
+		 * (Allocation alloc : reservations) {
+		 * 
+		 * if (alloc.to < BiddingClock.getInstance() .getCurrentTime() ||
+		 * alloc.from > endTime) { continue; } drawAllocation(alloc, g,
+		 * vertical, width, endTime, thick);
+		 * 
+		 * } } g.setColor(back);
+		 * 
+		 * }
+		 * 
+		 * }
+		 */
 
 		return thick + 2 * (1 + (int) (thick / 3));
 
