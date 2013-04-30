@@ -169,8 +169,15 @@ public class Scheduler {
 
 			if (reserve) {
 				System.out.println("allocation is registering  ");
-				assert (switchesInfo.get(switchNum).getPort(portNum)
-						.reserve(alloc) >= 0);
+				int res = switchesInfo.get(switchNum).getPort(portNum)
+						.reserve(alloc);
+				//assert ( 
+				if(res < 0){
+					System.out.println("should not happen");
+					System.exit(-1);
+				}
+				
+				
 			}
 
 		}

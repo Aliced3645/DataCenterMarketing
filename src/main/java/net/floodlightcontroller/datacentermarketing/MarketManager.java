@@ -35,7 +35,11 @@ public class MarketManager {
     private LowLevelController lowLevelController;
     private BiddingClock clock;
     private FlowUI flowUI;
-
+    
+    public long getCurrentTime(){
+    	return clock.getCurrentTime();
+    }
+    
     private MarketManager() throws IOException, InterruptedException,
 	    ExecutionException {
 	// initialize the UI.
@@ -49,7 +53,7 @@ public class MarketManager {
 
 	// initialize the timer
 	clock = BiddingClock.getInstance();
-
+	
     }
 
     public FlowUI getFlowUI() {

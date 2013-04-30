@@ -108,7 +108,7 @@ public class SwitchAddInfo {
 				return port;
 
 		}
-
+		System.out.println(ports);
 		return null;
 
 	}

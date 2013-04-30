@@ -88,6 +88,19 @@ public class Auctioneer {
 	
 	public void pushResults() throws IOException, InterruptedException, ExecutionException{
 		Set<Entry<String, BidResult>> resultSet = resultsForThisRound.entrySet();
+		if(resultSet.size() == 0){
+			System.out.println("\n\n\n Result size is 0");
+			System.out.println(" Request size is " + this.requestsForThisRound.size() + "\n\n\n");
+			//It should not happen, the reason it happens is due to the unstable
+			//property of floodlight
+			//but if it happens, then push the string to all requests
+			Set<Entry<String, BidRequest>> requestSet = requestsForThisRound.entrySet();
+			for(Entry<String, BidRequest> requestEntry : requestSet){
+				BidRequest bidRequest = requestEntry.getValue();
+				MarketManager.getInstance().getLowLevelController().pushMessageToHost(bidRequest.getSourceID(), "Strange problem in Floodlight");
+			}
+			return ;
+		}
 		for(Entry<String, BidResult> resultEntry : resultSet){
 			BidResult result = resultEntry.getValue();
 			String replyContent;
@@ -100,6 +113,7 @@ public class Auctioneer {
 			
 			//send to the host machine
 			MarketManager.getInstance().getLowLevelController().pushMessageToHost(result.getHostID(), replyContent);
+			System.out.println("\nResult pushed\n");
 		}
 	}
 

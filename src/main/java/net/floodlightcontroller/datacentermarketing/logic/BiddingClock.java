@@ -83,13 +83,13 @@ public class BiddingClock implements Runnable {
 	}
 
 	// in milliseconds
-	int roundTime = 100;
+	int roundTime = 50;
 	int tick = 100;
 	private Timer biddingTimer;
 	private Timer tickTimer;
 
 	long currentTime;
-
+	
 	public long getCurrentTime() {
 		synchronized (this) {
 			return currentTime;

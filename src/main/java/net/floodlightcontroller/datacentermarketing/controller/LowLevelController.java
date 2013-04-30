@@ -1423,6 +1423,7 @@ public class LowLevelController implements IOFSwitchListener,
 							break;
 						}
 						
+						System.out.println("\n\n Received a request at time " + MarketManager.getInstance().getCurrentTime() + "from host " + bidRequest.getSourceID()+ "\n\n\n");
 						/* 
 						 * call the function to put verify request by lantency
 						 * and if possible, put into the queue
@@ -1438,8 +1439,7 @@ public class LowLevelController implements IOFSwitchListener,
 							//generate the URL Hash for this User/BidRequest
 							bidRequest.getBidder().setLastRequest(bidRequest);
 							//push to the auctioneer
-							Auctioneer.getInstance().pushRequest(bidRequest);
-							
+							Auctioneer.getInstance().pushRequest(bidRequest);							
 						}
 						
 

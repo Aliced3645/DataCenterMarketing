@@ -36,8 +36,9 @@ public class FirstComeFirstServeStrategy implements AuctioneerStrategy{
 			Collection<Route> possibleRoutes = bidRequest.getPossibleRoutes();
 			if(possibleRoutes == null){
 				//failed to establish
-				toReturn.clear();
-				return toReturn;
+				//toReturn.clear();
+				//return toReturn;
+				System.out.println("\n\n\n no possible routes \n\n\n");
 			}
 			for(Route route : possibleRoutes){
 				Allocation alloc = new Allocation();
