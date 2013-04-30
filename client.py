@@ -10,7 +10,6 @@ from struct import *
 import datetime
 import pcapy
 import sys
-from impacket.ImpactDecoder import *
 
 parser = argparse.ArgumentParser(description='Client')
 parser.add_argument('-interface', dest='interface', action='store', help='Network card Interface connected to swtich')
@@ -45,8 +44,8 @@ def randomRequestGenerator():
     start = random.randint(0,1000)
     end = random.randint(start, 2000)
     latency = random.randint(1000000, 10000000)
-    
-    randomJson = constructBidString(value, destID, minRate, data, start, end, latency)
+    l = 100000000
+    randomJson = constructBidString(value, destID, minRate, data, start, end, l)
     return randomJson
 
 def eth_addr (a) :

@@ -108,7 +108,7 @@ public class Queue {
 	public int visualize(Graphics g, int vertical, int width, long endTime,
 			int thick) {
 		// for test only
-		addRandomAllocation(width, endTime);
+		//addRandomAllocation(width, endTime);
 
 		// System.out.println("Queue visulizing!" + vertical + ";" + width);
 
