@@ -168,6 +168,7 @@ public class Scheduler {
 				return false;
 
 			if (reserve) {
+				System.out.println("allocation is registering  ");
 				assert (switchesInfo.get(switchNum).getPort(portNum)
 						.reserve(alloc) >= 0);
 			}
@@ -187,7 +188,7 @@ public class Scheduler {
 	public float estimatePrice(Route rt, Allocation alloc) {
 		float price = 0f;
 
-		// we need to estimate price  on all the possible queue reservations
+		// we need to estimate price on all the possible queue reservations
 		List<NodePortTuple> switchPorts = rt.getPath();
 		for (int a = 0; a < switchPorts.size(); a++) {
 			NodePortTuple np = switchPorts.get(a);

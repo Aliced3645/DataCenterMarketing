@@ -192,6 +192,9 @@ public class Port {
 			return -1;
 		int randomQueue = ps.iterator().next();
 
+		System.out.println("allocation " + allocation
+				+ " is registered in port" + id);
+
 		try {
 			queues[randomQueue].reserve(allocation);
 			return randomQueue;
@@ -267,7 +270,7 @@ public class Port {
 	 */
 
 	public void outputAllocations() {
-		System.out.println("Allocation for port "+ id+":\n");
+		System.out.println("Allocation for port " + id + ":\n");
 		for (int a = 0; a < queues.length; a++) {
 			queues[a].outputAllocations();
 		}

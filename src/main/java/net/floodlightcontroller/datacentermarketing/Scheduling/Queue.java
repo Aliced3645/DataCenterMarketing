@@ -69,6 +69,9 @@ public class Queue {
 	public void reserve(Allocation allocation) {
 
 		reservations.add(allocation);
+		System.out.println("allocation " + allocation
+				+ " is registered in queue" + id);
+
 		Collections.sort(reservations, new Comparator<Allocation>() {
 			public int compare(Allocation a, Allocation b) {
 				return a.compareTo(b);
@@ -102,22 +105,15 @@ public class Queue {
 
 	}
 
-	public void outputAllocations()
-	{
-		System.out.println("\tThe allocation of Queue "+ (id+1)+":\n ");
-		for(Allocation alloc: reservations)
-		{
-			System.out.print(alloc+"\n");
-			
-			
+	public void outputAllocations() {
+		System.out.println("\tThe allocation of Queue " + (id + 1) + ":\n ");
+		for (Allocation alloc : reservations) {
+			System.out.print(alloc + "\n");
+
 		}
-		
-		
-		
+
 	}
-	
-	
-	
+
 	/* draw a line for the reserved bandwidth */
 	public int visualize(Graphics g, int vertical, int width, long endTime,
 			int thick) {
