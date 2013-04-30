@@ -3,16 +3,8 @@ package net.floodlightcontroller.datacentermarketing.Scheduling;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
-
-import org.easymock.internal.matchers.Captures;
-import org.python.modules.struct;
-
-import net.floodlightcontroller.datacentermarketing.MarketManager;
 import net.floodlightcontroller.datacentermarketing.logic.BiddingClock;
 
 /*
