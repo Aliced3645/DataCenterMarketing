@@ -16,6 +16,17 @@ public class BidResult {
 	//round counter (which round generates the result? )
 	int round;
 	Bidder bidder;
+	
+	private long hostID;
+	
+	public synchronized long getHostID() {
+		return hostID;
+	}
+
+	public synchronized void setHostID(long hostID) {
+		this.hostID = hostID;
+	}
+
 	//true for success
 	//false for fail
 	private boolean result;

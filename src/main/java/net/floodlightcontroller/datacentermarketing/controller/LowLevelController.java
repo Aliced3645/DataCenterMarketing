@@ -1359,7 +1359,7 @@ public class LowLevelController implements IOFSwitchListener,
 	}
 	
 	
-	private void pushMessageToHost(long hostID, String content){
+	public void pushMessageToHost(long hostID, String content){
 		/* 
 		 * for communication test
 		 */
@@ -1435,11 +1435,14 @@ public class LowLevelController implements IOFSwitchListener,
 							break;
 						}
 						else{
-							pushMessageToHost(bidRequest.getSourceID(), "latency probe successful");
-							break;
+							//go into the bidding pool
+							//generate the URL Hash for this User/BidRequest
+							bidRequest.getBidder().setLastRequest(bidRequest);
+							//push to the auctioneer
+							Auctioneer.getInstance().pushRequest(bidRequest);
+							
 						}
 						
-
 
 					} catch (Exception e) {
 						// TODO Auto-generated catch block

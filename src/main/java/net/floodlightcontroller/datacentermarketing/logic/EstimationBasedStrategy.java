@@ -125,6 +125,7 @@ public class EstimationBasedStrategy implements AuctioneerStrategy{
 				/**
 				 * Result is set false to this bid
 				 */
+				result.setHostID(bidRequest.getSourceID());
 				result.setResult(false);
 				result.setBidder(bidRequest.getBidder());
 				result.setRound(Auctioneer.round);
@@ -156,7 +157,6 @@ public class EstimationBasedStrategy implements AuctioneerStrategy{
 			alloc.setTo((long)bidRequest.getEndTime());
 			
 			BidResult result = new BidResult();
-
 			
 			if(Scheduler.getInstance().validateAndReserveRoute(competitiveBid.getRoute(), alloc,true)){
 				/**
@@ -167,6 +167,7 @@ public class EstimationBasedStrategy implements AuctioneerStrategy{
 				result.setBidder(bidRequest.getBidder());
 				result.setRound(Auctioneer.round);
 				result.getBidder().setLatestResult(result);
+				result.setHostID(bidRequest.getSourceID());
 			}
 			else{
 				/**
@@ -177,8 +178,8 @@ public class EstimationBasedStrategy implements AuctioneerStrategy{
 				result.setBidder(bidRequest.getBidder());
 				result.setRound(Auctioneer.round);
 				result.getBidder().setLatestResult(result);			
+				result.setHostID(bidRequest.getSourceID());
 			}
-			
 		}
 		
 		return toReturn;

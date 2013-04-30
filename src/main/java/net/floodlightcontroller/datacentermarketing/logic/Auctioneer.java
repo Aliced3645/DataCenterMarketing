@@ -7,11 +7,14 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.Hashtable;
 
+import net.floodlightcontroller.datacentermarketing.MarketManager;
 import net.floodlightcontroller.datacentermarketing.messagepasser.RESTQuerier;
 
 //Auctioneer is a singleton class
@@ -82,12 +85,28 @@ public class Auctioneer {
 		this.resultsForThisRound = strategy
 				.processAllocation(requestsForThisRound);
 	}
+	
+	public void pushResults() throws IOException, InterruptedException, ExecutionException{
+		Set<Entry<String, BidResult>> resultSet = resultsForThisRound.entrySet();
+		for(Entry<String, BidResult> resultEntry : resultSet){
+			BidResult result = resultEntry.getValue();
+			String replyContent;
+			if(result.getResult()){
+				replyContent = "Congratulations you won the bid";
+			}
+			else{
+				replyContent = "Sorry, you lose your bid";
+			}
+			
+			//send to the host machine
+			MarketManager.getInstance().getLowLevelController().pushMessageToHost(result.getHostID(), replyContent);
+		}
+	}
 
 	public static Auctioneer getInstance() {
 		if (_instance == null) {
 			_instance = new Auctioneer();
 		}
-
 		return _instance;
 	}
 
@@ -128,6 +147,7 @@ public class Auctioneer {
 		//}
 	}
 
+	
 	public LinkedHashMap<String, BidResult> getResultsForThisRound() {
 		return this.resultsForThisRound;
 	}

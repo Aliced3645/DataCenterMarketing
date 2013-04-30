@@ -22,8 +22,23 @@ public class BiddingClock implements Runnable{
 	    	 tickTimer.stop();
 	    	 //time is up
 	    	 Auctioneer.getInstance().setBusy();
+	    	 
 	    	 try {
-				Auctioneer.getInstance().computeAllocation();
+	    		 Auctioneer.getInstance().computeAllocation();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    	 
+	    	 //broadcast result to all participants
+	    	 try {
+				Auctioneer.getInstance().pushResults();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -35,7 +50,6 @@ public class BiddingClock implements Runnable{
 				e.printStackTrace();
 			}
 	    	 Auctioneer.getInstance().setNotBusy();
-	    	
 	    	 PriceAdjuster.getInstance().adjustPrice(); 	 
 	    	 Auctioneer.getInstance().clearRound();
 	    	 //a new round
@@ -72,7 +86,7 @@ public class BiddingClock implements Runnable{
 	}
 
 	//in milliseconds
-	int roundTime= 30000;
+	int roundTime= 20000;
 	int tick = 100;
 	private Timer biddingTimer;
 	private Timer tickTimer;
