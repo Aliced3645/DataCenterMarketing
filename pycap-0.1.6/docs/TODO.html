@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.2.8: http://docutils.sourceforge.net/" />
+<title>Python Packet Capture and Injection Library</title>
+<meta name="author" content="Mark Rowe" />
+<link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="python-packet-capture-and-injection-library">
+<h1 class="title">Python Packet Capture and Injection Library</h1>
+<h2 class="subtitle" id="todo">TODO</h2>
+<table class="docinfo" frame="void" rules="none">
+<col class="docinfo-name" />
+<col class="docinfo-content" />
+<tbody valign="top">
+<tr><th class="docinfo-name">Author:</th>
+<td>Mark Rowe</td></tr>
+<tr><th class="docinfo-name">Contact:</th>
+<td><a class="first last reference" href="mailto:bdash&#64;gmx.net">bdash&#64;gmx.net</a></td></tr>
+<tr class="field"><th class="docinfo-name">Web site:</th><td class="field-body"><a class="reference" href="http://pycap.sourceforge.net">http://pycap.sourceforge.net</a></td>
+</tr>
+<tr class="field"><th class="docinfo-name">Project page:</th><td class="field-body"><a class="reference" href="http://sourceforge.net/projects/pycap/">http://sourceforge.net/projects/pycap/</a></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li>Get compilation under Python 2.2 working again.</li>
+<li>Finish support for packet construction and injection via <a class="reference" href="http://www.packetfactory.net/libnet/">libnet</a>.  All protocols
+except UDP and ICMP are implemented, but need more testing.</li>
+<li>Support more protocol types, such as <a class="reference" href="http://www.faqs.org/rfcs/rfc1034.html">DNS</a> and <a class="reference" href="http://www.faqs.org/rfcs/rfc2470.html">IPv6</a>.</li>
+<li>Test on more architectures.  Currently tested on Mac OS X/PPC and
+Linux/x86.</li>
+<li>Write full documentation for the module.</li>
+<li>Come up with better system for documentation.</li>
+<li>Make this work on Windows.  I briefly struggled with compiling using VC7 under Win XP
+using <a class="reference" href="http://winpcap.polito.it/">winpcap</a> and <a class="reference" href="http://www.eeye.com/html/Research/Tools/libnetnt.html">LibnetNT</a>.  No luck, and was getting some rather interesting errors
+about missing header files which appeared to be where they should be :-/.</li>
+</ul>
+</div>
+</body>
+</html>

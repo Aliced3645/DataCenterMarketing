@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: pycap
+Version: 0.1.6
+Summary: Python libpcap wrapper
+Home-page: http://pycap.sourceforge.net/
+Author: Mark Rowe
+Author-email: bdash@clear.net.nz
+License: BSD
+Description: UNKNOWN
+Platform: UNKNOWN

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.2.8: http://docutils.sourceforge.net/" />
+<title>Python Packet Capture and Injection Library</title>
+<meta name="author" content="Mark Rowe" />
+<link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="python-packet-capture-and-injection-library">
+<h1 class="title">Python Packet Capture and Injection Library</h1>
+<h2 class="subtitle" id="reference-documentation">Reference Documentation</h2>
+<table class="docinfo" frame="void" rules="none">
+<col class="docinfo-name" />
+<col class="docinfo-content" />
+<tbody valign="top">
+<tr><th class="docinfo-name">Author:</th>
+<td>Mark Rowe</td></tr>
+<tr><th class="docinfo-name">Contact:</th>
+<td><a class="first last reference" href="mailto:bdash&#64;gmx.net">bdash&#64;gmx.net</a></td></tr>
+<tr class="field"><th class="docinfo-name">Web site:</th><td class="field-body"><a class="reference" href="http://pycap.sourceforge.net">http://pycap.sourceforge.net</a></td>
+</tr>
+<tr class="field"><th class="docinfo-name">Project page:</th><td class="field-body"><a class="reference" href="http://sourceforge.net/projects/pycap/">http://sourceforge.net/projects/pycap/</a></td>
+</tr>
+</tbody>
+</table>
+<p>This documentation is incomplete, and may possibly be wrong in places. 
+If there is anything that needs clarification, feel free to email me.</p>
+<div class="section" id="class-pycap">
+<h1><a name="class-pycap">Class <tt class="literal"><span class="pre">pycap</span></tt></a></h1>
+<p><tt class="literal"><span class="pre">pycap(device,</span> <span class="pre">filename,</span> <span class="pre">snaplen,</span> <span class="pre">promisc,</span> <span class="pre">timeout)</span></tt></p>
+<blockquote>
+<p>All parameters are optional.</p>
+<dl>
+<dt>device</dt>
+<dd>The device name to capture packets from.  If omitted a default device
+is selected by libpcap.</dd>
+<dt>filename</dt>
+<dd>A packet capture file to read data from.</dd>
+<dt>snaplen</dt>
+<dd>The maximum length of data to capture in bytes.  Defaults to 65535.</dd>
+<dt>promisc</dt>
+<dd>Boolean value specifying whether to put the interface into promiscuous mode.</dd>
+<dt>timeout</dt>
+<dd>The read timeout specified in milliseconds.  Defaults to 255.</dd>
+</dl>
+</blockquote>
+<div class="section" id="methods">
+<h2><a name="methods">Methods</a></h2>
+<p><tt class="literal"><span class="pre">next()</span></tt></p>
+<blockquote>
+<p>Returns the next packet captured from the interface.  The packet is
+returned as a tuple of variable length with the last element being
+the time it was captured.  The other elements are protocol headers
+in order from lowest-level to highest-level, followed by the
+remaining unparsed data.</p>
+<p>Raises <tt class="literal"><span class="pre">pycap.error</span></tt> if the read timeout is reached.</p>
+</blockquote>
+<p><tt class="literal"><span class="pre">stats()</span></tt></p>
+<blockquote>
+Returns a tuple containing the number of packets received, the
+number dropped, and the number dropped by the interface.</blockquote>
+<p><tt class="literal"><span class="pre">datalink()</span></tt></p>
+<blockquote>
+Returns the datalink type as an integer.</blockquote>
+<p><tt class="literal"><span class="pre">filter(filter)</span></tt></p>
+<blockquote>
+Specify a filter which will be applied to all received packets.  The syntax for the <tt class="literal"><span class="pre">filter</span></tt> argument is documented in the <a class="reference" href="http://www.tcpdump.org/tcpdump_man.html">tcpdump manpage</a>.</blockquote>
+</div>
+<div class="section" id="members">
+<h2><a name="members">Members</a></h2>
+<p><tt class="literal"><span class="pre">device</span></tt></p>
+<blockquote>
+The device that libpcap is capturing from.</blockquote>
+<p><tt class="literal"><span class="pre">filename</span></tt></p>
+<blockquote>
+The filename that libpcap is capturing from, or <tt class="literal"><span class="pre">None</span></tt> if it is not reading from file.</blockquote>
+</div>
+</div>
+<div class="section" id="ethernet">
+<h1><a name="ethernet">Ethernet</a></h1>
+<div class="section" id="id1">
+<h2><a name="id1">Members</a></h2>
+<p><tt class="literal"><span class="pre">source</span></tt></p>
+<blockquote>
+The MAC address of the network card that sent this packet.</blockquote>
+<p><tt class="literal"><span class="pre">destination</span></tt></p>
+<blockquote>
+The MAC address of the network card that this packet is destined for.</blockquote>
+<p><tt class="literal"><span class="pre">type</span></tt></p>
+<blockquote>
+An integer representing the type of protocol that is encapsulated in this Ethernet packet.</blockquote>
+<p><tt class="literal"><span class="pre">packet</span></tt></p>
+<blockquote>
+The raw packet data as a string.</blockquote>
+</div>
+</div>
+<div class="section" id="arp">
+<h1><a name="arp">ARP</a></h1>
+<p>The purpose of the <a class="reference" href="http://www.faqs.org/rfcs/rfc826.html">Address Resolution Protocol</a> is to present a
+method of converting Protocol Addresses (e.g., IP addresses) to Local
+Network Addresses (e.g., Ethernet addresses).</p>
+<div class="section" id="id3">
+<h2><a name="id3">Members</a></h2>
+<p><tt class="literal"><span class="pre">protocol</span></tt></p>
+<blockquote>
+The protocol for the requested address.</blockquote>
+<p><tt class="literal"><span class="pre">operation</span></tt></p>
+<blockquote>
+The type of ARP operation that is requested.</blockquote>
+<p><tt class="literal"><span class="pre">hardwarelength</span></tt></p>
+<blockquote>
+The length of a hardware address.</blockquote>
+<p><tt class="literal"><span class="pre">protocollength</span></tt></p>
+<blockquote>
+The length of a protocol address.</blockquote>
+<p><tt class="literal"><span class="pre">hardwareformat</span></tt></p>
+<blockquote>
+The type of hardware the packet is being sent over.</blockquote>
+<p><tt class="literal"><span class="pre">sourcehardware</span></tt></p>
+<blockquote>
+The hardware address of the computer sending this packet.</blockquote>
+<p><tt class="literal"><span class="pre">targethardware</span></tt></p>
+<blockquote>
+The hardware address of the target computer.</blockquote>
+<p><tt class="literal"><span class="pre">sourceprotocol</span></tt></p>
+<blockquote>
+The protocol address of the computer sending this packet.</blockquote>
+<p><tt class="literal"><span class="pre">targetprotocol</span></tt></p>
+<blockquote>
+The protocol address of the target computer.</blockquote>
+<p><tt class="literal"><span class="pre">packet</span></tt></p>
+<blockquote>
+The raw packet data as a string.</blockquote>
+</div>
+</div>
+</div>
+</body>
+</html>

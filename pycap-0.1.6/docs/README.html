@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.2.8: http://docutils.sourceforge.net/" />
+<title>Python Packet Capture and Injection Library</title>
+<meta name="author" content="Mark Rowe" />
+<link rel="stylesheet" href="default.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="python-packet-capture-and-injection-library">
+<h1 class="title">Python Packet Capture and Injection Library</h1>
+<table class="docinfo" frame="void" rules="none">
+<col class="docinfo-name" />
+<col class="docinfo-content" />
+<tbody valign="top">
+<tr><th class="docinfo-name">Author:</th>
+<td>Mark Rowe</td></tr>
+<tr><th class="docinfo-name">Contact:</th>
+<td><a class="first last reference" href="mailto:bdash&#64;gmx.net">bdash&#64;gmx.net</a></td></tr>
+<tr class="field"><th class="docinfo-name">Web site:</th><td class="field-body"><a class="reference" href="http://pycap.sourceforge.net">http://pycap.sourceforge.net</a></td>
+</tr>
+<tr class="field"><th class="docinfo-name">Project page:</th><td class="field-body"><a class="reference" href="http://sourceforge.net/projects/pycap/">http://sourceforge.net/projects/pycap/</a></td>
+</tr>
+</tbody>
+</table>
+<p>This package provides the ability to capture packets from network
+interfaces.  It dissects commonly found structures in network packets
+such as Ethernet, <a class="reference" href="http://www.faqs.org/rfcs/rfc791.html">IP</a>, <a class="reference" href="http://www.faqs.org/rfcs/rfc826.html">ARP</a>, <a class="reference" href="http://www.faqs.org/rfcs/rfc793.html">TCP</a>, <a class="reference" href="http://www.faqs.org/rfcs/rfc768.html">UDP</a>, and <a class="reference" href="http://www.faqs.org/rfcs/rfc792.html">ICMP</a> headers.</p>
+<div class="section" id="supported-platforms">
+<h1><a name="supported-platforms">Supported Platforms</a></h1>
+<p><tt class="literal"><span class="pre">pycap</span></tt> should work on any platform that supports <a class="reference" href="http://www.tcpdump.org">libpcap</a>, <a class="reference" href="http://www.packetfactory.net/libnet/">libnet</a> and
+<a class="reference" href="http://www.python.org">Python</a>.  It currently requires Python 2.3.  It will be backported to
+Python 2.2 if enough interest is shown. If you find any bugs please
+report them on the <a class="reference" href="https://sourceforge.net/projects/pycap/">Sourceforge project page</a>.</p>
+</div>
+<div class="section" id="to-do">
+<h1><a name="to-do">To Do</a></h1>
+<p>Packet injection is currently a work in progress.  It is known to be
+broken, and should hopefully be working soon.  A full list of things
+left to complete is available on a <a class="reference" href="http://pycap.sourceforge.net/todo.html">separate page</a>.</p>
+</div>
+<div class="section" id="installation">
+<h1><a name="installation">Installation</a></h1>
+<p><tt class="literal"><span class="pre">pycap</span></tt> is available from CVS, or from its <a class="reference" href="https://sourceforge.net/projects/pycap/">Sourceforge project
+page</a>.  Installing <tt class="literal"><span class="pre">pycap</span></tt> from the released tarball requires
+extracting the file then executing the following commands.</p>
+<pre class="literal-block">
+% python setup.py build
+% sudo python setup.py install
+</pre>
+<p>To obtain and install <tt class="literal"><span class="pre">pycap</span></tt> from CVS follow these steps,
+adjusting for your platform as necessary.  Note that the CVS password
+is empty.</p>
+<pre class="literal-block">
+% cvs -d:pserver:anonymous&#64;cvs.sourceforge.net:/cvsroot/pycap login 
+(Logging in to anonymous&#64;cvs.sourceforge.net)
+CVS password:
+% cvs -z3 -d:pserver:anonymous&#64;cvs.sourceforge.net:/cvsroot/pycap co pycap
+% cd pycap/
+% python setup.py build
+% sudo python setup.py install
+</pre>
+</div>
+<div class="section" id="details">
+<h1><a name="details">Details</a></h1>
+<p>Note that <a class="reference" href="http://www.tcpdump.org">libpcap</a> and <a class="reference" href="http://www.packetfactory.net/libnet/">libnet</a> may require superuser access to capture packets.</p>
+</div>
+<div class="section" id="example">
+<h1><a name="example">Example</a></h1>
+<pre class="doctest-block">
+&gt;&gt;&gt; import pycap.capture
+&gt;&gt;&gt; p = pycap.capture.capture()
+&gt;&gt;&gt; packet = p.next()
+&gt;&gt;&gt; packet
+(Ethernet(type=0x800, 00:03:93:44:a9:92 -&gt; 00:50:ba:8f:c4:5f), IP(proto=0x6, 192.168.0.235 -&gt; 64.12.24.129),
+ TCP(57579 -&gt; 5190, seq=0xc1600e16, ack=0xf481e20e, flags=(push, ack)), '*\x05\x01\xff\x00\x00', 
+ 1046153559.33903)
+&gt;&gt;&gt; packet[0]
+Ethernet(type=0x800, 00:03:93:44:a9:92 -&gt; 00:50:ba:8f:c4:5f)
+&gt;&gt;&gt; dir(packet[0])
+['__class__', '__delattr__', '__doc__', '__getattribute__', '__hash__', '__init__', '__new__', '__reduce__',
+ '__reduce_ex__', '__repr__', '__setattr__', '__str__', 'destination', 'packet', 'source', 'type']
+&gt;&gt;&gt; packet[0].source
+'00:03:93:44:a9:92'
+&gt;&gt;&gt; dir(packet[1])
+['__class__', '__delattr__', '__doc__', '__getattribute__', '__hash__', '__init__', '__new__', '__reduce__',
+ '__reduce_ex__', '__repr__', '__setattr__', '__str__', 'checksum', 'destination', 'headerlength', 'id',
+ 'length', 'offset', 'packet', 'protocol', 'source', 'timetolive', 'typeofservice', 'version']
+&gt;&gt;&gt; packet[1].version
+4
+&gt;&gt;&gt; 
+</pre>
+</div>
+<div class="section" id="reference">
+<h1><a name="reference">Reference</a></h1>
+<p><a class="reference" href="http://pycap.sourceforge.net/docs.html">Reference documentation</a> is severely lacking.  If there is anything
+that you would like an explantion on feel free to email me or file a
+bug report on it.</p>
+</div>
+</div>
+</body>
+</html>

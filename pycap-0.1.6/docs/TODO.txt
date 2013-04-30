@@ -1,0 +1,29 @@
+=============================================
+ Python Packet Capture and Injection Library
+=============================================
+-------
+TODO
+-------
+
+:Author: Mark Rowe
+:Contact: bdash@gmx.net
+:Web site: http://pycap.sourceforge.net
+:Project page: http://sourceforge.net/projects/pycap/
+
+* Get compilation under Python 2.2 working again.
+* Finish support for packet construction and injection via libnet_.  All protocols
+  except UDP and ICMP are implemented, but need more testing.
+* Support more protocol types, such as DNS_ and IPv6_.
+* Test on more architectures.  Currently tested on Mac OS X/PPC and
+  Linux/x86.
+* Write full documentation for the module.
+* Come up with better system for documentation.
+* Make this work on Windows.  I briefly struggled with compiling using VC7 under Win XP
+  using winpcap_ and LibnetNT_.  No luck, and was getting some rather interesting errors
+  about missing header files which appeared to be where they should be :-/.
+
+.. _DNS: http://www.faqs.org/rfcs/rfc1034.html
+.. _IPv6: http://www.faqs.org/rfcs/rfc2470.html
+.. _libnet: http://www.packetfactory.net/libnet/
+.. _winpcap: http://winpcap.polito.it/
+.. _libnetNT: http://www.eeye.com/html/Research/Tools/libnetnt.html

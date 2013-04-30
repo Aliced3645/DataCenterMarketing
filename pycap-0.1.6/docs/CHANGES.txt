@@ -1,0 +1,25 @@
+=============================================
+ Python Packet Capture and Injection Library
+=============================================
+-----------
+Change Log
+-----------
+
+:Author: Mark Rowe
+:Contact: bdash@gmx.net
+:Web site: http://pycap.sourceforge.net
+:Project page: http://sourceforge.net/projects/pycap/
+
+
+Whats new in ``pycap`` 0.1.5
+----------------------------
+* Packet injection works for Ethernet, ARP, IP and TCP.
+* Capture objects can be used as an iterator allowing code such as the following:
+
+  >>> import pycap.capture
+  >>> capture = pycap.capture.capture()
+  >>> for packet in capture:
+  ...   print packet
+  >>>
+
+* ``pycap.constants`` package that contains constants for various protocols.

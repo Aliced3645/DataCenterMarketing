@@ -1,0 +1,162 @@
+=============================================
+ Python Packet Capture and Injection Library
+=============================================
+---------------------------------------
+ Reference Documentation
+---------------------------------------
+
+:Author: Mark Rowe
+:Contact: bdash@gmx.net
+:Web site: http://pycap.sourceforge.net
+:Project page: http://sourceforge.net/projects/pycap/
+
+This documentation is incomplete, and may possibly be wrong in places. 
+If there is anything that needs clarification, feel free to email me.
+
+Class ``pycap``
+--------------------------
+``pycap(device, filename, snaplen, promisc, timeout)``
+
+  All parameters are optional.
+
+  device
+    The device name to capture packets from.  If omitted a default device
+    is selected by libpcap.
+
+  filename
+    A packet capture file to read data from.
+
+  snaplen
+    The maximum length of data to capture in bytes.  Defaults to 65535.
+
+  promisc
+    Boolean value specifying whether to put the interface into promiscuous mode.
+
+  timeout
+    The read timeout specified in milliseconds.  Defaults to 255.
+
+
+Methods
+=======
+
+``next()``
+
+  Returns the next packet captured from the interface.  The packet is
+  returned as a tuple of variable length with the last element being
+  the time it was captured.  The other elements are protocol headers
+  in order from lowest-level to highest-level, followed by the
+  remaining unparsed data.
+
+  Raises ``pycap.error`` if the read timeout is reached.
+
+
+``stats()``
+
+  Returns a tuple containing the number of packets received, the
+  number dropped, and the number dropped by the interface.
+
+
+``datalink()``
+
+  Returns the datalink type as an integer.
+
+
+``filter(filter)``
+
+  Specify a filter which will be applied to all received packets.  The syntax for the ``filter`` argument is documented in the `tcpdump manpage`_.
+
+Members
+=======
+``device``
+  
+  The device that libpcap is capturing from.
+
+
+``filename``
+
+  The filename that libpcap is capturing from, or ``None`` if it is not reading from file.
+
+
+
+Ethernet
+--------
+
+Members
+=======
+
+``source``
+ 
+  The MAC address of the network card that sent this packet.
+
+``destination``
+
+  The MAC address of the network card that this packet is destined for.
+
+``type``
+
+  An integer representing the type of protocol that is encapsulated in this Ethernet packet.
+
+``packet``
+
+  The raw packet data as a string.
+
+
+ARP
+---
+
+The purpose of the `Address Resolution Protocol`__ is to present a
+method of converting Protocol Addresses (e.g., IP addresses) to Local
+Network Addresses (e.g., Ethernet addresses).
+
+__ ARP_
+
+Members
+=======
+
+``protocol``
+
+  The protocol for the requested address.
+
+``operation``
+
+  The type of ARP operation that is requested.
+
+``hardwarelength``
+
+  The length of a hardware address.
+
+``protocollength``
+
+  The length of a protocol address.
+
+``hardwareformat``
+  
+  The type of hardware the packet is being sent over.
+
+``sourcehardware``
+
+  The hardware address of the computer sending this packet.
+
+``targethardware``
+
+  The hardware address of the target computer.
+
+``sourceprotocol``
+
+  The protocol address of the computer sending this packet.
+
+``targetprotocol``
+
+  The protocol address of the target computer.
+
+``packet``
+
+  The raw packet data as a string.
+
+
+.. _tcpdump manpage: http://www.tcpdump.org/tcpdump_man.html
+.. _IP: http://www.faqs.org/rfcs/rfc791.html
+.. _TCP: http://www.faqs.org/rfcs/rfc793.html
+.. _UDP: http://www.faqs.org/rfcs/rfc768.html
+.. _ICMP: http://www.faqs.org/rfcs/rfc792.html
+.. _ARP: http://www.faqs.org/rfcs/rfc826.html
