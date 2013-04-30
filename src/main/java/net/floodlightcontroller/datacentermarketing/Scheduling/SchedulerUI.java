@@ -41,125 +41,156 @@ import javax.swing.JMenuBar;
  */
 public class SchedulerUI extends JDialog {
 
-    public void doRepaint() {
+	public static volatile boolean showQueue = false;
+	public static volatile boolean showPort = false;
+	public static volatile boolean showSwitch = false;
 
-	repaint();
-    }
+	private final int width = 1000;
 
-    /*
-     * public void step(String[] args) {
-     * 
-     * System.out.println("\n\n\t\t\33333333"); try {
-     * UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
-     * catch (Exception e) { e.printStackTrace(); } try { FlowUI dialog = new
-     * FlowUI(); dialog.setTitle("Datacenter Control Panel");
-     * dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-     * dialog.setVisible(true); } catch (Exception e) { e.printStackTrace(); } }
-     */
+	private final int height = 10000;
 
-    private int width = 1000;
+	private int thick = 2;
 
-    long endTimeOffset = 1000;
+	public void doRepaint() {
 
-    private class MainCanvas extends JPanel {
-
-	public MainCanvas() {
-	    super();
-	    // TODO Auto-generated constructor stub
-	    setOpaque(false);
-	    setPreferredSize(new Dimension(600, 2000));
-	    setBackground(Color.BLACK);
-	    setBorder(BorderFactory.createLineBorder(Color.RED));
+		repaint();
 	}
 
-	public void paintComponent(Graphics g) {
-	    super.paintComponent(g);
+	/*
+	 * public void step(String[] args) {
+	 * 
+	 * System.out.println("\n\n\t\t\33333333"); try {
+	 * UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
+	 * catch (Exception e) { e.printStackTrace(); } try { FlowUI dialog = new
+	 * FlowUI(); dialog.setTitle("Datacenter Control Panel");
+	 * dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	 * dialog.setVisible(true); } catch (Exception e) { e.printStackTrace(); } }
+	 */
 
-	    Scheduler.getInstance()
-		    .visualize(
-			    g,
-			    width,
-			    endTimeOffset
-				    + BiddingClock.getInstance()
-					    .getCurrentTime());
+	long endTimeOffset = 1000;
 
+	private class MainCanvas extends JPanel {
+
+		public MainCanvas() {
+			super();
+			// TODO Auto-generated constructor stub
+			setOpaque(false);
+			setPreferredSize(new Dimension(width, height));
+			setBackground(Color.white);
+			setBorder(BorderFactory.createLineBorder(Color.yellow));
+		}
+
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+
+			g.setColor(Color.black);
+			g.fillRect(0, 0, width, height);
+
+			Scheduler.getInstance()
+					.visualize(
+							g,
+							width,
+							endTimeOffset
+									+ BiddingClock.getInstance()
+											.getCurrentTime(), thick);
+
+		}
 	}
-    }
 
-    public SchedulerUI() {
-	try {
-	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	} catch (Exception e) {
-	    e.printStackTrace();
+	public SchedulerUI() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		setBounds(150, 100, width, height);
+		System.out.println("\n\n\t\t\t222222222");
+
+		JMenuBar menuBar = new JMenuBar();
+		menuBar.setToolTipText("Mwnu");
+		menuBar.setBounds(0, 0, width, 10);
+		getContentPane().add(menuBar, BorderLayout.NORTH);
+
+		MainCanvas mainFrame = new MainCanvas();
+
+		JScrollPane scrollPane = new JScrollPane(mainFrame,
+				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+		getContentPane().add(scrollPane, BorderLayout.CENTER);
+
+		// control
+		JPanel controlPane = new JPanel();
+		getContentPane().add(controlPane, BorderLayout.SOUTH);
+
+		JComboBox showClient = new JComboBox();
+		showClient.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		showClient.setToolTipText("Choose the client to highlight");
+		showClient.setModel(new DefaultComboBoxModel(new String[] { "0", "1",
+				"2", "3", "4" }));
+		showClient.setSelectedIndex(0);
+		showClient.setEditable(true);
+		controlPane.add(showClient);
+
+		JRadioButton swl = new JRadioButton("Show Switch");
+		swl.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				showSwitch = !showSwitch;
+				repaint();
+			}
+		});
+		controlPane.add(swl);
+
+		JRadioButton ptl = new JRadioButton("Show Port");
+		ptl.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showPort = !showPort;
+				repaint();
+			}
+		});
+		controlPane.add(ptl);
+
+		JRadioButton ql = new JRadioButton("Show Queue");
+		ql.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showQueue = !showQueue;
+				repaint();
+			}
+		});
+		controlPane.add(ql);
+
+		final JSlider scale = new JSlider();
+		scale.setValue(2);
+		scale.setMaximum(10);
+		scale.setMinimum(1);
+		scale.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				thick = scale.getValue();
+				repaint();
+			}
+		});
+		scale.setToolTipText("thick");
+		controlPane.add(scale);
+
+		final JSlider speed = new JSlider();
+		speed.setValue(1 );
+		speed.setMinimum(1 );
+		speed.setMaximum(15);
+		speed.setPaintTicks(true);
+		speed.setPaintLabels(true);
+		speed.setPaintLabels(true);
+		speed.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				endTimeOffset = speed.getValue()*1000;
+				repaint();
+			}
+		});
+		speed.setToolTipText("scale");
+		controlPane.add(speed);
 	}
-	setBounds(150, 100, 1000, 600);
-	System.out.println("\n\n\t\t\t222222222");
-
-	JMenuBar menuBar = new JMenuBar();
-	menuBar.setToolTipText("Mwnu");
-	menuBar.setBounds(0, 0, 1000, 10);
-	getContentPane().add(menuBar, BorderLayout.NORTH);
-
-	MainCanvas mainFrame = new MainCanvas();
-
-	JScrollPane scrollPane = new JScrollPane(mainFrame,
-		JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-		JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-
-	getContentPane().add(scrollPane, BorderLayout.CENTER);
-
-	// control
-	JPanel controlPane = new JPanel();
-	getContentPane().add(controlPane, BorderLayout.SOUTH);
-
-	JComboBox showClient = new JComboBox();
-	showClient.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent arg0) {
-	    }
-	});
-	showClient.setToolTipText("Choose the client to highlight");
-	showClient.setModel(new DefaultComboBoxModel(new String[] { "0", "1",
-		"2", "3", "4" }));
-	showClient.setSelectedIndex(0);
-	showClient.setEditable(true);
-	controlPane.add(showClient);
-
-	JRadioButton swl = new JRadioButton("Show Switch");
-	swl.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
-	    }
-	});
-	controlPane.add(swl);
-
-	JRadioButton ptl = new JRadioButton("Show Port");
-	ptl.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
-	    }
-	});
-	controlPane.add(ptl);
-
-	JRadioButton ql = new JRadioButton("Show Queue");
-	ql.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
-	    }
-	});
-	controlPane.add(ql);
-
-	JSlider scale = new JSlider();
-	scale.addChangeListener(new ChangeListener() {
-	    public void stateChanged(ChangeEvent arg0) {
-	    }
-	});
-	scale.setToolTipText("scale");
-	controlPane.add(scale);
-
-	JSlider speed = new JSlider();
-	speed.addChangeListener(new ChangeListener() {
-	    public void stateChanged(ChangeEvent e) {
-	    }
-	});
-	speed.setToolTipText("spped");
-	controlPane.add(speed);
-    }
 
 }

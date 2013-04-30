@@ -105,7 +105,8 @@ public class Queue {
 	}
 
 	/* draw a line for the reserved bandwidth */
-	public int visualize(Graphics g, int vertical, int width, long endTime) {
+	public int visualize(Graphics g, int vertical, int width, long endTime,
+			int thick) {
 		// for test only
 		addRandomAllocation(width, endTime);
 
@@ -114,9 +115,10 @@ public class Queue {
 		Color back = g.getColor();
 
 		// step draw back ground
-		g.setColor(Color.red);
-		g.drawLine(0, vertical, width, vertical);
-
+		if (SchedulerUI.showQueue) {
+			g.setColor(Color.white);
+			g.fillRect(0, vertical, width, thick);
+		}
 		if (reservations != null) {
 			// now draw the allocations
 			for (Allocation alloc : reservations) {
@@ -125,18 +127,18 @@ public class Queue {
 						|| alloc.from > endTime) {
 					continue;
 				}
-				drawAllocation(alloc, g, vertical, width, endTime);
+				drawAllocation(alloc, g, vertical, width, endTime, thick);
 
 			}
 		}
 		g.setColor(back);
 
-		return 3;
+		return thick + 2 * (1 + (int) (thick / 3));
 
 	}
 
 	private void drawAllocation(Allocation alloc, Graphics g, int vertical,
-			int width, long endTime) {
+			int width, long endTime, int thick) {
 
 		// 1. calculate the length of the line
 		int length = (int) (width * alloc.getDuration() / (endTime - BiddingClock
@@ -148,19 +150,19 @@ public class Queue {
 
 		// 3. get the color of the allocation , according bandwidth usage
 		g.setColor(getAllocColor(alloc));
-		g.drawLine(startX, vertical, startX + length, vertical);
-
+		// g.drawLine(startX, vertical, startX + length, vertical);
+		g.fillRect(startX, vertical, startX + length, thick);
 	}
 
 	private Color getAllocColor(Allocation alloc) {
 		/* return Color.blue; */
 		try {
 			if (alloc.direction == ADirection.IN)
-				return new Color(255 * alloc.bandwidth / portCap, 0, 0);
+				return new Color((float) alloc.bandwidth / portCap, 0, 0);
 			else if (alloc.direction == ADirection.OUT)
-				return new Color(0, 0, 255 * alloc.bandwidth / portCap);
+				return new Color(0, 0, (float) alloc.bandwidth / portCap);
 			else
-				return new Color(0, 255 * alloc.bandwidth / portCap, 0);
+				return new Color(0, (float) alloc.bandwidth / portCap, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Color.blue;
