@@ -16,15 +16,6 @@ public class BiddingClock implements Runnable {
 	// performs as a thread to take care of time
 	// send hint to auctioneer when the auction cycle begins/ends
 
-	// Singleton
-	ActionListener roundCleaner = new ActionListener() {
-		public void actionPerformed(ActionEvent evt) {
-			// pause the ticker when computing the allocations
-			// time is up
-
-		}
-	};
-
 	ActionListener ticker = new ActionListener() {
 
 		@Override
@@ -33,8 +24,10 @@ public class BiddingClock implements Runnable {
 				currentTime++;
 			}
 			if (currentTime % roundTime == 0) {
+				
+				tickTimer.stop();
 				Auctioneer.getInstance().setBusy();
-
+				
 				try {
 					Auctioneer.getInstance().computeAllocation();
 				} catch (IOException e1) {
@@ -66,6 +59,7 @@ public class BiddingClock implements Runnable {
 				Auctioneer.getInstance().clearRound();
 				// a new round
 				Auctioneer.getInstance().round++;
+				tickTimer.start();
 			}
 		}
 
@@ -89,7 +83,7 @@ public class BiddingClock implements Runnable {
 	}
 
 	// in milliseconds
-	int roundTime = 200;
+	int roundTime = 100;
 	int tick = 100;
 	private Timer biddingTimer;
 	private Timer tickTimer;

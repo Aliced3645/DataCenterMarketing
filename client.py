@@ -11,6 +11,8 @@ import datetime
 import pcapy
 import sys
 
+
+
 parser = argparse.ArgumentParser(description='Client')
 parser.add_argument('-interface', dest='interface', action='store', help='Network card Interface connected to swtich')
 parser.add_argument('-id', dest='bidderID', action='store', help='ID for the bidder, e.g., mike')
@@ -44,8 +46,8 @@ def randomRequestGenerator():
     start = random.randint(0,1000)
     end = random.randint(start, 2000)
     latency = random.randint(1000000, 10000000)
-    l = 100000000
-    randomJson = constructBidString(value, destID, minRate, data, start, end, l)
+    latencyq = 100000000
+    randomJson = constructBidString(value, 2, minRate, data, start, end,latencyq)
     return randomJson
 
 def eth_addr (a) :
@@ -96,9 +98,13 @@ def sniffing():
         result = parse_packet(packet)
         if result is not None:
             lastFetched = result
-            break
+            thread.exit()
 
+def udpListen():
+    
+    return
 
+    
 if __name__ == "__main__":
     
     while True:
@@ -117,3 +123,9 @@ if __name__ == "__main__":
         p.join()
         
         print lastFetched
+        
+        #parse the result
+        if lastFetched[0:3] == 'Yes':
+            print 'ready to send UDP flows'
+            
+        

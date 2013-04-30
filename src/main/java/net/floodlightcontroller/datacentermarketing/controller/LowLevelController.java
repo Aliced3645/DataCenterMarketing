@@ -402,8 +402,7 @@ public class LowLevelController implements IOFSwitchListener,
 				.setPayload(new Data(payLoad.getBytes()));
 
 		Ethernet ethernet = (Ethernet) new Ethernet()
-				.setSourceMACAddress(
-						outSwitch.getPort((short) 1).getHardwareAddress())
+				.setSourceMACAddress(device.getMACAddressString())
 				.setDestinationMACAddress(device.getMACAddressString())
 				.setEtherType(Ethernet.TYPE_IPv4).setPayload(probe);
 
