@@ -163,7 +163,7 @@ public class Port {
 			if (allocated == null) {
 				s.add(a);
 			} else {
-				if (allocated.direction != allocation.direction) {
+				if (allocated.direction != allocation.direction && type==Port_Type.HALF_DUPLEX) {
 					if (usedBandwidthHolder != null) {
 						usedBandwidthHolder.setHd(0f);
 					}
