@@ -97,10 +97,20 @@ public class SwitchAddInfo {
 	 */
 
 	public Port getPort(int i) {
-		if (i >= ports.length)
-			return null;
+		/*
+		 * if (i >= ports.length) return null;
+		 * 
+		 * return ports[i];
+		 */
+		for (Port port : ports) {
 
-		return ports[i];
+			if (port.id == i)
+				return port;
+
+		}
+
+		return null;
+
 	}
 
 	public int visualize(Graphics g, int vertical, int width, long endTime,
@@ -128,7 +138,7 @@ public class SwitchAddInfo {
 			g.setColor(Color.blue);
 			g.fillRect(width - 40, vertical, 20, usedHeight);
 			g.setColor(Color.green);
-			g.drawString(this.id + "", width - 40, vertical+25);
+			g.drawString(this.id + "", width - 40, vertical + 25);
 			g.setColor(back);
 
 		}
