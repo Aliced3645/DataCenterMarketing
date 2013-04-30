@@ -29,6 +29,8 @@ public class BidRequest implements Serializable{
 	private long sourceID;
 	private long destID;
 	
+	public boolean valid = false;
+	
 	//a key-value pair list for resource and required amount
 	private HashMap<Resource, Float> requiredResources;
 	
@@ -66,19 +68,25 @@ public class BidRequest implements Serializable{
 		//For each route, ping for them.
 		for(Route rt : possibleRoutes){
 			//probe one time now
-			MarketManager.getInstance().getLowLevelController().probeLatency(rt, true);
-			
-			synchronized(this){
-				this.wait(); // block until being waken up
+			boolean res = MarketManager.getInstance().getLowLevelController().probeLatency(rt, true);
+			if(res){
+				synchronized(this){
+					this.wait(); // block until being waken up
+				}
+			}
+			else{
+				this.verifiedRoutes.clear();
+				return;
 			}
 			/**
 			 * waken up, now the probed latency has been set
 			 */
-			System.out.println("\n\n\nWAKEN UP!!!!! " +this.probedLatency +"\n\n\n");
-			// compare the latency
 			float requiredLatency = this.requiredResources.get(Resource.LATENCY);
+			System.out.println("\n\n\nWAKEN UP!!!!! " +this.probedLatency + " Required" + requiredLatency);
+			// compare the latency
 			if(requiredLatency > this.probedLatency){
 				//pass
+				System.out.println("HEYHEYHEY\n\n\n\n\n");
 				verifiedRoutes.add(rt);
 			}
 		}

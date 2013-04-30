@@ -367,45 +367,6 @@ public class LowLevelController implements IOFSwitchListener,
 		return routes;
 	}
 
-	// /**
-	// * flow pusher to reserve a route
-	// *
-	// * @param {Route} route the route to reserve
-	// * @param {long} bandwidth the bandwidth to reserve
-	// */
-	// private void pushFlow(Route route, long bandwidth) {
-	// //generate a random flow
-	// String srcIp = IPv4.fromIPv4Address(flowCount);
-	// String dstIp = IPv4.fromIPv4Address(flowCount * 2);
-	// ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
-	// OFFlowMod flowMod = new OFFlowMod();
-	// flowMod.setType(OFType.FLOW_MOD);
-	// OFAction outputTo = new OFActionOutput((short) ran.nextInt(30));
-	// actionsTo.add(outputTo);
-	// OFMatch match = new OFMatch();
-	// match.setNetworkDestination(IPv4.toIPv4Address(dstIp));
-	// match.setNetworkSource(IPv4.toIPv4Address(srcIp));
-	// match.setDataLayerType(Ethernet.TYPE_IPv4);
-	// flowMod.setActions(actionsTo);
-	// flowMod.setMatch(match);
-	// //flowMod.setHardTimeout((short)20);
-	// logger.info("pushing the flow:" + ("Flow#" + flowCount
-	// + " srcIp:" + match.getNetworkSource()
-	// + " srcPort:" + match.getTransportSource()
-	// + " dstIp:" + match.getNetworkDestination()
-	// + " dstPort:" + match.getTransportDestination()));
-	// staticFlowEntryPusher.addFlow(("Flow#" + flowCount), flowMod, dp);
-	// flowCount ++;
-	// if(flowCount == TOTAL_FLOWS) {
-	// stop = true;
-	// try {
-	// createRecorder.close();
-	// } catch (IOException e) {
-	// e.printStackTrace();
-	// }
-	// }
-	// }
-	//
 	/**
 	 * debug information
 	 */
@@ -424,75 +385,27 @@ public class LowLevelController implements IOFSwitchListener,
 
 	private void sendPacketOutMessage(String sourceIP, String destIP,
 			IOFSwitch outSwitch, String payLoad, IDevice device, short outport) {
-		
-//
-//		IPv4 probe = new IPv4();
-//		String pplString = "Hello World";
-//		System.out.println("PPL: " + pplString);
-//		probe = (IPv4) probe.setVersion((byte) 4).setDiffServ((byte) 0)
-//				.setIdentification((short) 188).setFlags((byte) 0)
-//				.setFragmentOffset((short) 0).setTtl((byte) 250)
-//				/* .setProtocol(IPv4.PROTOCOL_UDP) */.setChecksum((short) 0)
-//				.setSourceAddress("5.6.7.8").setDestinationAddress("5.6.7.8")
-//				.setPayload(new Data(pplString.getBytes()));
-//
-//		//IOFSwitch iofSwitch = floodlightProvider.getSwitches().get(1);
-//		Ethernet ethernet = (Ethernet) new Ethernet()
-//				.setSourceMACAddress(
-//						outSwitch.getPort((short) 1).getHardwareAddress())
-//				.setDestinationMACAddress(
-//						outSwitch.getPort((short) 3).getHardwareAddress())
-//				.setEtherType(Ethernet.TYPE_IPv4).setPayload(probe);
-//
-//
-//		// needs to create a packet and send to switch
-//		OFPacketOut packetOutMessage = (OFPacketOut) floodlightProvider
-//				.getOFMessageFactory().getMessage(OFType.PACKET_OUT);
-//
-//		short packetOutLength = (short) OFPacketOut.MINIMUM_LENGTH; // starting
-//		// length
-//
-//		// set buffer id to NONE
-//		packetOutMessage.setBufferId(OFPacketOut.BUFFER_ID_NONE);
-//		packetOutMessage.setInPort(OFPort.OFPP_NONE);
-//		packetOutMessage
-//				.setActionsLength((short) OFActionOutput.MINIMUM_LENGTH);
-//		packetOutLength += OFActionOutput.MINIMUM_LENGTH;
-//
-//		// set actions
-//		List<OFAction> actions = new ArrayList<OFAction>(1);
-//		actions.add(new OFActionOutput((short) 1, (short) 0));
-//
-//		packetOutMessage.setActions(actions);
-//
-//		byte[] packetData = /* action.getPacket(); */ethernet.serialize();
-//		packetOutMessage.setPacketData(packetData);
-//		packetOutLength += (short) packetData.length;
-//		packetOutMessage.setLength(packetOutLength);
-//
-//		try {
-//			outSwitch.write(packetOutMessage, null);
-//			outSwitch.flush();
-//		} catch (Exception e) {
-//			log.error("Tried to write OFFlowMod to {} but failed: {}",
-//					HexString.toHexString(outSwitch.getId()), e.getMessage());
-//		}
-		
-		
-		
+
 		IPv4 probe = new IPv4();
-		probe = (IPv4) probe.setVersion((byte) 4).setDiffServ((byte) 0)
-				.setIdentification((short) 188).setFlags((byte) 0)
-				.setFragmentOffset((short) 0).setTtl((byte) 250)
-				/*.setProtocol(IPv4.PROTOCOL_UDP)*/
+		probe = (IPv4) probe
+				.setVersion((byte) 4)
+				.setDiffServ((byte) 0)
+				.setIdentification((short) 188)
+				.setFlags((byte) 0)
+				.setFragmentOffset((short) 0)
+				.setTtl((byte) 250)
+				/* .setProtocol(IPv4.PROTOCOL_UDP) */
 				.setChecksum((short) 0)
-				.setSourceAddress(sourceIP).setDestinationAddress(IPv4.fromIPv4Address(device.getIPv4Addresses()[0]))
+				.setSourceAddress(sourceIP)
+				.setDestinationAddress(
+						IPv4.fromIPv4Address(device.getIPv4Addresses()[0]))
 				.setPayload(new Data(payLoad.getBytes()));
-		
+
 		Ethernet ethernet = (Ethernet) new Ethernet()
-					.setSourceMACAddress(outSwitch.getPort((short) 1).getHardwareAddress())
-					.setDestinationMACAddress(device.getMACAddressString())
-					.setEtherType(Ethernet.TYPE_IPv4).setPayload(probe);
+				.setSourceMACAddress(
+						outSwitch.getPort((short) 1).getHardwareAddress())
+				.setDestinationMACAddress(device.getMACAddressString())
+				.setEtherType(Ethernet.TYPE_IPv4).setPayload(probe);
 
 		// needs to create a packet and send to switch
 		OFPacketOut packetOutMessage = (OFPacketOut) floodlightProvider
@@ -526,51 +439,51 @@ public class LowLevelController implements IOFSwitchListener,
 			log.error("Tried to write OFFlowMod to {} but failed: {}",
 					HexString.toHexString(outSwitch.getId()), e.getMessage());
 		}
-		
-		
-		
+
 	}
 
 	private void installOutRule(String sourceIP, String destIP,
-			IOFSwitch outSwitch, short port, IDevice device) throws IOException, InterruptedException, ExecutionException {
-		
-//		updateSwitches();
-//		//IOFSwitch startSw = switches.get(1);
-//		// action
-//		OFAction outputTo = new OFActionOutput((short)3, (short) 1500);
-//		// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
-//		// controller
-//		// action list
-//		ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
-//		actionsTo.add(outputTo);
-//
-//		String matchString = "nw_dst=5.6.7.8" + "," + "nw_src=5.6.7.8,"
-//				+ "dl_type=" + 0x800;
-//		OFMatch match = new OFMatch();
-//		match.fromString(matchString);
-//		// match.setDataLayerType(Ethernet.TYPE_IPv4);
-//		log.debug("set match " + match.toString());
-//
-//		// flow mod
-//		OFFlowMod flowMod = (OFFlowMod) floodlightProvider
-//				.getOFMessageFactory().getMessage(OFType.FLOW_MOD);
-//
-//		flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
-//				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
-//				.setCookie(AppCookie.makeCookie(0, 0))
-//				.setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
-//				.setActions(actionsTo).setLengthU(OFFlowMod.MINIMUM_LENGTH
-//				// + OFActionNetworkLayerAddress.MINIMUM_LENGTH
-//						+ OFActionOutput.MINIMUM_LENGTH);
-//
-//		flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
-//
-//		log.debug("match in flowmod is now : " + flowMod.getMatch().toString());
-//
-//		writeFlowModToSwitch(outSwitch, flowMod);
-//		sendBarrier(outSwitch);
-		
-		
+			IOFSwitch outSwitch, short port, IDevice device)
+			throws IOException, InterruptedException, ExecutionException {
+
+		// updateSwitches();
+		// //IOFSwitch startSw = switches.get(1);
+		// // action
+		// OFAction outputTo = new OFActionOutput((short)3, (short) 1500);
+		// // outputTo.setLength(Short.MAX_VALUE);// we want whole packet back
+		// to
+		// // controller
+		// // action list
+		// ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
+		// actionsTo.add(outputTo);
+		//
+		// String matchString = "nw_dst=5.6.7.8" + "," + "nw_src=5.6.7.8,"
+		// + "dl_type=" + 0x800;
+		// OFMatch match = new OFMatch();
+		// match.fromString(matchString);
+		// // match.setDataLayerType(Ethernet.TYPE_IPv4);
+		// log.debug("set match " + match.toString());
+		//
+		// // flow mod
+		// OFFlowMod flowMod = (OFFlowMod) floodlightProvider
+		// .getOFMessageFactory().getMessage(OFType.FLOW_MOD);
+		//
+		// flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
+		// .setBufferId(OFPacketOut.BUFFER_ID_NONE)
+		// .setCookie(AppCookie.makeCookie(0, 0))
+		// .setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
+		// .setActions(actionsTo).setLengthU(OFFlowMod.MINIMUM_LENGTH
+		// // + OFActionNetworkLayerAddress.MINIMUM_LENGTH
+		// + OFActionOutput.MINIMUM_LENGTH);
+		//
+		// flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
+		//
+		// log.debug("match in flowmod is now : " +
+		// flowMod.getMatch().toString());
+		//
+		// writeFlowModToSwitch(outSwitch, flowMod);
+		// sendBarrier(outSwitch);
+
 		OFAction outputTo = new OFActionOutput(port, (short) 1500);
 		// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
 		// controller
@@ -578,9 +491,9 @@ public class LowLevelController implements IOFSwitchListener,
 		ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
 		actionsTo.add(outputTo);
 
-		String matchString = "nw_src=" + sourceIP + "," + "nw_dst=" + 
-					IPv4.fromIPv4Address(device.getIPv4Addresses()[0])
-					+ "," + "dl_type=" + 0x800;
+		String matchString = "nw_src=" + sourceIP + "," + "nw_dst="
+				+ IPv4.fromIPv4Address(device.getIPv4Addresses()[0]) + ","
+				+ "dl_type=" + 0x800;
 		OFMatch match = new OFMatch();
 		match.fromString(matchString);
 		// match.setDataLayerType(Ethernet.TYPE_IPv4);
@@ -597,7 +510,9 @@ public class LowLevelController implements IOFSwitchListener,
 				.setCommand(OFFlowMod.OFPFC_ADD)
 				.setMatch(match)
 				.setActions(actionsTo)
-				.setLengthU(OFFlowMod.MINIMUM_LENGTH + OFActionOutput.MINIMUM_LENGTH);
+				.setLengthU(
+						OFFlowMod.MINIMUM_LENGTH
+								+ OFActionOutput.MINIMUM_LENGTH);
 
 		flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
 
@@ -998,12 +913,12 @@ public class LowLevelController implements IOFSwitchListener,
 	}
 
 	// TODO check cache
-
+	
 	// for the first one, we make a packet and send it to the first switch
 	// the last switch send the packet back, as required by an action
-
+	
 	// checks for validatiu
-	public void probeLatency(Route rt, boolean whetherDelete) throws Exception {
+	public boolean probeLatency(Route rt, boolean whetherDelete) throws Exception {
 
 		/*
 		 * // TODO TOREMOVE Scheduler.getInstance().refreshTopo();
@@ -1017,21 +932,20 @@ public class LowLevelController implements IOFSwitchListener,
 		// for the first one, we make a packet and send it to the first switch
 		// the last switch send the packet back, as required by an action
 
-		// checks for validatiu
-
 		if (rt == null) {
 			debug("no route was presented to probe");
-
+			return false;
 		}
 
 		List<NodePortTuple> switchesPorts = rt.getPath();
 
 		if (switchesPorts == null && switchesPorts.size() < 2) {
 			debug("Route length is not right.");
-			return;
+			return false;
 		}
 		if (switchesPorts.size() % 2 == 1) {
 			debug("mismatched switch in-out port number!");
+			return false;
 		}
 
 		// get the first switch
@@ -1193,7 +1107,6 @@ public class LowLevelController implements IOFSwitchListener,
 						startSw.getPort((short) 3).getHardwareAddress())
 				.setEtherType(Ethernet.TYPE_IPv4).setPayload(probe);
 
-
 		// needs to create a packet and send to switch
 		OFPacketOut packetOutMessage = (OFPacketOut) floodlightProvider
 				.getOFMessageFactory().getMessage(OFType.PACKET_OUT);
@@ -1231,6 +1144,7 @@ public class LowLevelController implements IOFSwitchListener,
 			log.error("Tried to write OFFlowMod to {} but failed: {}",
 					HexString.toHexString(startSw.getId()), e.getMessage());
 		}
+		return true;
 	}
 
 	private void finishRouteBenchMark(OFPacketIn msg) {
@@ -1443,7 +1357,25 @@ public class LowLevelController implements IOFSwitchListener,
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	
+	private void pushMessageToHost(long hostID, String content){
+		/* 
+		 * for communication test
+		 */
+		IDevice device = devices.get(hostID);
+		SwitchPort[] ports = device.getAttachmentPoints();
 
+		IOFSwitch comeSwitch = switches.get(ports[0]
+				.getSwitchDPID());
+		short comePort = (short) ports[0].getPort();
+
+		this.sendPacketOutMessage("1.2.3.4", "1.2.3.4",
+				comeSwitch, content, device, comePort);
+		System.out.println("packet sent..");
+		
+	}
+	
 	@Override
 	public net.floodlightcontroller.core.IListener.Command receive(
 			IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
@@ -1459,11 +1391,15 @@ public class LowLevelController implements IOFSwitchListener,
 			IPv4 probe = new IPv4();
 			probe.deserialize(eth.getPayload().serialize(), 0, eth.getPayload()
 					.serialize().length);
-			
+
 			if (IPv4.toIPv4Address("1.2.3.4") == probe.getDestinationAddress()) {
 				finishRouteBenchMark((OFPacketIn) msg);
 			}
-			// request packet from client (from data plane)
+			/**
+			 * request packet from client (from data plane) In the distributed
+			 * version, this is the only way to get bidding request
+			 */
+
 			else if (probe.getDestinationAddress() == IPv4
 					.toIPv4Address("10.0.0.10")) {
 				// parse the bid information
@@ -1471,8 +1407,7 @@ public class LowLevelController implements IOFSwitchListener,
 						.serialize());
 				if (payloadString.equals(previousContent))
 					break;
-				else 
-				{
+				else {
 					previousContent = payloadString;
 					// process the request
 					try {
@@ -1481,27 +1416,31 @@ public class LowLevelController implements IOFSwitchListener,
 						updateDevices();
 						BidRequest bidRequest = BidRequestResource
 								.requestJsonStringToBidRequest(payloadString);
-						// get the user host ID and get the attacted switch
-						long bidderHostID = bidRequest.getSourceID();
-						bidRequest.getBidder().setHostID(bidderHostID);
-						// try to send back a packet..
-						IDevice device = devices.get(bidderHostID);
-						SwitchPort[] ports = device.getAttachmentPoints();
+						if( !bidRequest.valid){
+							//not a valid request JSON
+							//send error message back
+							String errorContent = "This bid request is not valid, man";
+							pushMessageToHost(bidRequest.getSourceID(), errorContent);
+							break;
+						}
 						
-						IOFSwitch comeSwitch = switches.get(ports[0]
-								.getSwitchDPID());
-						short comePort = (short) ports[0].getPort();
+						/* 
+						 * call the function to put verify request by lantency
+						 * and if possible, put into the queue
+						 */
+						bidRequest.verifyPossibleRoutesByLatency();
+						if(bidRequest.getPossibleRoutes().isEmpty()){
+							//no possilbe routes 
+							pushMessageToHost(bidRequest.getSourceID(), "latency probe failure");
+							break;
+						}
+						else{
+							pushMessageToHost(bidRequest.getSourceID(), "latency probe successful");
+							break;
+						}
 						
-						/* install a rule to switch */
-						//installOutRule("1.2.3.4", "1.2.3.4", comeSwitch, comePort, device);
-						
-						/* send a packet */
-						String content = "You cant find me";
-						this.sendPacketOutMessage("1.2.3.4", "1.2.3.4", comeSwitch, content, device, comePort);
-						
-						System.out.println("packet sent..");
-						
-						
+
+
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

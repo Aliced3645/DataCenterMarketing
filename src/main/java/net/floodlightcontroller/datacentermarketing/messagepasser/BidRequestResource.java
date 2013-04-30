@@ -106,7 +106,7 @@ public class BidRequestResource extends ServerResource {
 	            }
 	            else if(name == "Latency"){
 	            	jp.nextToken();
-	            	bidRequest.addRequestField(Resource.LATENCY, jp.getFloatValue());
+	            	bidRequest.addRequestField(Resource.LATENCY, jp.getIntValue());
 	            	bLatency = true;
 	            }
 	            
@@ -117,10 +117,9 @@ public class BidRequestResource extends ServerResource {
 	        
 	        //check if the bidRequest is value by seeing whether minimum set of fields are filled
 	        if(bBidder && bValue && bMinRate && bSID && bDID && bData && bStart && bEnd && bLatency)
-	        	return bidRequest;
-	        else
-	        	//not a valid bid request
-	        	return null;
+	        	bidRequest.valid = true;
+	        
+	        return bidRequest;
 		}
 		
 		@Post
@@ -129,7 +128,7 @@ public class BidRequestResource extends ServerResource {
 		public static void postBidRequest(String bidRequestString) throws Exception{
 			//System.out.println(bidRequestString);
 			BidRequest bidRequest = requestJsonStringToBidRequest(bidRequestString);
-			if(bidRequest == null){
+			if(bidRequest == null || !bidRequest.valid){
 				System.out.println("JSON String format not satisfied");
 				return;
 			}
@@ -149,14 +148,6 @@ public class BidRequestResource extends ServerResource {
 			//push to the auctioneer
 			Auctioneer.getInstance().pushRequest(bidRequest);
 			
-			//for debugging
-			/*
-			HashMap<String,BidRequest> requests = Auctioneer.getInstance().getBidRequestForThisRound();
-			Set<Entry<String,BidRequest>> reqset = requests.entrySet();
-			for(Entry<String, BidRequest> req : reqset){
-				System.out.println(req.getValue());
-			}
-			*/
 			return;
 		}
 		
