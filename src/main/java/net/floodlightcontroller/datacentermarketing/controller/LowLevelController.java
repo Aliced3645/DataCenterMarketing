@@ -484,14 +484,15 @@ public class LowLevelController implements IOFSwitchListener,
 		probe = (IPv4) probe.setVersion((byte) 4).setDiffServ((byte) 0)
 				.setIdentification((short) 188).setFlags((byte) 0)
 				.setFragmentOffset((short) 0).setTtl((byte) 250)
-				/* .setProtocol(IPv4.PROTOCOL_UDP) */.setChecksum((short) 0)
+				/*.setProtocol(IPv4.PROTOCOL_UDP)*/
+				.setChecksum((short) 0)
 				.setSourceAddress(sourceIP).setDestinationAddress(IPv4.fromIPv4Address(device.getIPv4Addresses()[0]))
 				.setPayload(new Data(payLoad.getBytes()));
 		
 		Ethernet ethernet = (Ethernet) new Ethernet()
 					.setSourceMACAddress(outSwitch.getPort((short) 1).getHardwareAddress())
 					.setDestinationMACAddress(device.getMACAddressString())
-				.setEtherType(Ethernet.TYPE_IPv4).setPayload(probe);
+					.setEtherType(Ethernet.TYPE_IPv4).setPayload(probe);
 
 		// needs to create a packet and send to switch
 		OFPacketOut packetOutMessage = (OFPacketOut) floodlightProvider
