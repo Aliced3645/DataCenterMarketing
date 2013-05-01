@@ -43,7 +43,7 @@ public class SwitchAddInfo {
 		}
 
 	}
-
+ 
 	@Override
 	public String toString() {
 		String tr = "";
