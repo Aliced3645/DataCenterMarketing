@@ -91,7 +91,7 @@ def sniffing():
     global lastFetched
     global localBiddingRound
     
-    cap = pcapy.open_live(interface , 65536 , 1 , 0)
+    cap = pcapy.open_live(interface , 65536 , 0 , 0)
     while(1) :
         (header, packet) = cap.next()
         #function to parse a packet
