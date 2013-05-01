@@ -285,7 +285,7 @@ System.exit(-100);
 	}
 
 	// basic functionality begins here..
-	public void updateSwitches() throws IOException, InterruptedException,
+	public synchronized void updateSwitches() throws IOException, InterruptedException,
 			ExecutionException {
 
 		switches.clear();
@@ -310,13 +310,13 @@ System.exit(-100);
 			switches.put(ofSwitch.getId(), ofSwitch);
 
 			// query the switch to get the update..
-			future = ofSwitch.querySwitchFeaturesReply();
-			ofSwitch.flush();
+			//future = ofSwitch.querySwitchFeaturesReply();
+			//ofSwitch.flush();
 		}
 
 	}
 
-	public void updateDevices() {
+	public synchronized void updateDevices() {
 		devices.clear();
 		if (deviceManager == null) {
 			System.out.println("DeviceManager is null");
@@ -328,7 +328,6 @@ System.exit(-100);
 		while (iterator.hasNext()) {
 			IDevice device = iterator.next();
 			devices.put(device.getDeviceKey(), device);
-
 		}
 
 	}
@@ -1362,12 +1361,16 @@ System.exit(-100);
 		return false;
 	}
 
-	public void pushMessageToHost(long hostID, String content) {
+	public void pushMessageToHost(long hostID, String content) throws IOException, InterruptedException, ExecutionException {
 		/*
 		 * for communication test
 		 */
+		updateSwitches();
+		updateDevices();
+		
 		IDevice device = devices.get(hostID);
 		SwitchPort[] ports = device.getAttachmentPoints();
+
 		try {
 
 			IOFSwitch comeSwitch = switches.get(ports[0].getSwitchDPID());
@@ -1386,9 +1389,13 @@ System.exit(-100);
 				System.out
 						.println("The attach points are empty, make updates!");
 				((DeviceManagerImpl) deviceManager).topologyChanged();
-
+				
+				
+				
 			}
-
+			
+			
+			
 			e.printStackTrace();
 
 		}

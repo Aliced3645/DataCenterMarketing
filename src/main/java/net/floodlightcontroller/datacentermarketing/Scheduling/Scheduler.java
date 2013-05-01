@@ -151,7 +151,10 @@ public class Scheduler {
 
 	public boolean validateAndReserveRoute(Route rt, Allocation alloc,
 			boolean reserve) {
-
+		
+		
+		
+		
 		// we need to validate all the possible queue reservations
 		List<NodePortTuple> switchPorts = rt.getPath();
 		for (int a = 0; a < switchPorts.size(); a++) {
