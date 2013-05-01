@@ -78,7 +78,7 @@ public class RouteInstaller {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			try {
-				MarketManager.getInstance().getLowLevelController().installRoute(srcID, destID, rt, bandwidth, (short)(timeout/1000));
+				MarketManager.getInstance().getLowLevelController().installRoute(srcID, destID, rt, bandwidth, (short)(timeout));
 				//tell client that they CAN GO
 				int addressInt = MarketManager.getInstance().getLowLevelController().getDevices().get(destID).getIPv4Addresses()[0];
 				

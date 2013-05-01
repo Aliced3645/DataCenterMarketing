@@ -40,26 +40,28 @@ def constructBidString(value, destID, minRate, data, start, end, latency):
 def randomRequestGenerator():
     #random items to generate:
     value = random.randint(0,1000)
-    destID = random.randint(0,allhosts - 1)
+    destID = random.randint(2,allhosts - 1)
     minRate = random.randint(0, 5000)
     data = random.randint(0,50000)
-    start = random.randint(0,1000)
-    end = random.randint(start, 2000)
+    #relative time..
+    start = random.randint(0,5000)
+    end = random.randint(start, 20000)
     latency = random.randint(1000000, 10000000)
     latencyq = 100000000
-    randomJson = constructBidString(value, 2, minRate, data, start, end,latencyq)
+    randomJson = constructBidString(value, destID, minRate, data, start, end,latencyq)
     return randomJson
 
 def eth_addr (a) :
     b = "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x" % (ord(a[0]) , ord(a[1]) , ord(a[2]), ord(a[3]), ord(a[4]) , ord(a[5]))
     return b
        
+lastFetched = ''
 
 def parse_packet(packet) :
      
     #parse ethernet header
     eth_length = 14
-     
+    global lastFetched    
     eth_header = packet[:eth_length]
     eth = unpack('!6s6sH' , eth_header)
     eth_protocol = socket.ntohs(eth[2])
@@ -79,45 +81,75 @@ def parse_packet(packet) :
          
         #we fetch the response packet
         if str(s_addr) == '1.2.3.4':
-            print "\ntarget fetched!!\n"
             h_size = eth_length + iph_length 
             data = packet[h_size:]
-            fetchedData = data[0:]
-            return fetchedData
+            lastFetched = data[0:]
+            return '1.2.3.4'
         
-lastFetched = ''
+
+        #Reminder from the server that 
+        #the client could start to send packets
+        elif str(s_addr) == '1.2.3.5':
+            h_size = eth_length + iph_length 
+            data = packet[h_size:]
+            lastFetched = data[0:]
+            return '1.2.3.5'
+
 
 def sniffing():
     global lastFetched
     global localBiddingRound
     
-    cap = pcapy.open_live(interface , 65536 , 0 , 0)
+    cap = pcapy.open_live(interface , 65536 , 1 , 0)
     while(1) :
         (header, packet) = cap.next()
         #function to parse a packet
         result = parse_packet(packet)
         if result is not None:
-            lastFetched = result
-            thread.exit()
+            print lastFetched
+            if result == '1.2.3.4':
+                content = randomRequestGenerator()
+                packet = Ether() / IP(dst="10.0.0.255") / content
+                # send
+                sendp(packet, iface=interface, count=1)
+
+
+def sniffingForReminder():
+    return
 
 def udpListen():
-    
     return
 
     
 if __name__ == "__main__":
     
+    p = threading.Thread(target=sniffing)
+    p.start()
+
+
+    #make the first bid
+    content = randomRequestGenerator()
+    print content
+    packet = Ether() / IP(dst="10.0.0.255") / content
+    # send
+    sendp(packet, iface=interface, count=1)
+
+
+    p.join()
+
+'''
     while True:
-        print randomRequestGenerator()
+        content = randomRequestGenerator()
+        print content
         #send scapy packet ...
         #p = threading.Thread(target = replyListener)
         #p.daemon = True
         #p.start()
         p = threading.Thread(target=sniffing)
         p.start()
-        packet = Ether() / IP(dst="10.0.0.10") / randomRequestGenerator()
+        packet = Ether() / IP(dst="10.0.0.255") / content
         # send
-        sendp(packet, iface=interface)
+        sendp(packet, iface=interface, count=1)
         
         #sniffing()
         p.join()
@@ -128,4 +160,5 @@ if __name__ == "__main__":
         if lastFetched[0:3] == 'Yes':
             print 'ready to send UDP flows'
             
-        
+'''
+
