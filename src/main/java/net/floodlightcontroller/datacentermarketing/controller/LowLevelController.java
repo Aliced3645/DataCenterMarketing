@@ -86,6 +86,7 @@ import net.floodlightcontroller.datacentermarketing.messagepasser.BidRequestReso
 import net.floodlightcontroller.devicemanager.IDevice;
 import net.floodlightcontroller.devicemanager.IDeviceService;
 import net.floodlightcontroller.devicemanager.SwitchPort;
+import net.floodlightcontroller.devicemanager.internal.DeviceManagerImpl;
 import net.floodlightcontroller.packet.ARP;
 import net.floodlightcontroller.packet.Data;
 import net.floodlightcontroller.packet.Ethernet;
@@ -256,7 +257,8 @@ public class LowLevelController implements IOFSwitchListener,
 	@Override
 	public void switchPortChanged(Long switchId) {
 		// TODO Auto-generated method stub
-
+System.exit(-100);
+		
 	}
 
 	@Override
@@ -1366,13 +1368,30 @@ public class LowLevelController implements IOFSwitchListener,
 		 */
 		IDevice device = devices.get(hostID);
 		SwitchPort[] ports = device.getAttachmentPoints();
+		try {
 
-		IOFSwitch comeSwitch = switches.get(ports[0].getSwitchDPID());
-		short comePort = (short) ports[0].getPort();
+			IOFSwitch comeSwitch = switches.get(ports[0].getSwitchDPID());
 
-		this.sendPacketOutMessage("1.2.3.4", "1.2.3.4", comeSwitch, content,
-				device, comePort);
-		System.out.println("packet sent..");
+			short comePort = (short) ports[0].getPort();
+
+			this.sendPacketOutMessage("1.2.3.4", "1.2.3.4", comeSwitch,
+					content, device, comePort);
+			System.out.println("packet sent..");
+		} catch (Exception e) {
+			System.out.println("ERROR, ports are  " + ports);
+
+			System.out.println("ERROR, ports count  " + ports.length);
+
+			if (ports.length == 0) {
+				System.out
+						.println("The attach points are empty, make updates!");
+				((DeviceManagerImpl) deviceManager).topologyChanged();
+
+			}
+
+			e.printStackTrace();
+
+		}
 
 	}
 
@@ -1423,12 +1442,14 @@ public class LowLevelController implements IOFSwitchListener,
 							pushMessageToHost(bidRequest.getSourceID(),
 									errorContent);
 							payloadSet.clear();
+
 							break;
 						}
 
 						System.out.println("\n\n Received a request at time "
 								+ MarketManager.getInstance().getCurrentTime()
 								+ "content: " + payloadString
+								+ "from host " + bidRequest.getSourceID()
 								+ "\n\n\n");
 						/*
 						 * call the function to put verify request by lantency
@@ -1446,6 +1467,8 @@ public class LowLevelController implements IOFSwitchListener,
 							// go into the bidding pool
 							// generate the URL Hash for this
 							// User/BidRequest
+							// go into the bidding pool
+							// generate the URL Hash for this User/BidRequest
 							bidRequest.getBidder().setLastRequest(bidRequest);
 							// push to the auctioneer
 							Auctioneer.getInstance().pushRequest(bidRequest);
