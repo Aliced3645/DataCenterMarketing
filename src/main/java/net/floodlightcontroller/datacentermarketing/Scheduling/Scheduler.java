@@ -161,7 +161,8 @@ public class Scheduler {
 			long switchNum = np.getNodeId();
 			short portNum = np.getPortId();
 
-			HashSet<Integer> ps = switchesInfo.get(switchNum).getPort(portNum)
+			HashSet<Integer> ps = switchesInfo.get(switchNum)
+					.getPort(portNum)
 					.possibleQ(alloc);
 
 			if (ps == null)
