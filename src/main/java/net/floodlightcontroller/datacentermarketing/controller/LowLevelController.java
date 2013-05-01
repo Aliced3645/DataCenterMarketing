@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -124,6 +125,7 @@ public class LowLevelController implements IOFSwitchListener,
 	protected static Logger log = LoggerFactory
 			.getLogger(LowLevelController.class);
 	private String previousContent = "";
+	private HashSet<String> payloadSet = new HashSet<String>();
 
 	// the payload of the ping packet
 	// records the route and a boolean on whether its entries should be deleted
@@ -912,12 +914,13 @@ public class LowLevelController implements IOFSwitchListener,
 	}
 
 	// TODO check cache
-	
+
 	// for the first one, we make a packet and send it to the first switch
 	// the last switch send the packet back, as required by an action
-	
+
 	// checks for validatiu
-	public boolean probeLatency(Route rt, boolean whetherDelete) throws Exception {
+	public boolean probeLatency(Route rt, boolean whetherDelete)
+			throws Exception {
 
 		/*
 		 * // TODO TOREMOVE Scheduler.getInstance().refreshTopo();
@@ -1230,7 +1233,7 @@ public class LowLevelController implements IOFSwitchListener,
 		// flow mod
 		OFFlowMod flowMod = (OFFlowMod) floodlightProvider
 				.getOFMessageFactory().getMessage(OFType.FLOW_MOD);
-
+		
 		flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
 				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
 				.setCookie(AppCookie.makeCookie(0, 0))
@@ -1356,25 +1359,23 @@ public class LowLevelController implements IOFSwitchListener,
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
-	
-	public void pushMessageToHost(long hostID, String content){
-		/* 
+
+	public void pushMessageToHost(long hostID, String content) {
+		/*
 		 * for communication test
 		 */
 		IDevice device = devices.get(hostID);
 		SwitchPort[] ports = device.getAttachmentPoints();
 
-		IOFSwitch comeSwitch = switches.get(ports[0]
-				.getSwitchDPID());
+		IOFSwitch comeSwitch = switches.get(ports[0].getSwitchDPID());
 		short comePort = (short) ports[0].getPort();
 
-		this.sendPacketOutMessage("1.2.3.4", "1.2.3.4",
-				comeSwitch, content, device, comePort);
+		this.sendPacketOutMessage("1.2.3.4", "1.2.3.4", comeSwitch, content,
+				device, comePort);
 		System.out.println("packet sent..");
-		
+
 	}
-	
+
 	@Override
 	public net.floodlightcontroller.core.IListener.Command receive(
 			IOFSwitch sw, OFMessage msg, FloodlightContext cntx) {
@@ -1404,10 +1405,10 @@ public class LowLevelController implements IOFSwitchListener,
 				// parse the bid information
 				String payloadString = new String(probe.getPayload()
 						.serialize());
-				if (payloadString.equals(previousContent))
+				if (payloadSet.contains(payloadString)) {
 					break;
-				else {
-					previousContent = payloadString;
+				} else {
+					payloadSet.add(payloadString);
 					// process the request
 					try {
 						// refresh device list
@@ -1415,41 +1416,47 @@ public class LowLevelController implements IOFSwitchListener,
 						updateDevices();
 						BidRequest bidRequest = BidRequestResource
 								.requestJsonStringToBidRequest(payloadString);
-						if( !bidRequest.valid){
-							//not a valid request JSON
-							//send error message back
+						if (!bidRequest.valid) {
+							// not a valid request JSON
+							// send error message back
 							String errorContent = "This bid request is not valid, man";
-							pushMessageToHost(bidRequest.getSourceID(), errorContent);
+							pushMessageToHost(bidRequest.getSourceID(),
+									errorContent);
+							payloadSet.clear();
 							break;
 						}
-						
-						System.out.println("\n\n Received a request at time " + MarketManager.getInstance().getCurrentTime() + "from host " + bidRequest.getSourceID()+ "\n\n\n");
-						/* 
+
+						System.out.println("\n\n Received a request at time "
+								+ MarketManager.getInstance().getCurrentTime()
+								+ "content: " + payloadString
+								+ "\n\n\n");
+						/*
 						 * call the function to put verify request by lantency
 						 * and if possible, put into the queue
 						 */
 						bidRequest.verifyPossibleRoutesByLatency();
-						if(bidRequest.getPossibleRoutes().isEmpty()){
-							//no possilbe routes 
-							pushMessageToHost(bidRequest.getSourceID(), "latency probe failure");
+						System.out.println("Batman!");
+						if (bidRequest.getPossibleRoutes().isEmpty()) {
+							// no possilbe routes
+							pushMessageToHost(bidRequest.getSourceID(),
+									"latency probe failure");
+							payloadSet.clear();
 							break;
-						}
-						else{
-							//go into the bidding pool
-							//generate the URL Hash for this User/BidRequest
+						} else {
+							// go into the bidding pool
+							// generate the URL Hash for this
+							// User/BidRequest
 							bidRequest.getBidder().setLastRequest(bidRequest);
-							//push to the auctioneer
-							Auctioneer.getInstance().pushRequest(bidRequest);							
+							// push to the auctioneer
+							Auctioneer.getInstance().pushRequest(bidRequest);
 						}
-						
-
+						payloadSet.clear();
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 			}
-
 			break;
 		case QUEUE_GET_CONFIG_REPLY:
 

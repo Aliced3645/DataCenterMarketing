@@ -36,16 +36,16 @@ public class Auctioneer {
 		this.currentRequestWaitingLatencyVerification = currentRequestWaitingLatencyVerification;
 	}
 	
-	public void setBusy() {
+	public synchronized void setBusy() {
 		// busy if calculating the bidding for this round
 		this.busyFlag = true;
 	}
 
-	public boolean isBusy() {
+	public synchronized boolean isBusy() {
 		return this.busyFlag;
 	}
 
-	public void setNotBusy() {
+	public synchronized void setNotBusy() {
 		this.busyFlag = false;
 		// IF there are something in the NextRoundrequests
 		// add them into thisRound request
@@ -77,19 +77,20 @@ public class Auctioneer {
 		this.strategy = new FirstComeFirstServeStrategy();
 	}
 
-	public LinkedHashMap<String, BidRequest> getBidRequestForThisRound() {
+	public synchronized LinkedHashMap<String, BidRequest> getBidRequestForThisRound() {
 		return this.requestsForThisRound;
 	}
 
-	public void computeAllocation() throws IOException, InterruptedException, ExecutionException {
+	public synchronized void computeAllocation() throws IOException, InterruptedException, ExecutionException {
 		this.resultsForThisRound = strategy
 				.processAllocation(requestsForThisRound);
 	}
 	
-	public void pushResults() throws IOException, InterruptedException, ExecutionException{
+	public synchronized void pushResults() throws IOException, InterruptedException, ExecutionException{
 		Set<Entry<String, BidResult>> resultSet = resultsForThisRound.entrySet();
 		if(resultSet.size() == 0){
 			System.out.println("\n\n\n Result size is 0");
+			System.out.println("Request for next round size is " + this.requestsForNextRound.size());
 			System.out.println(" Request size is " + this.requestsForThisRound.size() + "\n\n\n");
 			//It should not happen, the reason it happens is due to the unstable
 			//property of floodlight
@@ -124,7 +125,7 @@ public class Auctioneer {
 		return _instance;
 	}
 
-	public void pushRequest(BidRequest bidRequest) {
+	public synchronized void pushRequest(BidRequest bidRequest) {
 		synchronized (this) {
 			if (bidRequest != null) {
 				if (!this.isBusy())
@@ -138,16 +139,16 @@ public class Auctioneer {
 		}
 	}
 
-	public void setStrategy(AuctioneerStrategy _strategy) {
+	public synchronized void setStrategy(AuctioneerStrategy _strategy) {
 		this.strategy = _strategy;
 	}
 
-	public AuctioneerStrategy getStrategy() {
+	public synchronized AuctioneerStrategy getStrategy() {
 		return this.strategy;
 	}
 
 	// a bidding round has ended, clear the round
-	public void clearRound() {
+	public synchronized void clearRound() {
 		//synchronized (this) {
 			requestsForThisRound.clear();
 			if(resultsForThisRound != null)
@@ -162,7 +163,7 @@ public class Auctioneer {
 	}
 
 	
-	public LinkedHashMap<String, BidResult> getResultsForThisRound() {
+	public synchronized LinkedHashMap<String, BidResult> getResultsForThisRound() {
 		return this.resultsForThisRound;
 	}
 }
