@@ -257,8 +257,8 @@ public class LowLevelController implements IOFSwitchListener,
 	@Override
 	public void switchPortChanged(Long switchId) {
 		// TODO Auto-generated method stub
-System.exit(-100);
-		
+		System.exit(-100);
+
 	}
 
 	@Override
@@ -285,8 +285,8 @@ System.exit(-100);
 	}
 
 	// basic functionality begins here..
-	public synchronized void updateSwitches() throws IOException, InterruptedException,
-			ExecutionException {
+	public synchronized void updateSwitches() throws IOException,
+			InterruptedException, ExecutionException {
 
 		switches.clear();
 
@@ -310,8 +310,8 @@ System.exit(-100);
 			switches.put(ofSwitch.getId(), ofSwitch);
 
 			// query the switch to get the update..
-			//future = ofSwitch.querySwitchFeaturesReply();
-			//ofSwitch.flush();
+			// future = ofSwitch.querySwitchFeaturesReply();
+			// ofSwitch.flush();
 		}
 
 	}
@@ -578,15 +578,25 @@ System.exit(-100);
 		}
 	}
 
+	/**
+	 * 
+	 * @param srcID
+	 * @param destID
+	 * @param rt
+	 * @param bandwidth
+	 * @param timeout in seconds!
+	 * @return
+	 * @throws Exception
+	 */
 	public boolean installRoute(long srcID, long destID, Route rt,
-			long bandwidth) throws Exception {
+			long bandwidth, short timeout) throws Exception {
 		if (rt == null) {
 			debug("no route was presented to install");
 			return false;
 		}
 
 		List<NodePortTuple> switchesPorts = rt.getPath();
-
+		
 		if (switchesPorts == null && switchesPorts.size() < 2) {
 			debug("Route length is not right.");
 			return false;
@@ -628,7 +638,7 @@ System.exit(-100);
 		OFFlowMod flowMod = (OFFlowMod) floodlightProvider
 				.getOFMessageFactory().getMessage(OFType.FLOW_MOD);
 
-		flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
+		flowMod.setIdleTimeout(timeout).setHardTimeout(timeout)
 				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
 				.setCookie(AppCookie.makeCookie(0, 0))
 				.setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
@@ -673,8 +683,8 @@ System.exit(-100);
 			 * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
 			 */
 
-			flowMod.setIdleTimeout(Short.MAX_VALUE)
-					.setHardTimeout(Short.MAX_VALUE)
+			flowMod.setIdleTimeout(timeout)
+					.setHardTimeout(timeout)
 					.setBufferId(OFPacketOut.BUFFER_ID_NONE)
 					.setCookie(AppCookie.makeCookie(0, 0))
 					.setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
@@ -711,7 +721,7 @@ System.exit(-100);
 		 * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
 		 */
 
-		flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
+		flowMod.setIdleTimeout(timeout).setHardTimeout(timeout)
 				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
 				.setCookie(AppCookie.makeCookie(0, 0))
 				.setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
@@ -721,7 +731,7 @@ System.exit(-100);
 		flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
 
 		writeFlowModToSwitch(endSw, flowMod);
-
+		
 		sendBarrier(endSw);
 
 		log.debug("\nsettle end switch!");
@@ -738,8 +748,8 @@ System.exit(-100);
 		return false;
 	}
 
-	private void deleteRouteEntriesForFlow(Route rt, long srcID, long destID) {
-
+	// matching by source and destination IP addresses
+	private void deleteRoute(Route rt, String sourceIP, String destIP) {
 		if (rt == null) {
 			debug("no route was presented to install");
 			return;
@@ -759,7 +769,6 @@ System.exit(-100);
 		int index = 0;
 		NodePortTuple first = switchesPorts.get(index);
 		long nodePid = first.getNodeId();
-		short startPort = first.getPortId();
 		IOFSwitch startSw = switches.get(nodePid);
 		// action
 		OFAction outputTo = new OFActionOutput(first.getPortId(), (short) 1500);
@@ -769,15 +778,8 @@ System.exit(-100);
 		ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
 		actionsTo.add(outputTo);
 
-		// get the ID of source and destination
-		IDevice sourceDevice = devices.get(srcID);
-		IDevice destDevice = devices.get(destID);
-
 		// something not sure right now
-		String matchString = "nw_dst="
-				+ IPv4.fromIPv4Address(destDevice.getIPv4Addresses()[0]) + ","
-				+ "nw_src="
-				+ IPv4.fromIPv4Address(sourceDevice.getIPv4Addresses()[0])
+		String matchString = "nw_dst=" + destIP + "," + "nw_src=" + sourceIP
 				+ "," + "dl_type=" + 0x800;
 		OFMatch match = new OFMatch();
 		match.fromString(matchString);
@@ -826,17 +828,8 @@ System.exit(-100);
 			flowMod = (OFFlowMod) floodlightProvider.getOFMessageFactory()
 					.getMessage(OFType.FLOW_MOD);
 			outputTo = new OFActionOutput(egressPortPid, (short) 1500);
-			// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back
-			// to
-			// controller
 
 			actionsTo.add(outputTo);
-			/*
-			 * match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL &
-			 * (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
-			 * match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
-			 * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
-			 */
 
 			flowMod.setIdleTimeout(Short.MAX_VALUE)
 					.setHardTimeout(Short.MAX_VALUE)
@@ -860,20 +853,9 @@ System.exit(-100);
 		IOFSwitch endSw = switches.get(nodePid);
 		outputTo = new OFActionOutput(OFPort.OFPP_CONTROLLER.getValue(),
 				(short) 1500);
-		// outputTo = new OFActionOutput().setPort(OFPort.OFPP_CONTROLLER
-		// .getValue());
-		// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
-		// controller
 
 		actionsTo.clear();
 		actionsTo.add(outputTo);
-
-		/*
-		 * match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL &
-		 * (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
-		 * match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
-		 * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
-		 */
 
 		flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
 				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
@@ -890,6 +872,7 @@ System.exit(-100);
 		log.debug("\nRemoved end switch!");
 
 		return;
+
 	}
 
 	// bench marks cache
@@ -1175,7 +1158,7 @@ System.exit(-100);
 				debug("Ping packet content: " + id);
 				// TODO tear down the route
 				if (toDelete == true) {
-					deleteRouteEntriesForPing(route);
+					this.deleteRoute(route, "1.2.3.4", "1.2.3.4");
 				}
 
 				// wake up the bidRequest and set the latency
@@ -1197,145 +1180,6 @@ System.exit(-100);
 		log.debug("\npacket out, now wait for inmessage");
 
 		return;
-	}
-
-	private void deleteRouteEntriesForPing(Route rt) {
-		List<NodePortTuple> switchesPorts = rt.getPath();
-
-		if (switchesPorts == null && switchesPorts.size() < 2) {
-			debug("Route length is not right.");
-			return;
-		}
-		if (switchesPorts.size() % 2 == 1) {
-			debug("mismatched switch in-out port number!");
-		}
-
-		// get the first switch
-		int index = 0;
-		NodePortTuple first = switchesPorts.get(index);
-		long nodePid = first.getNodeId();
-		short startPort = first.getPortId();
-		IOFSwitch startSw = switches.get(nodePid);
-		// action
-		OFAction outputTo = new OFActionOutput(first.getPortId(), (short) 1500);
-		// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
-		// controller
-		// action list
-		ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
-		actionsTo.add(outputTo);
-
-		String matchString = "nw_dst=1.2.3.4" + "," + "nw_src=1.2.3.4,"
-				+ "dl_type=" + 0x800;
-		OFMatch match = new OFMatch();
-		match.fromString(matchString);
-		// match.setDataLayerType(Ethernet.TYPE_IPv4);
-		log.debug("set match " + match.toString());
-
-		// flow mod
-		OFFlowMod flowMod = (OFFlowMod) floodlightProvider
-				.getOFMessageFactory().getMessage(OFType.FLOW_MOD);
-		
-		flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
-				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
-				.setCookie(AppCookie.makeCookie(0, 0))
-				.setCommand(OFFlowMod.OFPFC_DELETE).setMatch(match)
-				.setOutPort(OFPort.OFPP_NONE)
-				.setLengthU(OFFlowMod.MINIMUM_LENGTH);
-
-		flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
-
-		log.debug("match in flowmod is now : " + flowMod.getMatch().toString());
-
-		writeFlowModToSwitch(startSw, flowMod);
-		sendBarrier(startSw);
-
-		// set the middle ones that are on same switch
-		index++;
-
-		log.debug("\nRemoved first switch!");
-
-		while (index < switchesPorts.size() - 1) {
-			// get the switch
-			NodePortTuple firstInPair = switchesPorts.get(index);
-			nodePid = firstInPair.getNodeId();
-			IOFSwitch sw = switches.get(nodePid);
-			short ingressPortPid = firstInPair.getPortId();
-			index++;
-			NodePortTuple secondInPair = switchesPorts.get(index);
-			short egressPortPid = secondInPair.getPortId();
-			index++;
-
-			if (firstInPair.getNodeId() != secondInPair.getNodeId()) {
-				debug("mismatched switch id!");
-			}
-
-			actionsTo.clear();
-			flowMod = (OFFlowMod) floodlightProvider.getOFMessageFactory()
-					.getMessage(OFType.FLOW_MOD);
-			outputTo = new OFActionOutput(egressPortPid, (short) 1500);
-			// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back
-			// to
-			// controller
-
-			actionsTo.add(outputTo);
-			/*
-			 * match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL &
-			 * (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
-			 * match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
-			 * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
-			 */
-
-			flowMod.setIdleTimeout(Short.MAX_VALUE)
-					.setHardTimeout(Short.MAX_VALUE)
-					.setBufferId(OFPacketOut.BUFFER_ID_NONE)
-					.setCookie(AppCookie.makeCookie(0, 0))
-					.setCommand(OFFlowMod.OFPFC_DELETE).setMatch(match)
-					.setOutPort(OFPort.OFPP_NONE)
-					.setLengthU(OFFlowMod.MINIMUM_LENGTH);
-
-			flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
-
-			writeFlowModToSwitch(sw, flowMod);
-			sendBarrier(sw);
-		}
-
-		log.debug("\nRemoved middle switches!");
-
-		// last port
-		NodePortTuple last = switchesPorts.get(index);
-		nodePid = last.getNodeId();
-		IOFSwitch endSw = switches.get(nodePid);
-		outputTo = new OFActionOutput(OFPort.OFPP_CONTROLLER.getValue(),
-				(short) 1500);
-		// outputTo = new OFActionOutput().setPort(OFPort.OFPP_CONTROLLER
-		// .getValue());
-		// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
-		// controller
-
-		actionsTo.clear();
-		actionsTo.add(outputTo);
-
-		/*
-		 * match = new OFMatch().setWildcards(OFMatch.OFPFW_ALL &
-		 * (~OFMatch.OFPFW_NW_SRC_MASK) & (~OFMatch.OFPFW_NW_DST_MASK));
-		 * match.setNetworkSource(IPv4.toIPv4Address("1.2.3.4"));
-		 * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
-		 */
-
-		flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
-				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
-				.setCookie(AppCookie.makeCookie(0, 0))
-				.setCommand(OFFlowMod.OFPFC_DELETE).setMatch(match)
-				.setOutPort(OFPort.OFPP_NONE)
-				.setLengthU(OFFlowMod.MINIMUM_LENGTH);
-
-		flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
-
-		writeFlowModToSwitch(endSw, flowMod);
-		sendBarrier(endSw);
-
-		log.debug("\nRemoved end switch!");
-
 	}
 
 	private void sendBarrier(IOFSwitch sw) {
@@ -1361,13 +1205,14 @@ System.exit(-100);
 		return false;
 	}
 
-	public void pushMessageToHost(long hostID, String content) throws IOException, InterruptedException, ExecutionException {
+	public void pushMessageToHost(long hostID, String content)
+			throws IOException, InterruptedException, ExecutionException {
 		/*
 		 * for communication test
 		 */
 		updateSwitches();
 		updateDevices();
-		
+
 		IDevice device = devices.get(hostID);
 		SwitchPort[] ports = device.getAttachmentPoints();
 
@@ -1389,13 +1234,9 @@ System.exit(-100);
 				System.out
 						.println("The attach points are empty, make updates!");
 				((DeviceManagerImpl) deviceManager).topologyChanged();
-				
-				
-				
+
 			}
-			
-			
-			
+
 			e.printStackTrace();
 
 		}
@@ -1414,22 +1255,22 @@ System.exit(-100);
 
 			Ethernet eth = IFloodlightProviderService.bcStore.get(cntx,
 					IFloodlightProviderService.CONTEXT_PI_PAYLOAD);
-			IPv4 probe = new IPv4();
-			probe.deserialize(eth.getPayload().serialize(), 0, eth.getPayload()
+			IPv4 ipContent = new IPv4();
+			ipContent.deserialize(eth.getPayload().serialize(), 0, eth.getPayload()
 					.serialize().length);
 
-			if (IPv4.toIPv4Address("1.2.3.4") == probe.getDestinationAddress()) {
+			if (IPv4.toIPv4Address("1.2.3.4") == ipContent.getDestinationAddress()) {
 				finishRouteBenchMark((OFPacketIn) msg);
 			}
+			
 			/**
 			 * request packet from client (from data plane) In the distributed
 			 * version, this is the only way to get bidding request
 			 */
-
-			else if (probe.getDestinationAddress() == IPv4
-					.toIPv4Address("10.0.0.10")) {
+			else if (ipContent.getDestinationAddress() == IPv4
+					.toIPv4Address("10.0.0.255")) {
 				// parse the bid information
-				String payloadString = new String(probe.getPayload()
+				String payloadString = new String(ipContent.getPayload()
 						.serialize());
 				if (payloadSet.contains(payloadString)) {
 					break;
@@ -1455,9 +1296,8 @@ System.exit(-100);
 
 						System.out.println("\n\n Received a request at time "
 								+ MarketManager.getInstance().getCurrentTime()
-								+ "content: " + payloadString
-								+ "from host " + bidRequest.getSourceID()
-								+ "\n\n\n");
+								+ "content: " + payloadString + "from host "
+								+ bidRequest.getSourceID() + "\n\n\n");
 						/*
 						 * call the function to put verify request by lantency
 						 * and if possible, put into the queue
