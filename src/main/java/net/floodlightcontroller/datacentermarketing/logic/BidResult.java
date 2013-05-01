@@ -17,6 +17,8 @@ public class BidResult {
 	int round;
 	Bidder bidder;
 	
+	//private short duration;
+	
 	private long hostID;
 	
 	public synchronized long getHostID() {
@@ -27,6 +29,7 @@ public class BidResult {
 		this.hostID = hostID;
 	}
 
+	
 	//true for success
 	//false for fail
 	private boolean result;

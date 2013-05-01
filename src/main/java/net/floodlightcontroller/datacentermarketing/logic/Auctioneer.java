@@ -86,6 +86,12 @@ public class Auctioneer {
 				.processAllocation(requestsForThisRound);
 	}
 	
+	//public synchronized void installWinningRoute(BidResult result){
+	//	
+	//}
+	
+	
+	
 	public synchronized void pushResults() throws IOException, InterruptedException, ExecutionException{
 		Set<Entry<String, BidResult>> resultSet = resultsForThisRound.entrySet();
 		if(resultSet.size() == 0){
