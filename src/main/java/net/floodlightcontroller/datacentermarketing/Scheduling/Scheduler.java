@@ -121,15 +121,21 @@ public class Scheduler {
 		if (switches == null || switches.size() == 0) {
 			return;
 		}
-		switchesInfo.clear();
+		 
 		Iterator<Long> it = switches.keySet().iterator();
 
 		while (it.hasNext()) {
 			Long id = it.next();
-			IOFSwitch sw = (IOFSwitch) (switches.get(id));
-			debug("recording switch" + sw.toString());
-			SwitchAddInfo swi = new SwitchAddInfo(id, sw);
-			switchesInfo.put(id, swi);
+
+			if (!switchesInfo.containsKey(id)) {
+				IOFSwitch sw = (IOFSwitch) (switches.get(id));
+				debug("recording switch" + sw.toString());
+				SwitchAddInfo swi = new SwitchAddInfo(id, sw);
+				switchesInfo.put(id, swi);
+			} else {
+				IOFSwitch sw = (IOFSwitch) (switches.get(id));
+				switchesInfo.get(id).update(sw);
+			}
 		}
 
 	}
@@ -161,8 +167,7 @@ public class Scheduler {
 			long switchNum = np.getNodeId();
 			short portNum = np.getPortId();
 
-			HashSet<Integer> ps = switchesInfo.get(switchNum)
-					.getPort(portNum)
+			HashSet<Integer> ps = switchesInfo.get(switchNum).getPort(portNum)
 					.possibleQ(alloc);
 
 			if (ps == null)
@@ -172,13 +177,12 @@ public class Scheduler {
 				System.out.println("allocation is registering  ");
 				int res = switchesInfo.get(switchNum).getPort(portNum)
 						.reserve(alloc);
-				//assert ( 
-				if(res < 0){
+				// assert (
+				if (res < 0) {
 					System.out.println("should not happen");
 					System.exit(-1);
 				}
-				
-				
+
 			}
 
 		}
