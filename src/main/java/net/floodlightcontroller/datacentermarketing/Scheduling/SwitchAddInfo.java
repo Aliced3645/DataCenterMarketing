@@ -34,6 +34,16 @@ public class SwitchAddInfo {
 
 	}
 
+	public void update(IOFSwitch iofswIn) {
+
+		iofSw = iofswIn;
+
+		if (iofswIn.getEnabledPorts().size() != ports.length) {
+			System.exit(-110);/* do it if happens */
+		}
+
+	}
+
 	@Override
 	public String toString() {
 		String tr = "";
