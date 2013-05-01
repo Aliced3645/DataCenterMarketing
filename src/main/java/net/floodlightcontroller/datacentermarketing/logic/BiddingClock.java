@@ -92,7 +92,7 @@ public class BiddingClock implements Runnable {
 	
 	public long getCurrentTime() {
 		synchronized (this) {
-			return currentTime;
+			return System.currentTimeMillis();
 		}
 	}
 

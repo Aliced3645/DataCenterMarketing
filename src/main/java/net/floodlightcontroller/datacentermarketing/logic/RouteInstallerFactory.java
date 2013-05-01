@@ -3,6 +3,8 @@ package net.floodlightcontroller.datacentermarketing.logic;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import net.floodlightcontroller.routing.Route;
+
 /**
  * This factory creates timers for winning bids
  * to install routes 
@@ -24,15 +26,18 @@ public class RouteInstallerFactory {
 	}
 	
 	/**
-	 * The trigger function
+	 * 
+	 * @param triggerTime is the absolute system when the route should be installed ( in milliseconds )
+	 * @param srcID
+	 * @param destID
+	 * @param rt
+	 * @param bandwidth
+	 * @param timeout
 	 */
 	
-	ActionListener routeInstallTriggered = new ActionListener(){
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			
-		}
-	};
-	
-	
+	public void createRouteInstaller(long triggerTime, long srcID, long destID, Route rt,
+			long bandwidth, short timeout){
+		RouteInstaller routeInstaller = new RouteInstaller(triggerTime, srcID, destID, rt, bandwidth, timeout);
+		return;
+	}	
 }
