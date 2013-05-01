@@ -86,9 +86,22 @@ public class Auctioneer {
 				.processAllocation(requestsForThisRound);
 	}
 	
-	//public synchronized void installWinningRoute(BidResult result){
-	//	
-	//}
+	public synchronized void setRouteInstallers(){
+		Set<Entry<String, BidResult>> resultSet = resultsForThisRound.entrySet();
+		
+		for(Entry<String, BidResult> resultEntry : resultSet){
+			BidResult result = resultEntry.getValue();
+
+			if(result.getResult()){
+				BidRequest bidRequest = result.getBidRequest();
+				RouteInstallerFactory.getInstance().createRouteInstaller(
+						(long)bidRequest.getStartTime(), (long)bidRequest.getSourceID(), (long)bidRequest.getDestID(), 
+						result.getRoute(), (long)(bidRequest.getMinBandwidth()), 
+						(short)(bidRequest.getStartTime() - bidRequest.getEndTime()), (long)bidRequest.getData());
+			}
+		}
+		
+	}
 	
 	
 	
@@ -104,7 +117,7 @@ public class Auctioneer {
 			Set<Entry<String, BidRequest>> requestSet = requestsForThisRound.entrySet();
 			for(Entry<String, BidRequest> requestEntry : requestSet){
 				BidRequest bidRequest = requestEntry.getValue();
-				MarketManager.getInstance().getLowLevelController().pushMessageToHost(bidRequest.getSourceID(), "Strange problem in Floodlight");
+				MarketManager.getInstance().getLowLevelController().pushMessageToHost("1.2.3.4", bidRequest.getSourceID(), "Strange problem in Floodlight");
 			}
 			return ;
 		}
@@ -119,7 +132,7 @@ public class Auctioneer {
 			}
 			
 			//send to the host machine
-			MarketManager.getInstance().getLowLevelController().pushMessageToHost(result.getHostID(), replyContent);
+			MarketManager.getInstance().getLowLevelController().pushMessageToHost("1.2.3.4", result.getHostID(), replyContent);
 			System.out.println("\nResult pushed\n");
 		}
 	}

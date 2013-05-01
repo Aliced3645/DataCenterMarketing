@@ -96,12 +96,12 @@ public class BidRequestResource extends ServerResource {
 	            }
 	            else if(name == "Start"){
 	            	jp.nextToken();
-	            	bidRequest.addRequestField(Resource.START_TIME, jp.getFloatValue());
+	            	bidRequest.addRequestField(Resource.START_TIME, System.currentTimeMillis() + jp.getFloatValue());
 	            	bStart = true;
 	            }
 	            else if(name == "End"){
 	            	jp.nextToken();
-	            	bidRequest.addRequestField(Resource.END_TIME, jp.getFloatValue());
+	            	bidRequest.addRequestField(Resource.END_TIME, System.currentTimeMillis() + jp.getFloatValue());
 	            	bEnd = true;
 	            }
 	            else if(name == "Latency"){

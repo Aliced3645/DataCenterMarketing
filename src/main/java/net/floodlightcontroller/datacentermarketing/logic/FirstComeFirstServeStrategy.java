@@ -48,9 +48,11 @@ public class FirstComeFirstServeStrategy implements AuctioneerStrategy{
 				if(Scheduler.getInstance().validateAndReserveRoute(route, alloc,true)){
 					//successfully allocated
 					result.setResult(true);
+					result.setRoute(route);
 					break;
 				}
 			}
+			result.setBidRequest(bidRequest);
 			result.setHostID(bidRequest.getSourceID());
 			result.setBidder(bidRequest.getBidder());
 			result.setRound(Auctioneer.round);

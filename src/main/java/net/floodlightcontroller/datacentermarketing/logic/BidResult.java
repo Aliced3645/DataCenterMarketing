@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import net.floodlightcontroller.datacentermarketing.Scheduling.Allocation;
 import net.floodlightcontroller.datacentermarketing.messagepasser.BidResultJSONSerializer;
+import net.floodlightcontroller.routing.Route;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -17,8 +18,28 @@ public class BidResult {
 	int round;
 	Bidder bidder;
 	
-	//private short duration;
+	Route route; //which route to go?
 	
+	public synchronized Route getRoute() {
+		return route;
+	}
+
+	public synchronized void setRoute(Route route) {
+		this.route = route;
+	}
+
+	
+	BidRequest bidRequest; // the corresbodding request
+	
+	public synchronized BidRequest getBidRequest() {
+		return bidRequest;
+	}
+
+	public synchronized void setBidRequest(BidRequest bidRequest) {
+		this.bidRequest = bidRequest;
+	}
+
+
 	private long hostID;
 	
 	public synchronized long getHostID() {

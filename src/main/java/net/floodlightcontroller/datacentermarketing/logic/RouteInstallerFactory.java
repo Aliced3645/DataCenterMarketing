@@ -36,8 +36,8 @@ public class RouteInstallerFactory {
 	 */
 	
 	public void createRouteInstaller(long triggerTime, long srcID, long destID, Route rt,
-			long bandwidth, short timeout){
-		RouteInstaller routeInstaller = new RouteInstaller(triggerTime, srcID, destID, rt, bandwidth, timeout);
+			long bandwidth, short timeout, long data){
+		RouteInstaller routeInstaller = new RouteInstaller(triggerTime, srcID, destID, rt, bandwidth, timeout, data);
 		return;
 	}	
 }

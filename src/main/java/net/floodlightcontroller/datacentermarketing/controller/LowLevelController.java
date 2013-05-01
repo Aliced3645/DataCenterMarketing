@@ -966,7 +966,7 @@ public class LowLevelController implements IOFSwitchListener,
 				.setActions(actionsTo).setLengthU(OFFlowMod.MINIMUM_LENGTH
 				// + OFActionNetworkLayerAddress.MINIMUM_LENGTH
 						+ OFActionOutput.MINIMUM_LENGTH);
-
+		
 		flowMod.setFlags(OFFlowMod.OFPFF_SEND_FLOW_REM);
 
 		log.debug("match in flowmod is now : " + flowMod.getMatch().toString());
@@ -1074,7 +1074,7 @@ public class LowLevelController implements IOFSwitchListener,
 		String routeJSONString = JsonWriter.objectToJson(rt);
 		PingPayload ppl = new PingPayload(routeJSONString, whetherDelete);
 		String pplString = ppl.toString();
-		System.out.println("PPL: " + pplString);
+		System.out.println("PPL: " + routeJSONString);
 		// Route rtt = (Route)JsonReader.toJava(content);
 		// System.out.println("JSON...!!" + content);
 		// System.out.println("ROUTE...!!!" + rtt);
@@ -1205,7 +1205,7 @@ public class LowLevelController implements IOFSwitchListener,
 		return false;
 	}
 
-	public void pushMessageToHost(long hostID, String content)
+	public void pushMessageToHost(String sourceIP, long hostID, String content)
 			throws IOException, InterruptedException, ExecutionException {
 		/*
 		 * for communication test
@@ -1222,7 +1222,7 @@ public class LowLevelController implements IOFSwitchListener,
 
 			short comePort = (short) ports[0].getPort();
 
-			this.sendPacketOutMessage("1.2.3.4", "1.2.3.4", comeSwitch,
+			this.sendPacketOutMessage(sourceIP, "1.2.3.4", comeSwitch,
 					content, device, comePort);
 			System.out.println("packet sent..");
 		} catch (Exception e) {
@@ -1287,7 +1287,7 @@ public class LowLevelController implements IOFSwitchListener,
 							// not a valid request JSON
 							// send error message back
 							String errorContent = "This bid request is not valid, man";
-							pushMessageToHost(bidRequest.getSourceID(),
+							pushMessageToHost("1.2.3.4", bidRequest.getSourceID(),
 									errorContent);
 							payloadSet.clear();
 
@@ -1306,7 +1306,7 @@ public class LowLevelController implements IOFSwitchListener,
 						System.out.println("Batman!");
 						if (bidRequest.getPossibleRoutes().isEmpty()) {
 							// no possilbe routes
-							pushMessageToHost(bidRequest.getSourceID(),
+							pushMessageToHost("1.2.3.4", bidRequest.getSourceID(),
 									"latency probe failure");
 							payloadSet.clear();
 							break;

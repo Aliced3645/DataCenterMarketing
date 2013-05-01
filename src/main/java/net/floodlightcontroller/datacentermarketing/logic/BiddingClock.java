@@ -27,7 +27,6 @@ public class BiddingClock implements Runnable {
 				
 				tickTimer.stop();
 				Auctioneer.getInstance().setBusy();
-				
 				try {
 					Auctioneer.getInstance().computeAllocation();
 				} catch (IOException e1) {
@@ -54,6 +53,8 @@ public class BiddingClock implements Runnable {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				//Set timers to install route when their time comes
+				Auctioneer.getInstance().setRouteInstallers();
 				Auctioneer.getInstance().setNotBusy();
 				PriceAdjuster.getInstance().adjustPrice();
 				Auctioneer.getInstance().clearRound();
