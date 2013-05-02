@@ -34,6 +34,8 @@ if allhosts is None:
     allhosts = 7
     
 def constructBidString(value, destID, minRate, data, start, end, latency):
+    global host
+    global bidderID
     json = "{\"Bidder\":\"%s\", \"Value\":%s, \"SID\":%s, \"DID\":%s, \"MinRate\":%s, \"Data\":%s,\"Start\":%s, \"End\":%s, \"Latency\":%s}" % (bidderID, value, host, destID, minRate, data, start, end, latency)
     return json
 
@@ -96,28 +98,57 @@ def parse_packet(packet) :
             return '1.2.3.5'
 
 
+
+
 def sniffing():
     global lastFetched
     global localBiddingRound
     
-    cap = pcapy.open_live(interface , 65536 , 1 , 0)
+    cap = pcapy.open_live(interface , 65536 , 0 , 0)
     while(1) :
         (header, packet) = cap.next()
         #function to parse a packet
         result = parse_packet(packet)
         if result is not None:
-            print lastFetched
             if result == '1.2.3.4':
+                print lastFetched
                 content = randomRequestGenerator()
                 packet = Ether() / IP(dst="10.0.0.255") / content
-                # send
                 sendp(packet, iface=interface, count=1)
+            if result == '1.2.3.5':
+                #parse JSON first
+                parsed_json = json.loads(lastFetched)
+                print 'Get a reminder from the server, start transmitting..'
+                destIP = parsed_json('destIP')
+                bandwidth = parsed_json('bandwidth')
+                duration = parsed_json('duration')
+                data = parsed_json('data')
+                pSend = threading.Thread(target=udpSend, args=(destIP,
+                            bandwidth, duration, data))
+                pSend.start()
 
+                
 
-def sniffingForReminder():
+datablock = 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'
+
+def udpSend(destIP, bandwidth, duration, data):
+    # current method : send until all data ends
+    sock = socket.socket(socket.AF_INET, # Internet
+                     socket.SOCK_DGRAM) # UDP
+    left = data
+    while left > 0 :
+        sock.sendto(MESSAGE, (destIP, 9999))
+        left = left - 0.001
+    
     return
 
+#a thread always receiving data for UDP
 def udpListen():
+    sock = socket.socket(socket.AF_INET, # Internet
+            socket.SOCK_DGRAM) # UDP
+    sock.bind(('0.0.0.0', 9999))
+    while True:
+        data, addr = sock.recvfrom(5000)
     return
 
     
@@ -125,7 +156,9 @@ if __name__ == "__main__":
     
     p = threading.Thread(target=sniffing)
     p.start()
-
+    
+    p2 = threading.Thread(target=udpListen)
+    p2.start()
 
     #make the first bid
     content = randomRequestGenerator()
@@ -133,7 +166,6 @@ if __name__ == "__main__":
     packet = Ether() / IP(dst="10.0.0.255") / content
     # send
     sendp(packet, iface=interface, count=1)
-
 
     p.join()
 
