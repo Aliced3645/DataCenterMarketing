@@ -27,10 +27,10 @@ public class BidRequestJSONSerializer extends JsonSerializer<BidRequest>{
 		jGen.writeNumberField("Value", bidRequest.getBidValue());
 		jGen.writeNumberField("SourceHostID", bidRequest.getSourceID());
 		jGen.writeNumberField("DestHostID", bidRequest.getDestID());
-		HashMap<Resource, Float> requiredResources = bidRequest.getRequiredResources();
+		HashMap<Resource, Long> requiredResources = bidRequest.getRequiredResources();
 		//traverse the hashmap
-		Set<Entry<Resource, Float>> resourceSet = requiredResources.entrySet();
-		for(Entry<Resource,Float> entry : resourceSet){
+		Set<Entry<Resource, Long>> resourceSet = requiredResources.entrySet();
+		for(Entry<Resource,Long> entry : resourceSet){
 			Resource name = entry.getKey();
 			switch(name){
 				case DATA:

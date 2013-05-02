@@ -42,7 +42,7 @@ public class Bidder extends Thread{
 
 
 	//performs as a factory for BidRequest
-	private BidRequest generateBidRequest(HashMap<Resource, Float> requestResources, long sourceID, long destID, float value){
+	private BidRequest generateBidRequest(HashMap<Resource, Long> requestResources, long sourceID, long destID, float value){
 		
 		//clear the result for the last time
 		BidRequest request = new BidRequest(this, sourceID, destID, value, requestResources);
@@ -71,7 +71,7 @@ public class Bidder extends Thread{
 	//true if received
 	//false if timeout (auctionner's ack is not received in the period of time)
 	
-	public boolean sendBidRequestAndWaitForResult(long sourceID, long destID, HashMap<Resource, Float> requestResources, float value) throws InterruptedException{
+	public boolean sendBidRequestAndWaitForResult(long sourceID, long destID, HashMap<Resource, Long> requestResources, float value) throws InterruptedException{
 		
 		latestResult = null;
 		BidRequest request = this.generateBidRequest(requestResources, sourceID, destID, value);

@@ -32,7 +32,7 @@ public class BidRequest implements Serializable{
 	public boolean valid = false;
 	
 	//a key-value pair list for resource and required amount
-	private HashMap<Resource, Float> requiredResources;
+	private HashMap<Resource, Long> requiredResources;
 	
 	/**
 	 * the collection of feasible routes 
@@ -94,11 +94,11 @@ public class BidRequest implements Serializable{
 	}
 	
 	public BidRequest(){
-		this.requiredResources = new HashMap<Resource, Float>();
+		this.requiredResources = new HashMap<Resource, Long>();
 		this.verifiedRoutes = new LinkedList<Route>();
 	}
 	
-	public BidRequest(Bidder _bidder, long _sourceID, long _destID, float _bidValue, HashMap<Resource, Float> _requiredResources){
+	public BidRequest(Bidder _bidder, long _sourceID, long _destID, float _bidValue, HashMap<Resource, Long> _requiredResources){
 		this.bidder = _bidder;
 		this.bidValue = _bidValue;
 		this.requiredResources = _requiredResources;
@@ -142,11 +142,11 @@ public class BidRequest implements Serializable{
 		this.destID = destID;
 	}
 
-	public HashMap<Resource, Float> getRequiredResources() {
+	public HashMap<Resource, Long> getRequiredResources() {
 		return requiredResources;
 	}
 
-	public void setRequiredResources(HashMap<Resource, Float> requiredResources) {
+	public void setRequiredResources(HashMap<Resource, Long> requiredResources) {
 		this.requiredResources = requiredResources;
 	}
 
@@ -154,7 +154,7 @@ public class BidRequest implements Serializable{
 		return serialVersionUID;
 	}
 
-	public void addRequestField(Resource resource, float amount){
+	public void addRequestField(Resource resource, long amount){
 		if(requiredResources.containsKey(resource)){
 			requiredResources.put(resource, requiredResources.get(resource) + amount);
 		}
@@ -171,11 +171,11 @@ public class BidRequest implements Serializable{
 		return false;
 	}
 	
-	public float getStartTime(){
+	public long getStartTime(){
 		return requiredResources.get(Resource.START_TIME);
 	}
 	
-	public float getEndTime(){
+	public long getEndTime(){
 		return requiredResources.get(Resource.END_TIME);
 	}
 	

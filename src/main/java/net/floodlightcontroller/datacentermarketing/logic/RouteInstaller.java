@@ -83,7 +83,7 @@ public class RouteInstaller {
 				int addressInt = MarketManager.getInstance().getLowLevelController().getDevices().get(destID).getIPv4Addresses()[0];
 				
 				TransmissionReminder reminder = new TransmissionReminder(
-						IPv4.fromIPv4Address(addressInt), bandwidth, timeout + 1000, data);
+						IPv4.fromIPv4Address(addressInt), bandwidth, timeout*1000 + 1000, data);
 				String content = reminder.toJSONString();
 				MarketManager.getInstance().getLowLevelController().pushMessageToHost("1.2.3.5", srcID, content);
 				

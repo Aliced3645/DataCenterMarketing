@@ -82,31 +82,31 @@ public class BidRequestResource extends ServerResource {
 	            }
 	            else if(name == "MinRate"){
 	            	jp.nextToken();
-	            	bidRequest.addRequestField(Resource.MIN_RATE, jp.getFloatValue());
+	            	bidRequest.addRequestField(Resource.MIN_RATE, jp.getLongValue());
 	            	bMinRate = true;
 	            }
 	            else if(name == "MaxRate"){
 	            	jp.nextToken();
-	            	bidRequest.addRequestField(Resource.MAX_RATE, jp.getFloatValue());
+	            	bidRequest.addRequestField(Resource.MAX_RATE, jp.getLongValue());
 	            }
 	            else if(name == "Data"){
 	            	jp.nextToken();
-	            	bidRequest.addRequestField(Resource.DATA, jp.getFloatValue());
+	            	bidRequest.addRequestField(Resource.DATA,jp.getLongValue());
 	            	bData = true;
 	            }
 	            else if(name == "Start"){
 	            	jp.nextToken();
-	            	bidRequest.addRequestField(Resource.START_TIME, System.currentTimeMillis() + jp.getFloatValue());
+	            	bidRequest.addRequestField(Resource.START_TIME, System.currentTimeMillis() + jp.getLongValue());
 	            	bStart = true;
 	            }
 	            else if(name == "End"){
 	            	jp.nextToken();
-	            	bidRequest.addRequestField(Resource.END_TIME, System.currentTimeMillis() + jp.getFloatValue());
+	            	bidRequest.addRequestField(Resource.END_TIME, System.currentTimeMillis() + jp.getLongValue());
 	            	bEnd = true;
 	            }
 	            else if(name == "Latency"){
 	            	jp.nextToken();
-	            	bidRequest.addRequestField(Resource.LATENCY, jp.getIntValue());
+	            	bidRequest.addRequestField(Resource.LATENCY, jp.getLongValue());
 	            	bLatency = true;
 	            }
 	            

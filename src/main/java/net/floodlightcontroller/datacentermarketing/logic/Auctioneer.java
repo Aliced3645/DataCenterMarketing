@@ -97,7 +97,10 @@ public class Auctioneer {
 				RouteInstallerFactory.getInstance().createRouteInstaller(
 						(long)bidRequest.getStartTime(), (long)bidRequest.getSourceID(), (long)bidRequest.getDestID(), 
 						result.getRoute(), (long)(bidRequest.getMinBandwidth()), 
-						(short)((bidRequest.getStartTime() - bidRequest.getEndTime()) / 1000), (long)bidRequest.getData());
+						(short)((bidRequest.getEndTime() - bidRequest.getStartTime()) / 1000), (long)bidRequest.getData());
+				
+				System.out.println("automan" + bidRequest.getEndTime() + " " + bidRequest.getStartTime() + " " + 
+						(short)((bidRequest.getEndTime() - bidRequest.getStartTime()) / 1000));
 			}
 		}
 		
