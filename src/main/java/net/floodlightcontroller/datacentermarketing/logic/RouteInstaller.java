@@ -78,8 +78,14 @@ public class RouteInstaller {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			try {
-				MarketManager.getInstance().getLowLevelController().installRoute(srcID, destID, rt, bandwidth, (short)(timeout));
-				//tell client that they CAN GO
+				
+				//Found that there is no need to install rules
+				//learning switch does that for us
+				//MarketManager.getInstance().getLowLevelController().installRoute(srcID, destID, rt, bandwidth, (short)(timeout));
+				
+				/**
+				 * tell client that he CAN GO
+				 */
 				int addressInt = MarketManager.getInstance().getLowLevelController().getDevices().get(destID).getIPv4Addresses()[0];
 				
 				TransmissionReminder reminder = new TransmissionReminder(

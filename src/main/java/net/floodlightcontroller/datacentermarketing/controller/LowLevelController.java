@@ -1213,7 +1213,7 @@ public class LowLevelController implements IOFSwitchListener,
 		updateSwitches();
 		updateDevices();
 
-		IDevice device = devices.get(hostID);
+		IDevice device = deviceManager.getDevice(hostID);
 		SwitchPort[] ports = device.getAttachmentPoints();
 
 		try {
@@ -1293,7 +1293,7 @@ public class LowLevelController implements IOFSwitchListener,
 
 							break;
 						}
-
+						
 						System.out.println("\n\n Received a request at time "
 								+ MarketManager.getInstance().getCurrentTime()
 								+ "content: " + payloadString + "from host "

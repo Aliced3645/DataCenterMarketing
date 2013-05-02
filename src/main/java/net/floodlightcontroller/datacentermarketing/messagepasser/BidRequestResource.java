@@ -31,6 +31,7 @@ public class BidRequestResource extends ServerResource {
 	        MappingJsonFactory f = new MappingJsonFactory();
 	        JsonParser jp;
 	        
+	        
 	        //these six fields must be filled in the JSON request
 	        boolean bBidder = false, bValue = false , bSID = false, bDID = false , 
 	        		bMinRate = false, bData = false, bStart = false, bEnd = false,
@@ -116,8 +117,16 @@ public class BidRequestResource extends ServerResource {
 	        }     
 	        
 	        //check if the bidRequest is value by seeing whether minimum set of fields are filled
-	        if(bBidder && bValue && bMinRate && bSID && bDID && bData && bStart && bEnd && bLatency)
-	        	bidRequest.valid = true;
+	        if(bBidder && bValue && bMinRate && bSID && bDID && bData && bStart && bEnd && bLatency){
+	        	//verify if the data could be transmitted within the time period
+	        	long dataAmount = bidRequest.getData();
+	        	long duration = bidRequest.getEndTime() - bidRequest.getStartTime();
+	        	if(dataAmount > (duration / 1000) * bidRequest.getMinBandwidth()){
+	        		bidRequest.valid = false;
+	        	}
+	        	else
+	        		bidRequest.valid = true;
+	        }
 	        
 	        return bidRequest;
 		}

@@ -183,11 +183,11 @@ public class BidRequest implements Serializable{
 		return requiredResources.get(Resource.MIN_RATE);
 	}
 	
-	public float getMaxBandwidth(){
+	public long getMaxBandwidth(){
 		return requiredResources.get(Resource.MAX_RATE);
 	}
 	
-	public float getData(){
+	public long getData(){
 		return requiredResources.get(Resource.DATA);
 	}
 
