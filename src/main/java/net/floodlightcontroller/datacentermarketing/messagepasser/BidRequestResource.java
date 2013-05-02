@@ -126,7 +126,7 @@ public class BidRequestResource extends ServerResource {
 	        	}
 	        	else
 	        	*/
-	        		bidRequest.valid = true;
+	        	bidRequest.valid = true;
 	        }
 	        
 	        return bidRequest;

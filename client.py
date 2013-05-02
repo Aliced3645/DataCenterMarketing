@@ -119,10 +119,10 @@ def sniffing():
                 #parse JSON first
                 parsed_json = json.loads(lastFetched)
                 print 'Get a reminder from the server, start transmitting..'
-                destIP = parsed_json('destIP')
-                bandwidth = parsed_json('bandwidth')
-                duration = parsed_json('duration')
-                data = parsed_json('data')
+                destIP = parsed_json['destIP']
+                bandwidth = parsed_json['bandwidth']
+                duration = parsed_json['duration']
+                data = parsed_json['data']
                 pSend = threading.Thread(target=udpSend, args=(destIP,
                             bandwidth, duration, data))
                 pSend.start()
@@ -137,7 +137,7 @@ def udpSend(destIP, bandwidth, duration, data):
                      socket.SOCK_DGRAM) # UDP
     left = data
     while left > 0 :
-        sock.sendto(MESSAGE, (destIP, 9999))
+        sock.sendto(datablock, (destIP, 9999))
         left = left - 0.001
     
     return
