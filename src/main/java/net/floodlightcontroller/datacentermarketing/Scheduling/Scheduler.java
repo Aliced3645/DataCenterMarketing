@@ -47,7 +47,7 @@ public class Scheduler {
 			ExecutionException {
 		switchesInfo = new HashMap<Long, SwitchAddInfo>();
 		// TODO how to initialize all the switches?
-
+		
 		refreshTopo();
 
 		// show UI
@@ -169,6 +169,7 @@ public class Scheduler {
 
 			HashSet<Integer> ps = switchesInfo.get(switchNum).getPort(portNum)
 					.possibleQ(alloc);
+					
 
 			if (ps == null)
 				return false;

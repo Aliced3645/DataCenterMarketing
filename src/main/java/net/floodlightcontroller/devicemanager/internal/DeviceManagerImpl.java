@@ -108,7 +108,11 @@ IFlowReconcileListener, IInfoProvider, IHAListener {
     protected IThreadPoolService threadPool;
     protected IFlowReconcileService flowReconcileMgr;
     protected IDebugCounterService debugCounters;
-
+    
+    public String toString(){
+    	System.out.println(this.deviceMap);
+		return null;
+    }
     /**
      * Time in milliseconds before entities will expire
      */
@@ -240,10 +244,14 @@ IFlowReconcileListener, IInfoProvider, IHAListener {
 
         @Override
         public String toString() {
+        	
+        	
             String devIdStr = device.getEntityClass().getName() + "::" +
                     device.getMACAddressString();
             return "DeviceUpdate [device=" + devIdStr + ", change=" + change
                    + ", fieldsChanged=" + fieldsChanged + "]";
+                   
+        	
         }
 
     }
@@ -346,6 +354,7 @@ IFlowReconcileListener, IInfoProvider, IHAListener {
         return deviceMap.get(deviceKey);
     }
 
+    
     @Override
     public IDevice findDevice(long macAddress, Short vlan,
                               Integer ipv4Address, Long switchDPID,

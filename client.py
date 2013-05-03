@@ -43,11 +43,11 @@ def randomRequestGenerator():
     #random items to generate:
     value = random.randint(0,1000)
     destID = random.randint(2,allhosts - 1)
-    minRate = random.randint(0, 5000)
+    minRate = random.randint(0, 10)
     data = random.randint(0,50000)
     #relative time..
-    start = random.randint(10000,15000)
-    end = random.randint(start, 20000)
+    start = random.randint(10000,100000)
+    end = random.randint(start, 200000)
     latency = random.randint(1000000, 10000000)
     latencyq = 100000000
     randomJson = constructBidString(value, destID, minRate, data, start, end,latencyq)
@@ -131,17 +131,35 @@ def sniffing():
 
 datablock = 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'
 
+
+granuality = 1000.0
 def udpSend(destIP, bandwidth, duration, data):
     # current method : send until all data ends
     sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
     start_time = time.time()
     left = data
+    allData = 0
+    count = 0
+    granulaityData = (float) (bandwidth / granuality)
+    print granulaityData
     while left > 0 :
-        sock.sendto(datablock, (destIP, 9999))
-        left = left - 0.001
-        
-
+        dataThisRound = 0
+        startThisRound = time.time()
+        while dataThisRound <=  granulaityData:
+            allData += 0.001
+            dataThisRound += 0.001
+            count += 1
+            sock.sendto(datablock, (destIP, 9999))
+            left = left - 0.001
+            if count == 1000:
+                rate = allData / (time.time() - start_time) 
+                count = 0
+                print str(rate) + 'MB/s'
+        passedTime = time.time() - startThisRound
+        if passedTime < 0.001:
+            t = time.sleep(0.001 - passedTime)
+    
     return
 
 #a thread always receiving data for UDP

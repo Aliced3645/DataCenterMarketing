@@ -120,6 +120,31 @@ public class LowLevelController implements IOFSwitchListener,
 	// internal hashmap for switches and devices
 	private Map<Long, IOFSwitch> switches;
 	private Map<Long, IDevice> devices;
+	
+	public IDevice getDeviceByID(long deviceID){
+		Collection<? extends IDevice> devices = deviceManager.getAllDevices();
+		long realIPlast = deviceID + 1;
+		String targetIP = "10.0.0." + realIPlast;
+		for(IDevice device : devices){
+			if( device.getIPv4Addresses().length > 0  &&
+				IPv4.fromIPv4Address(device.getIPv4Addresses()[0]).equals(targetIP)){
+				return device;
+			}
+		}
+		return null;
+	}
+	
+	public IOFSwitch getSwitchByID(long switchID){
+		Set<Entry<Long, IOFSwitch>> switches = controller.getSwitches().entrySet();
+		for(Entry<Long, IOFSwitch> entry : switches){
+			IOFSwitch iofswitch = entry.getValue();
+			if(iofswitch.getId() == switchID)
+				return iofswitch;
+		}
+		return null;
+	}
+	
+	
 	protected IFloodlightProviderService floodlightProvider;
 
 	private Future<OFFeaturesReply> future;
@@ -142,7 +167,7 @@ public class LowLevelController implements IOFSwitchListener,
 			jGen.writeEndObject();
 		}
 	}
-
+	
 	@JsonSerialize(using = PingPayloadJSONSerializer.class)
 	class PingPayload {
 		public String routeString;
@@ -338,11 +363,11 @@ public class LowLevelController implements IOFSwitchListener,
 	public ArrayList<Route> getNonLoopPaths(long srcID, long destID)
 			throws IOException, InterruptedException, ExecutionException {
 
-		updateDevices();
-		updateSwitches();
-
-		IDevice srcDev = devices.get(srcID);
-		IDevice destDev = devices.get(destID);
+		//updateDevices();
+		//updateSwitches();
+		
+		IDevice srcDev = getDeviceByID(srcID);
+		IDevice destDev = getDeviceByID(destID);
 		if (srcDev == null || destDev == null)
 			return null;
 
@@ -388,7 +413,7 @@ public class LowLevelController implements IOFSwitchListener,
 
 	private void sendPacketOutMessage(String sourceIP, String destIP,
 			IOFSwitch outSwitch, String payLoad, IDevice device, short outport) {
-
+		
 		IPv4 probe = new IPv4();
 		probe = (IPv4) probe
 				.setVersion((byte) 4)
@@ -397,7 +422,6 @@ public class LowLevelController implements IOFSwitchListener,
 				.setFlags((byte) 0)
 				.setFragmentOffset((short) 0)
 				.setTtl((byte) 250)
-				/* .setProtocol(IPv4.PROTOCOL_UDP) */
 				.setChecksum((short) 0)
 				.setSourceAddress(sourceIP)
 				.setDestinationAddress(
@@ -433,7 +457,7 @@ public class LowLevelController implements IOFSwitchListener,
 		packetOutMessage.setPacketData(packetData);
 		packetOutLength += (short) packetData.length;
 		packetOutMessage.setLength(packetOutLength);
-
+		
 		try {
 			outSwitch.write(packetOutMessage, null);
 			outSwitch.flush();
@@ -620,8 +644,8 @@ public class LowLevelController implements IOFSwitchListener,
 		actionsTo.add(outputTo);
 
 		// get the ID of source and destination
-		IDevice sourceDevice = devices.get(srcID);
-		IDevice destDevice = devices.get(destID);
+		IDevice sourceDevice = this.getDeviceByID(srcID);
+		IDevice destDevice = this.getDeviceByID(destID);
 
 		// something not sure right now
 		String matchString = "nw_dst="
@@ -1210,15 +1234,13 @@ public class LowLevelController implements IOFSwitchListener,
 		/*
 		 * for communication test
 		 */
-		updateSwitches();
-		updateDevices();
-
-		IDevice device = deviceManager.getDevice(hostID);
+		
+		IDevice device = this.getDeviceByID(hostID);
 		SwitchPort[] ports = device.getAttachmentPoints();
 
 		try {
 
-			IOFSwitch comeSwitch = switches.get(ports[0].getSwitchDPID());
+			IOFSwitch comeSwitch = controller.getSwitches().get(ports[0].getSwitchDPID());
 
 			short comePort = (short) ports[0].getPort();
 
@@ -1234,7 +1256,6 @@ public class LowLevelController implements IOFSwitchListener,
 				System.out
 						.println("The attach points are empty, make updates!");
 				((DeviceManagerImpl) deviceManager).topologyChanged();
-
 			}
 
 			e.printStackTrace();
@@ -1307,6 +1328,7 @@ public class LowLevelController implements IOFSwitchListener,
 						System.out.println("Batman!");
 						if (bidRequest.getPossibleRoutes().isEmpty()) {
 							// no possilbe routes
+							assert(bidRequest.getSourceID() == 0);
 							pushMessageToHost("1.2.3.4", bidRequest.getSourceID(),
 									"latency probe failure");
 							payloadSet.clear();
