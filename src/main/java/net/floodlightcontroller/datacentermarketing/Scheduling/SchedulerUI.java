@@ -12,6 +12,7 @@ import java.awt.Graphics;
 import java.awt.LayoutManager;
 
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.JRadioButton;
@@ -52,14 +53,20 @@ public class SchedulerUI extends JDialog {
 	// click position
 	public static volatile int x;
 	public static volatile int y;
-/*	public static volatile Boolean captured = false;
-	public static volatile Object highLighted = null;*/
+	/*
+	 * public static volatile Boolean captured = false; public static volatile
+	 * Object highLighted = null;
+	 */
 
 	private final int width = 1000;
 
 	private final int height = 10000;
 
 	private int thick = 2;
+
+	private JLabel st = new JLabel("start   ");
+
+	private JLabel ed = new JLabel("end     ");
 
 	public void doRepaint() {
 
@@ -77,7 +84,7 @@ public class SchedulerUI extends JDialog {
 	 * dialog.setVisible(true); } catch (Exception e) { e.printStackTrace(); } }
 	 */
 
-	long endTimeOffset = 1000;
+	long endTimeOffset = 10000;
 
 	private class MainCanvas extends JPanel {
 
@@ -95,6 +102,13 @@ public class SchedulerUI extends JDialog {
 
 			g.setColor(Color.black);
 			g.fillRect(0, 0, width, height);
+
+			st.setText("" + System.currentTimeMillis() /* / 1000 */);
+
+			ed.setText("" + (System.currentTimeMillis() + endTimeOffset)/*
+																		 * /
+																		 * 1000
+																		 */);
 
 			Scheduler.getInstance()
 					.visualize(
@@ -121,10 +135,13 @@ public class SchedulerUI extends JDialog {
 		 * menuBar.setBounds(0, 0, width, 10);
 		 */
 		JPanel menuBar = new JPanel();
+		menuBar.setLayout(new BorderLayout(0, 0));
 		info = new JTextField();
-		info.setPreferredSize(new Dimension(width, 30));
+		info.setPreferredSize(new Dimension(width / 2, 30));
 		info.setEditable(false);
-		menuBar.add(info);
+		menuBar.add(info, BorderLayout.CENTER);
+		menuBar.add(st, BorderLayout.WEST);
+		menuBar.add(ed, BorderLayout.EAST);
 
 		getContentPane().add(menuBar, BorderLayout.NORTH);
 
@@ -139,7 +156,7 @@ public class SchedulerUI extends JDialog {
 				x = e.getX();
 				y = e.getY();
 				info.setText(x + ": " + y);
-				//captured = false;
+				// captured = false;
 				repaint();
 
 			}
@@ -241,7 +258,7 @@ public class SchedulerUI extends JDialog {
 		speed.setPaintLabels(true);
 		speed.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				endTimeOffset = speed.getValue() * 1000;
+				endTimeOffset = speed.getValue() * 10000;
 				repaint();
 			}
 		});
