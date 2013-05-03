@@ -10,7 +10,7 @@ from struct import *
 import datetime
 import pcapy
 import sys
-
+import time
 
 
 parser = argparse.ArgumentParser(description='Client')
@@ -46,7 +46,7 @@ def randomRequestGenerator():
     minRate = random.randint(0, 5000)
     data = random.randint(0,50000)
     #relative time..
-    start = random.randint(0,5000)
+    start = random.randint(10000,15000)
     end = random.randint(start, 20000)
     latency = random.randint(1000000, 10000000)
     latencyq = 100000000
@@ -135,11 +135,13 @@ def udpSend(destIP, bandwidth, duration, data):
     # current method : send until all data ends
     sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
+    start_time = time.time()
     left = data
     while left > 0 :
         sock.sendto(datablock, (destIP, 9999))
         left = left - 0.001
-    
+        
+
     return
 
 #a thread always receiving data for UDP
