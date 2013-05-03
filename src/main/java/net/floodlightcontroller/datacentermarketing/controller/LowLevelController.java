@@ -1298,6 +1298,7 @@ public class LowLevelController implements IOFSwitchListener,
 								+ MarketManager.getInstance().getCurrentTime()
 								+ "content: " + payloadString + "from host "
 								+ bidRequest.getSourceID() + "\n\n\n");
+						
 						/*
 						 * call the function to put verify request by lantency
 						 * and if possible, put into the queue
