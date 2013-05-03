@@ -205,11 +205,14 @@ public class Queue {
 		/* return Color.blue; */
 		try {
 			if (alloc.direction == ADirection.IN)
-				return new Color((float) alloc.bandwidth / portCap, 0, 0);
+				return new Color((float) alloc.bandwidth / portCap * 0.5f
+						+ 0.5f, 0, 0);
 			else if (alloc.direction == ADirection.OUT)
-				return new Color(0, 0, (float) alloc.bandwidth / portCap);
+				return new Color(0, 0, (float) alloc.bandwidth / portCap * 0.5f
+						+ 0.5f);
 			else
-				return new Color(0, (float) alloc.bandwidth / portCap, 0);
+				return new Color(0, (float) alloc.bandwidth / portCap * 0.5f
+						+ 0.5f, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Color.blue;
