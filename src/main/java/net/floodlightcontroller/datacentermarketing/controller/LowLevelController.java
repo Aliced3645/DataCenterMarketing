@@ -331,12 +331,8 @@ public class LowLevelController implements IOFSwitchListener,
 
 			Entry<Long, IOFSwitch> entry = it.next();
 			IOFSwitch ofSwitch = entry.getValue();
-
-			switches.put(ofSwitch.getId(), ofSwitch);
-
-			// query the switch to get the update..
-			// future = ofSwitch.querySwitchFeaturesReply();
-			// ofSwitch.flush();
+			
+			switches.put(entry.getKey(), ofSwitch);
 		}
 
 	}
@@ -436,7 +432,8 @@ public class LowLevelController implements IOFSwitchListener,
 		// needs to create a packet and send to switch
 		OFPacketOut packetOutMessage = (OFPacketOut) floodlightProvider
 				.getOFMessageFactory().getMessage(OFType.PACKET_OUT);
-
+		
+		
 		short packetOutLength = (short) OFPacketOut.MINIMUM_LENGTH; // starting
 		// length
 
@@ -449,8 +446,9 @@ public class LowLevelController implements IOFSwitchListener,
 
 		// set actions
 		List<OFAction> actions = new ArrayList<OFAction>(0);
+		//OFActionOutput ofa = new OFActionOutput();
 		actions.add(new OFActionOutput((short) outport, (short) 0));
-
+		
 		packetOutMessage.setActions(actions);
 
 		byte[] packetData = /* action.getPacket(); */ethernet.serialize();
@@ -634,7 +632,7 @@ public class LowLevelController implements IOFSwitchListener,
 		NodePortTuple first = switchesPorts.get(index);
 		long nodePid = first.getNodeId();
 		short startPort = first.getPortId();
-		IOFSwitch startSw = switches.get(nodePid);
+		IOFSwitch startSw = controller.getSwitches().get(nodePid);
 		// action
 		OFAction outputTo = new OFActionOutput(first.getPortId(), (short) 1500);
 		// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
@@ -914,7 +912,7 @@ public class LowLevelController implements IOFSwitchListener,
 			}
 
 			for (Route rt : routes) {
-				probeLatency(rt, true);
+				probeLatency("1.2.3.4", "1.2.3.4", rt, true);
 			}
 		} else {
 			log.debug("\n\nDid not get routes, try again later");
@@ -927,7 +925,7 @@ public class LowLevelController implements IOFSwitchListener,
 	// the last switch send the packet back, as required by an action
 
 	// checks for validatiu
-	public boolean probeLatency(Route rt, boolean whetherDelete)
+	public boolean probeLatency(String src, String dest, Route rt, boolean whetherDelete)
 			throws Exception {
 
 		/*
@@ -941,7 +939,7 @@ public class LowLevelController implements IOFSwitchListener,
 
 		// for the first one, we make a packet and send it to the first switch
 		// the last switch send the packet back, as required by an action
-
+		
 		if (rt == null) {
 			debug("no route was presented to probe");
 			return false;
@@ -957,13 +955,14 @@ public class LowLevelController implements IOFSwitchListener,
 			debug("mismatched switch in-out port number!");
 			return false;
 		}
+		
 
 		// get the first switch
 		int index = 0;
 		NodePortTuple first = switchesPorts.get(index);
 		long nodePid = first.getNodeId();
 		short startPort = first.getPortId();
-		IOFSwitch startSw = switches.get(nodePid);
+		IOFSwitch startSw = controller.getSwitches().get(nodePid);
 		// action
 		OFAction outputTo = new OFActionOutput(first.getPortId(), (short) 1500);
 		// outputTo.setLength(Short.MAX_VALUE);// we want whole packet back to
@@ -972,7 +971,7 @@ public class LowLevelController implements IOFSwitchListener,
 		ArrayList<OFAction> actionsTo = new ArrayList<OFAction>();
 		actionsTo.add(outputTo);
 
-		String matchString = "nw_dst=1.2.3.4" + "," + "nw_src=1.2.3.4,"
+		String matchString = "nw_dst=" + src + "," + "nw_src=" + dest + ","
 				+ "dl_type=" + 0x800;
 		OFMatch match = new OFMatch();
 		match.fromString(matchString);
@@ -983,7 +982,7 @@ public class LowLevelController implements IOFSwitchListener,
 		OFFlowMod flowMod = (OFFlowMod) floodlightProvider
 				.getOFMessageFactory().getMessage(OFType.FLOW_MOD);
 
-		flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
+		flowMod.setIdleTimeout((short)Short.MAX_VALUE).setHardTimeout((short)Short.MAX_VALUE)
 				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
 				.setCookie(AppCookie.makeCookie(0, 0))
 				.setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
@@ -1007,7 +1006,7 @@ public class LowLevelController implements IOFSwitchListener,
 			// get the switch
 			NodePortTuple firstInPair = switchesPorts.get(index);
 			nodePid = firstInPair.getNodeId();
-			IOFSwitch sw = switches.get(nodePid);
+			IOFSwitch sw = controller.getSwitches().get(nodePid);
 			short ingressPortPid = firstInPair.getPortId();
 			index++;
 			NodePortTuple secondInPair = switchesPorts.get(index);
@@ -1053,7 +1052,7 @@ public class LowLevelController implements IOFSwitchListener,
 		// last port
 		NodePortTuple last = switchesPorts.get(index);
 		nodePid = last.getNodeId();
-		IOFSwitch endSw = switches.get(nodePid);
+		IOFSwitch endSw = controller.getSwitches().get(nodePid);
 		System.out.println(65533 + " " + 0xfffd + " " + (short) 0xfffd);
 		outputTo = new OFActionOutput(OFPort.OFPP_CONTROLLER.getValue(),
 				(short) 1500);
@@ -1106,9 +1105,8 @@ public class LowLevelController implements IOFSwitchListener,
 				.setIdentification((short) 188).setFlags((byte) 0)
 				.setFragmentOffset((short) 0).setTtl((byte) 250)
 				/* .setProtocol(IPv4.PROTOCOL_UDP) */.setChecksum((short) 0)
-				.setSourceAddress("1.2.3.4").setDestinationAddress("1.2.3.4")
+				.setSourceAddress(src).setDestinationAddress(dest)
 				.setPayload(new Data(pplString.getBytes()));
-
 		IOFSwitch iofSwitch = floodlightProvider.getSwitches().get(startSw);
 		Ethernet ethernet = (Ethernet) new Ethernet()
 				.setSourceMACAddress(
@@ -1157,7 +1155,7 @@ public class LowLevelController implements IOFSwitchListener,
 		return true;
 	}
 
-	private void finishRouteBenchMark(OFPacketIn msg) {
+	private void finishRouteBenchMark(String incoming, OFPacketIn msg) {
 
 		// get the data out of the msg
 		try {
@@ -1182,7 +1180,7 @@ public class LowLevelController implements IOFSwitchListener,
 				debug("Ping packet content: " + id);
 				// TODO tear down the route
 				if (toDelete == true) {
-					this.deleteRoute(route, "1.2.3.4", "1.2.3.4");
+					this.deleteRoute(route, incoming, incoming);
 				}
 
 				// wake up the bidRequest and set the latency
@@ -1255,7 +1253,7 @@ public class LowLevelController implements IOFSwitchListener,
 			if (ports.length == 0) {
 				System.out
 						.println("The attach points are empty, make updates!");
-				((DeviceManagerImpl) deviceManager).topologyChanged();
+				//((DeviceManagerImpl) deviceManager).topologyChanged();
 			}
 
 			e.printStackTrace();
@@ -1279,9 +1277,13 @@ public class LowLevelController implements IOFSwitchListener,
 			IPv4 ipContent = new IPv4();
 			ipContent.deserialize(eth.getPayload().serialize(), 0, eth.getPayload()
 					.serialize().length);
-
-			if (IPv4.toIPv4Address("1.2.3.4") == ipContent.getDestinationAddress()) {
-				finishRouteBenchMark((OFPacketIn) msg);
+			String comingIP = IPv4.fromIPv4Address(ipContent.getDestinationAddress());
+			
+			if ( IPv4.fromIPv4Address(ipContent.getDestinationAddress()).substring(0, 5).equals("1.2.3")){
+				//IPv4.toIPv4Address("1.2.3.0") == ipContent.getDestinationAddress()) {
+				
+				System.out.println("Iloveyou" + IPv4.fromIPv4Address(ipContent.getDestinationAddress()));
+				finishRouteBenchMark(comingIP, (OFPacketIn) msg);
 			}
 			
 			/**

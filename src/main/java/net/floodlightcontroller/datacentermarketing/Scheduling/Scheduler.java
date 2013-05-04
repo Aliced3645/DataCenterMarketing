@@ -86,6 +86,7 @@ public class Scheduler {
 		MarketManager.getInstance().getLowLevelController().updateSwitches();
 
 		debug("scheduler getting switches");
+		MarketManager.getInstance().getLowLevelController().updateSwitches();
 		initializeWithIOFSwitches(MarketManager.getInstance()
 				.getLowLevelController().getSwitches());
 

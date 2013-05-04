@@ -1271,8 +1271,10 @@ public class Controller implements IFloodlightProviderService,
 	                			probe.deserialize(eth.getPayload().serialize(), 0, eth.getPayload()
 	                					.serialize().length);
 	                			//if(listener.getName().equals(arg0))
-	                			if(probe.getSourceAddress() != IPv4.toIPv4Address("1.2.3.4")){
-	                				break;
+	                			int toAllow = probe.getSourceAddress();
+	                			String toPass = IPv4.fromIPv4Address(toAllow);
+	                			if(toPass.substring(0, 5) == "1.2.3"){
+	                				continue;
 	                			}
                         	}
                         	else

@@ -60,6 +60,7 @@ public class BidRequest implements Serializable{
 	 * @throws Exception 
 	 */
 	public void verifyPossibleRoutesByLatency() throws Exception{
+		String specialMatchingString = "1.2.3." + sourceID;
 		ArrayList<Route> possibleRoutes = MarketManager.getInstance().getNonLoopPaths(sourceID, destID);
 		if(possibleRoutes == null || possibleRoutes.isEmpty() )
 			return;
@@ -68,7 +69,7 @@ public class BidRequest implements Serializable{
 		//For each route, ping for them.
 		for(Route rt : possibleRoutes){
 			//probe one time now
-			boolean res = MarketManager.getInstance().getLowLevelController().probeLatency(rt, true);
+			boolean res = MarketManager.getInstance().getLowLevelController().probeLatency(specialMatchingString, specialMatchingString, rt, true);
 			if(res){
 				synchronized(this){
 					this.wait(); // block until being waken up
