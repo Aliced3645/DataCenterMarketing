@@ -24,6 +24,8 @@ bidderID = args.bidderID
 host = args.host
 allhosts = args.allhosts
 
+bidRound = 0
+
 if interface is None:
     interface = "h3-eth0"
 if bidderID is None:
@@ -108,12 +110,13 @@ def sniffing():
     global localBiddingRound
     
     cap = pcapy.open_live(interface , 65536 , 0 , 0)
-    while(1) :
+    while bidRound < 5 :
         (header, packet) = cap.next()
         #function to parse a packet
         result = parse_packet(packet)
         if result is not None:
             if result == '1.2.3.4':
+		bidRound += 1
                 print lastFetched
                 content = randomRequestGenerator()
                 packet = Ether() / IP(dst="10.0.0.255") / content
@@ -179,7 +182,7 @@ if __name__ == "__main__":
     
     p = threading.Thread(target=sniffing)
     p.start()
-    
+    random.seed(3)
     p2 = threading.Thread(target=udpListen)
     p2.start()
 
@@ -189,7 +192,7 @@ if __name__ == "__main__":
     packet = Ether() / IP(dst="10.0.0.255") / content
     # send
     sendp(packet, iface=interface, count=1)
-
+    bidRound += 1
     p.join()
 
 '''

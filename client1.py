@@ -24,6 +24,8 @@ bidderID = args.bidderID
 host = args.host
 allhosts = args.allhosts
 
+bidRound = 0
+
 if interface is None:
     interface = "h1-eth0"
 if bidderID is None:
@@ -33,11 +35,16 @@ if host is None:
 if allhosts is None:
     allhosts = 7
     
+
+    
+    
 def constructBidString(value, destID, minRate, data, start, end, latency):
     global host
     global bidderID
     json = "{\"Bidder\":\"%s\", \"Value\":%s, \"SID\":%s, \"DID\":%s, \"MinRate\":%s, \"Data\":%s,\"Start\":%s, \"End\":%s, \"Latency\":%s}" % (bidderID, value, host, destID, minRate, data, start, end, latency)
+    print json
     return json
+
 
 def randomRequestGenerator():
     #random items to generate:
@@ -103,14 +110,16 @@ def parse_packet(packet) :
 def sniffing():
     global lastFetched
     global localBiddingRound
-    
+    global bidRound
     cap = pcapy.open_live(interface , 65536 , 0 , 0)
-    while(1) :
+    while bidRound < 5 :
+        
         (header, packet) = cap.next()
         #function to parse a packet
         result = parse_packet(packet)
         if result is not None:
             if result == '1.2.3.4':
+                bidRound += 1
                 print lastFetched
                 content = randomRequestGenerator()
                 packet = Ether() / IP(dst="10.0.0.255") / content
@@ -173,20 +182,20 @@ def udpListen():
 
     
 if __name__ == "__main__":
-    
+
     p = threading.Thread(target=sniffing)
     p.start()
-    
+    random.seed(1)
     p2 = threading.Thread(target=udpListen)
     p2.start()
-
+    
     #make the first bid
     content = randomRequestGenerator()
     print content
     packet = Ether() / IP(dst="10.0.0.255") / content
     # send
     sendp(packet, iface=interface, count=1)
-
+    bidRound += 1
     p.join()
 
 '''
