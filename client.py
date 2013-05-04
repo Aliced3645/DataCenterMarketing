@@ -44,10 +44,10 @@ def randomRequestGenerator():
     value = random.randint(0,1000)
     destID = random.randint(2,allhosts - 1)
     minRate = random.randint(0, 10)
-    data = random.randint(0,50000)
     #relative time..
     start = random.randint(10000,100000)
     end = random.randint(start, 200000)
+    data = (end - start) / 1000.0 * minRate
     latency = random.randint(1000000, 10000000)
     latencyq = 100000000
     randomJson = constructBidString(value, destID, minRate, data, start, end,latencyq)
@@ -142,7 +142,8 @@ def udpSend(destIP, bandwidth, duration, data):
     allData = 0
     count = 0
     granulaityData = (float) (bandwidth / granuality)
-    print granulaityData
+    print 'Begin transmitting to ' + str(destIP) + ' at the speed of ' + str(bandwidth) + 'MB/s'
+    print 'Duration: ' + str(duration) + 'ms, ', 'data: ' + str(data) + 'MB'
     while left > 0 :
         dataThisRound = 0
         startThisRound = time.time()
@@ -155,7 +156,6 @@ def udpSend(destIP, bandwidth, duration, data):
             if count == 1000:
                 rate = allData / (time.time() - start_time) 
                 count = 0
-                print str(rate) + 'MB/s'
         passedTime = time.time() - startThisRound
         if passedTime < 0.001:
             t = time.sleep(0.001 - passedTime)

@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo mn --switch user --custom myTopo.py --topo mytopo --controller remote
+sudo mn --custom myTopo.py --topo mytopo --controller remote --switch ovsk
 
 #--custom myTopo.py --topo mytopo
 #--topo linear,4 
