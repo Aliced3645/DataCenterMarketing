@@ -1237,7 +1237,6 @@ public class LowLevelController implements IOFSwitchListener,
 		SwitchPort[] ports = device.getAttachmentPoints();
 
 		try {
-			System.out.println("switches!!!" + controller.getSwitches());
 			IOFSwitch comeSwitch = controller.getSwitches().get(ports[0].getSwitchDPID());
 
 			short comePort = (short) ports[0].getPort();

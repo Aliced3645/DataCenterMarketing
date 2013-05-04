@@ -74,7 +74,8 @@ public class Auctioneer {
 		resultsForThisRound = new LinkedHashMap<String, BidResult>();
 		requestsForNextRound = new LinkedHashMap<String, BidRequest>();
 		//default strategy..
-		this.strategy = new FirstComeFirstServeStrategy();
+		//this.strategy = new FirstComeFirstServeStrategy();
+		this.strategy = new EstimationBasedStrategy();
 	}
 
 	public synchronized LinkedHashMap<String, BidRequest> getBidRequestForThisRound() {
