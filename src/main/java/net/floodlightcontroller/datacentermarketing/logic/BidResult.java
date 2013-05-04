@@ -17,7 +17,17 @@ public class BidResult {
 	//round counter (which round generates the result? )
 	int round;
 	Bidder bidder;
+	public float value;
 	
+	public synchronized float getValue() {
+		return value;
+	}
+
+	public synchronized void setValue(float value) {
+		this.value = value;
+	}
+
+
 	Route route; //which route to go?
 	
 	public synchronized Route getRoute() {

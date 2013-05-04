@@ -982,7 +982,7 @@ public class LowLevelController implements IOFSwitchListener,
 		OFFlowMod flowMod = (OFFlowMod) floodlightProvider
 				.getOFMessageFactory().getMessage(OFType.FLOW_MOD);
 
-		flowMod.setIdleTimeout((short)Short.MAX_VALUE).setHardTimeout((short)Short.MAX_VALUE)
+		flowMod.setIdleTimeout((short)1).setHardTimeout((short)1)
 				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
 				.setCookie(AppCookie.makeCookie(0, 0))
 				.setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
@@ -1033,8 +1033,8 @@ public class LowLevelController implements IOFSwitchListener,
 			 * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
 			 */
 
-			flowMod.setIdleTimeout(Short.MAX_VALUE)
-					.setHardTimeout(Short.MAX_VALUE)
+			flowMod.setIdleTimeout((short)1)
+					.setHardTimeout((short)1)
 					.setBufferId(OFPacketOut.BUFFER_ID_NONE)
 					.setCookie(AppCookie.makeCookie(0, 0))
 					.setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
@@ -1071,7 +1071,7 @@ public class LowLevelController implements IOFSwitchListener,
 		 * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
 		 */
 
-		flowMod.setIdleTimeout(Short.MAX_VALUE).setHardTimeout(Short.MAX_VALUE)
+		flowMod.setIdleTimeout((short)1).setHardTimeout((short)1)
 				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
 				.setCookie(AppCookie.makeCookie(0, 0))
 				.setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
