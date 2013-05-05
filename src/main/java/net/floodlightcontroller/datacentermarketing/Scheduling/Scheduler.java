@@ -109,7 +109,7 @@ public class Scheduler {
 	}
 
 	private void debug(String x) {
-		System.out.println("NIB debug: " + x + "\n");
+		//System.out.println("NIB debug: " + x + "\n");
 	}
 
 	/**

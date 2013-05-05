@@ -265,6 +265,7 @@ public class LowLevelController implements IOFSwitchListener,
 		controller.addOFMessageListener(OFType.FEATURES_REPLY, this);
 		controller.addOFMessageListener(OFType.ECHO_REPLY, this);
 		controller.addOFMessageListener(OFType.PACKET_IN, this);
+		controller.addOFMessageListener(OFType.HELLO, this);
 	}
 
 	@Override
@@ -982,7 +983,7 @@ public class LowLevelController implements IOFSwitchListener,
 		OFFlowMod flowMod = (OFFlowMod) floodlightProvider
 				.getOFMessageFactory().getMessage(OFType.FLOW_MOD);
 
-		flowMod.setIdleTimeout((short)1).setHardTimeout((short)1)
+		flowMod.setIdleTimeout((short)Short.MAX_VALUE).setHardTimeout((short)Short.MAX_VALUE)
 				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
 				.setCookie(AppCookie.makeCookie(0, 0))
 				.setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
@@ -1033,8 +1034,8 @@ public class LowLevelController implements IOFSwitchListener,
 			 * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
 			 */
 
-			flowMod.setIdleTimeout((short)1)
-					.setHardTimeout((short)1)
+			flowMod.setIdleTimeout((short)Short.MAX_VALUE)
+					.setHardTimeout((short)Short.MAX_VALUE)
 					.setBufferId(OFPacketOut.BUFFER_ID_NONE)
 					.setCookie(AppCookie.makeCookie(0, 0))
 					.setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
@@ -1071,7 +1072,7 @@ public class LowLevelController implements IOFSwitchListener,
 		 * match.setNetworkDestination(IPv4.toIPv4Address("1.2.3.4"));
 		 */
 
-		flowMod.setIdleTimeout((short)1).setHardTimeout((short)1)
+		flowMod.setIdleTimeout((short)Short.MAX_VALUE).setHardTimeout((short)Short.MAX_VALUE)
 				.setBufferId(OFPacketOut.BUFFER_ID_NONE)
 				.setCookie(AppCookie.makeCookie(0, 0))
 				.setCommand(OFFlowMod.OFPFC_ADD).setMatch(match)
@@ -1097,7 +1098,6 @@ public class LowLevelController implements IOFSwitchListener,
 		String routeJSONString = JsonWriter.objectToJson(rt);
 		PingPayload ppl = new PingPayload(routeJSONString, whetherDelete);
 		String pplString = ppl.toString();
-		System.out.println("PPL: " + routeJSONString);
 		// Route rtt = (Route)JsonReader.toJava(content);
 		// System.out.println("JSON...!!" + content);
 		// System.out.println("ROUTE...!!!" + rtt);
@@ -1269,6 +1269,12 @@ public class LowLevelController implements IOFSwitchListener,
 		// get the reply, update related hash tables for queue/port/switch
 		// management
 
+		case HELLO:
+			System.out.println("hello!");
+			System.out.println(sw);
+			System.out.println(msg);
+			break;
+			
 		case PACKET_IN:
 
 			Ethernet eth = IFloodlightProviderService.bcStore.get(cntx,
@@ -1282,7 +1288,7 @@ public class LowLevelController implements IOFSwitchListener,
 				//IPv4.toIPv4Address("1.2.3.0") == ipContent.getDestinationAddress()) {
 				
 				System.out.println("Iloveyou" + IPv4.fromIPv4Address(ipContent.getDestinationAddress()));
-				finishRouteBenchMark(comingIP, (OFPacketIn) msg);
+				//finishRouteBenchMark(comingIP, (OFPacketIn) msg);
 			}
 			
 			/**
@@ -1312,21 +1318,22 @@ public class LowLevelController implements IOFSwitchListener,
 							pushMessageToHost("1.2.3.4", bidRequest.getSourceID(),
 									errorContent);
 							payloadSet.clear();
-
 							break;
 						}
 						
-						System.out.println("\n\n Received a request at time "
+						/*System.out.println("\n\n Received a request at time "
 								+ MarketManager.getInstance().getCurrentTime()
 								+ "content: " + payloadString + "from host "
 								+ bidRequest.getSourceID() + "\n\n\n");
-						
+						*/
 						/*
 						 * call the function to put verify request by lantency
 						 * and if possible, put into the queue
 						 */
-						bidRequest.verifyPossibleRoutesByLatency();
-						System.out.println("Batman!");
+						//bidRequest.verifyPossibleRoutesByLatency();
+						ArrayList<Route> possibleRoutes = MarketManager.getInstance().getNonLoopPaths(
+								bidRequest.getSourceID(), bidRequest.getDestID());
+						bidRequest.setPossibleRoutes(possibleRoutes);
 						if (bidRequest.getPossibleRoutes().isEmpty()) {
 							// no possilbe routes
 							assert(bidRequest.getSourceID() == 0);

@@ -44,6 +44,10 @@ public class BidRequest implements Serializable{
 		return verifiedRoutes;
 	}
 	
+	public void setPossibleRoutes( Collection<Route> possibleRoutes){
+		this.verifiedRoutes = possibleRoutes;
+	}
+	
 	//Set by the latency verification process
 	private long probedLatency;
 	
@@ -83,11 +87,9 @@ public class BidRequest implements Serializable{
 			 * waken up, now the probed latency has been set
 			 */
 			float requiredLatency = this.requiredResources.get(Resource.LATENCY);
-			System.out.println("\n\n\nWAKEN UP!!!!! " +this.probedLatency + " Required" + requiredLatency);
 			// compare the latency
 			if(requiredLatency > this.probedLatency){
 				//pass
-				System.out.println("HEYHEYHEY\n\n\n\n\n");
 				verifiedRoutes.add(rt);
 			}
 		}

@@ -107,8 +107,8 @@ public class Auctioneer {
         auctionLogger.info("Bidding info logger");  
 		
 		//default strategy..
-		this.strategy = new FirstComeFirstServeStrategy();
-		//this.strategy = new EstimationBasedStrategy();
+		//this.strategy = new FirstComeFirstServeStrategy();
+		this.strategy = new EstimationBasedStrategy();
 	}
 
 	public synchronized LinkedHashMap<String, BidRequest> getBidRequestForThisRound() {
@@ -120,18 +120,20 @@ public class Auctioneer {
 				.processAllocation(requestsForThisRound);
 		//update all values
 		Set<Entry<String, BidResult>> resultSet = resultsForThisRound.entrySet();
+		float originalIncome = totalIncome;
 		
 		for(Entry<String, BidResult> resultEntry : resultSet){
 			BidResult result = resultEntry.getValue();
-			float originalIncome = totalIncome;
 			if(result.getResult()){
 				this.totalIncome += result.getValue();
 			}
-			float incomeThisRound = totalIncome - originalIncome;
+		}
+		float incomeThisRound = totalIncome - originalIncome;
+		if(incomeThisRound != 0){
 			auctionLogger.info("Bidding Round " + round + ", thisRoundIncome " + incomeThisRound + ", " +
 					"total income " + totalIncome + ".");
 		}
-		
+	
 	}
 	
 	public synchronized void setRouteInstallers(){

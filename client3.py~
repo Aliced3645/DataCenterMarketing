@@ -27,11 +27,11 @@ allhosts = args.allhosts
 bidRound = 0
 
 if interface is None:
-    interface = "h4-eth0"
+    interface = "h3-eth0"
 if bidderID is None:
-    bidderID = "hay"
+    bidderID = "gay"
 if host is None:
-    host = 3
+    host = 2
 if allhosts is None:
     allhosts = 7
     
@@ -110,8 +110,7 @@ def sniffing():
     global localBiddingRound
     global bidRound
     cap = pcapy.open_live(interface , 65536 , 0 , 0)
-    #while bidRound < 5 :
-    while True:
+    while bidRound < 5 :
         (header, packet) = cap.next()
         #function to parse a packet
         result = parse_packet(packet)
@@ -183,7 +182,7 @@ if __name__ == "__main__":
     
     p = threading.Thread(target=sniffing)
     p.start()
-    random.seed(4)
+    random.seed(3)
     p2 = threading.Thread(target=udpListen)
     p2.start()
 

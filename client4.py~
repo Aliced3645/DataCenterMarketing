@@ -110,8 +110,7 @@ def sniffing():
     global localBiddingRound
     global bidRound
     cap = pcapy.open_live(interface , 65536 , 0 , 0)
-    #while bidRound < 5 :
-    while True:
+    while bidRound < 5 :
         (header, packet) = cap.next()
         #function to parse a packet
         result = parse_packet(packet)

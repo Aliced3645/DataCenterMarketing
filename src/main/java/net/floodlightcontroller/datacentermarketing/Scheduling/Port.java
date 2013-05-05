@@ -270,10 +270,12 @@ public class Port {
 	 */
 
 	public void outputAllocations() {
+		/*
 		System.out.println("Allocation for port " + id + ":\n");
 		for (int a = 0; a < queues.length; a++) {
 			queues[a].outputAllocations();
 		}
+		*/
 
 	}
 
