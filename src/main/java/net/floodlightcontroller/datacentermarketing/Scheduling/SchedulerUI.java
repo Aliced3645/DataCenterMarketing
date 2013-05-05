@@ -128,8 +128,6 @@ public class SchedulerUI extends JDialog {
 			e.printStackTrace();
 		}
 		setBounds(150, 100, width, height);
-		System.out.println("\n\n\t\t\t222222222");
-
 		/*
 		 * JMenuBar menuBar = new J(); menuBar.setToolTipText("Mwnu");
 		 * menuBar.setBounds(0, 0, width, 10);

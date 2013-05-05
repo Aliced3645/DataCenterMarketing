@@ -1,6 +1,11 @@
 package net.floodlightcontroller.datacentermarketing.logic;
 
 import java.io.IOException;
+import java.io.IOException;  
+import java.util.logging.FileHandler;  
+import java.util.logging.Level;  
+import java.util.logging.Logger;  
+import java.util.logging.SimpleFormatter;  
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,9 +28,19 @@ public class Auctioneer {
 
 	private boolean busyFlag = false;
 	public static int round = 0;
-	
+	private Logger auctionLogger = Logger.getLogger("Auction Logger");
+	FileHandler fh;  
+
 	public BidRequest currentRequestWaitingLatencyVerification;
+	private float totalIncome = 0;
 	
+	public void addTotalIncome(float value){
+		totalIncome += value;
+	}
+	
+	public float getTotalIncome(){
+		return totalIncome;
+	}
 	
 	public synchronized BidRequest getCurrentRequestWaitingLatencyVerification() {
 		return currentRequestWaitingLatencyVerification;
@@ -73,6 +88,24 @@ public class Auctioneer {
 		requestsForThisRound = new LinkedHashMap<String, BidRequest>();
 		resultsForThisRound = new LinkedHashMap<String, BidResult>();
 		requestsForNextRound = new LinkedHashMap<String, BidRequest>();
+		
+		//initialize logger
+		try {
+			fh = new FileHandler("/home/shu/git/DataCenterMarketing/BiddingLog.log");
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  
+        auctionLogger.addHandler(fh);  
+        SimpleFormatter formatter = new SimpleFormatter();  
+        fh.setFormatter(formatter);  
+          
+        // the following statement is used to log any messages  
+        auctionLogger.info("Bidding info logger");  
+		
 		//default strategy..
 		//this.strategy = new FirstComeFirstServeStrategy();
 		this.strategy = new EstimationBasedStrategy();
@@ -85,6 +118,22 @@ public class Auctioneer {
 	public synchronized void computeAllocation() throws IOException, InterruptedException, ExecutionException {
 		this.resultsForThisRound = strategy
 				.processAllocation(requestsForThisRound);
+		//update all values
+		Set<Entry<String, BidResult>> resultSet = resultsForThisRound.entrySet();
+		float originalIncome = totalIncome;
+		
+		for(Entry<String, BidResult> resultEntry : resultSet){
+			BidResult result = resultEntry.getValue();
+			if(result.getResult()){
+				this.totalIncome += result.getValue();
+			}
+		}
+		float incomeThisRound = totalIncome - originalIncome;
+		if(incomeThisRound != 0){
+			auctionLogger.info("Bidding Round " + round + ", thisRoundIncome " + incomeThisRound + ", " +
+					"total income " + totalIncome + ".");
+		}
+	
 	}
 	
 	public synchronized void setRouteInstallers(){
@@ -112,9 +161,6 @@ public class Auctioneer {
 	public synchronized void pushResults() throws IOException, InterruptedException, ExecutionException{
 		Set<Entry<String, BidResult>> resultSet = resultsForThisRound.entrySet();
 		if(resultSet.size() == 0){
-			System.out.println("\n\n\n Result size is 0");
-			System.out.println("Request for next round size is " + this.requestsForNextRound.size());
-			System.out.println(" Request size is " + this.requestsForThisRound.size() + "\n\n\n");
 			//It should not happen, the reason it happens is due to the unstable
 			//property of floodlight
 			//but if it happens, then push the string to all requests

@@ -52,6 +52,7 @@ public class FirstComeFirstServeStrategy implements AuctioneerStrategy{
 					break;
 				}
 			}
+			result.setValue(bidRequest.getBidValue());
 			result.setBidRequest(bidRequest);
 			result.setHostID(bidRequest.getSourceID());
 			result.setBidder(bidRequest.getBidder());

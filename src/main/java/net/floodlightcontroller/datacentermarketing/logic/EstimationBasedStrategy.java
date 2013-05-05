@@ -131,6 +131,7 @@ public class EstimationBasedStrategy implements AuctioneerStrategy {
 				/**
 				 * Result is set false to this bid
 				 */
+				result.setValue(bidRequest.getBidValue());
 				result.setBidRequest(bidRequest);
 				result.setHostID(bidRequest.getSourceID());
 				result.setResult(false);
@@ -176,6 +177,7 @@ public class EstimationBasedStrategy implements AuctioneerStrategy {
 				 */
 				result.setResult(false);
 			}
+			result.setValue(bidRequest.getBidValue());
 			result.setBidRequest(bidRequest);
 			result.setBidder(bidRequest.getBidder());
 			result.setRound(Auctioneer.round);

@@ -86,8 +86,8 @@ public class RouteInstaller {
 				/**
 				 * tell client that he CAN GO
 				 */
-				int addressInt = MarketManager.getInstance().getLowLevelController().getDevices().get(destID).getIPv4Addresses()[0];
-				
+				//int addressInt = MarketManager.getInstance().getLowLevelController().getDevices().get(destID).getIPv4Addresses()[0];
+				int addressInt = MarketManager.getInstance().getLowLevelController().getDeviceByID(destID).getIPv4Addresses()[0];
 				TransmissionReminder reminder = new TransmissionReminder(
 						IPv4.fromIPv4Address(addressInt), bandwidth, timeout*1000 + 1000, data);
 				String content = reminder.toJSONString();
