@@ -1,0 +1,1 @@
+cat "+w+" |grep Round >"+w+".t1; sed \'s/ / /\' "+w+".t1 > "+w+".t2 ; sed \'s/ / /\' "+w+".t2 > "+w+".t3 ; sed \'s/ / /\' "+w+".t3 > "+w+".t4 ; sed \'s/ / /\' "+w+".t4 > "+w+".t5; sed \':a;N;$!ba;s/.\\n/\\n /g\' "+w+".t5 |tr -s \' \'|cut -d\' \' -f3- > "+w+".csv; rm -rf *.t1 *.t2 *.t3 *.t4 *.t5 *~"
