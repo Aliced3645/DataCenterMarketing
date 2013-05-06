@@ -1,0 +1,56 @@
+May 5, 2013 11:44:34 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer <init>
+INFO: Bidding info logger
+May 5, 2013 11:45:24 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 5, thisRoundIncome 2187.0, total income 2187.0.
+May 5, 2013 11:45:34 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 6, thisRoundIncome 3107.0, total income 5294.0.
+May 5, 2013 11:45:44 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 7, thisRoundIncome 2273.0, total income 7567.0.
+May 5, 2013 11:45:54 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 8, thisRoundIncome 2991.0, total income 10558.0.
+May 5, 2013 11:46:04 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 9, thisRoundIncome 2637.0, total income 13195.0.
+May 5, 2013 11:46:14 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 10, thisRoundIncome 1291.0, total income 14486.0.
+May 5, 2013 11:46:24 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 11, thisRoundIncome 1803.0, total income 16289.0.
+May 5, 2013 11:46:34 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 12, thisRoundIncome 301.0, total income 16590.0.
+May 5, 2013 11:46:44 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 13, thisRoundIncome 682.0, total income 17272.0.
+May 5, 2013 11:47:05 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 15, thisRoundIncome 2816.0, total income 20088.0.
+May 5, 2013 11:47:15 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 16, thisRoundIncome 9.0, total income 20097.0.
+May 5, 2013 11:47:25 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 17, thisRoundIncome 697.0, total income 20794.0.
+May 5, 2013 11:47:35 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 18, thisRoundIncome 1336.0, total income 22130.0.
+May 5, 2013 11:47:45 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 19, thisRoundIncome 364.0, total income 22494.0.
+May 5, 2013 11:47:55 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 20, thisRoundIncome 1713.0, total income 24207.0.
+May 5, 2013 11:48:05 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 21, thisRoundIncome 1940.0, total income 26147.0.
+May 5, 2013 11:48:15 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 22, thisRoundIncome 1272.0, total income 27419.0.
+May 5, 2013 11:48:25 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 23, thisRoundIncome 1009.0, total income 28428.0.
+May 5, 2013 11:48:35 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 24, thisRoundIncome 1784.0, total income 30212.0.
+May 5, 2013 11:48:45 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 25, thisRoundIncome 1625.0, total income 31837.0.
+May 5, 2013 11:48:55 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 26, thisRoundIncome 2531.0, total income 34368.0.
+May 5, 2013 11:49:05 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 27, thisRoundIncome 991.0, total income 35359.0.
+May 5, 2013 11:49:25 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 29, thisRoundIncome 1387.0, total income 36746.0.
+May 5, 2013 11:49:35 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 30, thisRoundIncome 717.0, total income 37463.0.
+May 5, 2013 11:49:45 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 31, thisRoundIncome 1093.0, total income 38556.0.
+May 5, 2013 11:49:55 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 32, thisRoundIncome 868.0, total income 39424.0.
+May 5, 2013 11:50:05 AM net.floodlightcontroller.datacentermarketing.logic.Auctioneer computeAllocation
+INFO: Bidding Round 33, thisRoundIncome 406.0, total income 39830.0.
