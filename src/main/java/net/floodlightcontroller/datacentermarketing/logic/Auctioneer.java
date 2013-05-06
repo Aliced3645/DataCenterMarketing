@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.Hashtable;
 
 import net.floodlightcontroller.datacentermarketing.MarketManager;
+import net.floodlightcontroller.datacentermarketing.Scheduling.Scheduler;
 import net.floodlightcontroller.datacentermarketing.messagepasser.RESTQuerier;
 
 //Auctioneer is a singleton class
@@ -28,8 +29,8 @@ public class Auctioneer {
 
 	private boolean busyFlag = false;
 	public static int round = 0;
-	/*private Logger auctionLogger = Logger.getLogger("Auction Logger");
-	FileHandler fh;  */
+	private Logger auctionLogger = Logger.getLogger("Auction Logger");
+	FileHandler fh; 
 
 	public BidRequest currentRequestWaitingLatencyVerification;
 	private float totalIncome = 0;
@@ -89,9 +90,9 @@ public class Auctioneer {
 		resultsForThisRound = new LinkedHashMap<String, BidResult>();
 		requestsForNextRound = new LinkedHashMap<String, BidRequest>();
 		
-	/*	//initialize logger
+		//initialize logger
 		try {
-			fh = new FileHandler("/home/shu/git/DataCenterMarketing/BiddingLog.log");
+			fh = new FileHandler("/home/shu/git/DataCenterMarketing/experiment/BiddingLog.log");
 		} catch (SecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -101,14 +102,15 @@ public class Auctioneer {
 		}  
         auctionLogger.addHandler(fh);  
         SimpleFormatter formatter = new SimpleFormatter();  
-        fh.setFormatter(formatter);  */
+        fh.setFormatter(formatter);  
           
         // the following statement is used to log any messages  
-        /*auctionLogger.info("Bidding info logger");  */
+        auctionLogger.info("Bidding info logger"); 
 		
 		//default strategy..
 		this.strategy = new FirstComeFirstServeStrategy();
 		//this.strategy = new EstimationBasedStrategy();
+		//this.strategy = new MaxUtilizationStrategy();
 	}
 
 	public synchronized LinkedHashMap<String, BidRequest> getBidRequestForThisRound() {
@@ -130,8 +132,12 @@ public class Auctioneer {
 		}
 		float incomeThisRound = totalIncome - originalIncome;
 		if(incomeThisRound != 0){
-			/*auctionLogger.info("Bidding Round " + round + ", thisRoundIncome " + incomeThisRound + ", " +
-					"total income " + totalIncome + ".");*/
+			//auctionLogger.info("Bidding Round " + round + ", thisRoundIncome " + incomeThisRound + ", " +
+			//		"total income " + totalIncome + ".");
+			float utilization = Scheduler.getInstance().getAverageUtilization();
+			auctionLogger.info("Bidding Round " + round + ", ThisRoundUtilization " +  utilization
+					+ ", thisRoundIncome " + incomeThisRound + ", " + "total income " + totalIncome + ".");
+			
 		}
 	
 	}
