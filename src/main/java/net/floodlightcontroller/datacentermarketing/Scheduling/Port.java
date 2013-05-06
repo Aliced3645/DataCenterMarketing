@@ -166,14 +166,14 @@ public class Port {
 				if (allocated.direction != allocation.direction
 						&& type == Port_Type.HALF_DUPLEX) {
 					if (usedBandwidthHolder != null) {
-						usedBandwidthHolder.setHd(0f);
+						usedBandwidthHolder.setHd(Float.MAX_VALUE);
 					}
 					return null;
 				} else {
 					usedBandWidth += allocated.bandwidth;
 					if (usedBandWidth + allocation.bandwidth > capacity) {
 						if (usedBandwidthHolder != null) {
-							usedBandwidthHolder.setHd(0f);
+							usedBandwidthHolder.setHd(Float.MAX_VALUE);
 						}
 						return null;
 					}
@@ -234,6 +234,35 @@ public class Port {
 		return price;
 	}
 
+	float usedPercentage(long time) {
+		float used = 0f;
+		Allocation allocation = new Allocation(time, time, 0, null);
+
+		for (int a = 0; a < queues.length; a++) {
+			Allocation allocated = queues[a].get_overlap(allocation);
+			if (allocated != null) {
+				used += allocated.bandwidth;
+			}
+		}
+
+		return (float) used / (float) capacity;
+	}
+	
+	float remainingBandwidth(long time){
+		float used = 0f;
+		Allocation allocation = new Allocation(time, time, 0, null);
+
+		for (int a = 0; a < queues.length; a++) {
+			Allocation allocated = queues[a].get_overlap(allocation);
+			if (allocated != null) {
+				used += allocated.bandwidth;
+			}
+		}
+		
+		return (float)capacity - used;
+	}
+	
+
 	private class Holder<T> {
 		private T hd;
 
@@ -271,11 +300,9 @@ public class Port {
 
 	public void outputAllocations() {
 		/*
-		System.out.println("Allocation for port " + id + ":\n");
-		for (int a = 0; a < queues.length; a++) {
-			queues[a].outputAllocations();
-		}
-		*/
+		 * System.out.println("Allocation for port " + id + ":\n"); for (int a =
+		 * 0; a < queues.length; a++) { queues[a].outputAllocations(); }
+		 */
 
 	}
 

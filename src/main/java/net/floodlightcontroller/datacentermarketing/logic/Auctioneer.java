@@ -107,8 +107,8 @@ public class Auctioneer {
         auctionLogger.info("Bidding info logger");  
 		
 		//default strategy..
-		//this.strategy = new FirstComeFirstServeStrategy();
-		this.strategy = new EstimationBasedStrategy();
+		this.strategy = new FirstComeFirstServeStrategy();
+		//this.strategy = new EstimationBasedStrategy();
 	}
 
 	public synchronized LinkedHashMap<String, BidRequest> getBidRequestForThisRound() {

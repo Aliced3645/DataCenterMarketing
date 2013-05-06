@@ -15,7 +15,7 @@ import net.floodlightcontroller.routing.Route;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 @JsonSerialize(using=BidRequestJSONSerializer.class)
-public class BidRequest implements Serializable{
+public class BidRequest implements Serializable, Comparable{
 	
 	private static final long serialVersionUID = 1L;
 
@@ -76,7 +76,7 @@ public class BidRequest implements Serializable{
 			boolean res = MarketManager.getInstance().getLowLevelController().probeLatency(specialMatchingString, specialMatchingString, rt, true);
 			if(res){
 				synchronized(this){
-					this.wait(); // block until being waken up
+					this.wait(1000); // block until being waken up
 				}
 			}
 			else{
@@ -194,5 +194,18 @@ public class BidRequest implements Serializable{
 		return requiredResources.get(Resource.DATA);
 	}
 
+
+	//Compare by their bidding value
+	@Override
+	public int compareTo(Object right) {
+		// used for priority queue
+		BidRequest another = (BidRequest) right;
+		if (this.getBidValue() > another.getBidValue())
+			return -1;
+		if (this.getBidValue() == another.getBidValue())
+			return 0;
+		else
+			return 1;
+	}
 	
 }
