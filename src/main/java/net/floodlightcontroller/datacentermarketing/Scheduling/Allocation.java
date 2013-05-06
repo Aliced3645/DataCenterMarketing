@@ -36,7 +36,7 @@ public class Allocation implements Comparable<Allocation> {
 	@Override
 	public int compareTo(Allocation qta) {
 
-		return ((Long) from).compareTo((Long) qta.from);
+		return  ((Long) from).compareTo((Long) qta.from);
 	}
 
 	public boolean overlap(Allocation alloc) {

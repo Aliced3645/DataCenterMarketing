@@ -239,16 +239,25 @@ public class Port {
 		Allocation allocation = new Allocation(time, time, 0, null);
 
 		for (int a = 0; a < queues.length; a++) {
+			System.out.println("queue res:");
+			// queues[a].outputAllocations();
+
 			Allocation allocated = queues[a].get_overlap(allocation);
 			if (allocated != null) {
+				// System.out.println("over lapped" + allocated);
 				used += allocated.bandwidth;
 			}
 		}
 
-		return (float) used / (float) capacity;
+		float toReturn = (float) used / (float) capacity;
+
+		// outputAllocations();
+		System.out.println(time + " : " + used + " " + toReturn);
+
+		return toReturn;
 	}
-	
-	float remainingBandwidth(long time){
+
+	float remainingBandwidth(long time) {
 		float used = 0f;
 		Allocation allocation = new Allocation(time, time, 0, null);
 
@@ -258,10 +267,9 @@ public class Port {
 				used += allocated.bandwidth;
 			}
 		}
-		
-		return (float)capacity - used;
+
+		return (float) capacity - used;
 	}
-	
 
 	private class Holder<T> {
 		private T hd;
@@ -299,10 +307,11 @@ public class Port {
 	 */
 
 	public void outputAllocations() {
-		/*
-		 * System.out.println("Allocation for port " + id + ":\n"); for (int a =
-		 * 0; a < queues.length; a++) { queues[a].outputAllocations(); }
-		 */
+
+		System.out.println("Allocation for port " + id + ":\n");
+		for (int a = 0; a < queues.length; a++) {
+			queues[a].outputAllocations();
+		}
 
 	}
 
@@ -315,6 +324,7 @@ public class Port {
 		for (Queue pt : qList) {
 			pt.setPortCap(capacity);
 
+			// System.out.println(usedPercentage(System.currentTimeMillis()));
 			usedHeight += pt.visualize(g, vertical + usedHeight, width,
 					endTime, thick);
 		}

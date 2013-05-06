@@ -49,7 +49,7 @@ public class Queue {
 		for (int a = 0; a < reservations.size(); a++) {
 			Allocation q = reservations.get(a);
 			if (q.overlap(Allocation)) {
-				return Allocation;
+				return q;
 			}
 			if (q.from > Allocation.to) {
 				return null;
@@ -203,16 +203,22 @@ public class Queue {
 
 	private Color getAllocColor(Allocation alloc) {
 		/* return Color.blue; */
+		System.out.println((float) alloc.bandwidth / portCap * 0.5f
+				+ 0.5f +" "+ alloc.bandwidth + " "+portCap);
+		
+		
 		try {
 			if (alloc.direction == ADirection.IN)
-				return new Color((float) alloc.bandwidth / portCap * 0.5f
-						+ 0.5f, 0, 0);
+				return new Color(0f, (float) alloc.bandwidth / portCap * 0.5f
+						+ 0.5f, (float) alloc.bandwidth / portCap * 0.5f + 0.5f);
 			else if (alloc.direction == ADirection.OUT)
-				return new Color(0, 0, (float) alloc.bandwidth / portCap * 0.5f
-						+ 0.5f);
+				return new Color((float) alloc.bandwidth / portCap * 0.5f
+						+ 0.5f,
+						(float) alloc.bandwidth / portCap * 0.5f + 0.5f, 0f);
 			else
-				return new Color(0, (float) alloc.bandwidth / portCap * 0.5f
-						+ 0.5f, 0);
+				return new Color((float) alloc.bandwidth / portCap * 0.5f
+						+ 0.5f, 0f, (float) alloc.bandwidth / portCap * 0.5f
+						+ 0.5f);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Color.blue;

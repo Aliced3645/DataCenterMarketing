@@ -125,6 +125,7 @@ def sniffing():
                 content = randomRequestGenerator()
                 packet = Ether() / IP(dst="10.0.0.255") / content
                 sendp(packet, iface=interface, count=1)
+'''
             if result == '1.2.3.5':
                 #parse JSON first
                 parsed_json = json.loads(lastFetched)
@@ -136,6 +137,7 @@ def sniffing():
                 pSend = threading.Thread(target=udpSend, args=(destIP,
                             bandwidth, duration, data))
                 pSend.start()
+'''
 
                 
 

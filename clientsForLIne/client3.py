@@ -43,7 +43,7 @@ def constructBidString(value, destID, minRate, data, start, end, latency):
 
 def randomRequestGenerator():
     #random items to generate:
-    value = random.randint(0,1000)
+    value = random.randint(1000,10000)
     while True:
         destID = random.randint(0,4)
         if destID != 2:

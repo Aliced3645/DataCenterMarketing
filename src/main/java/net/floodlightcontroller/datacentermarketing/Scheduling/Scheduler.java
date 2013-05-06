@@ -47,7 +47,7 @@ public class Scheduler {
 			ExecutionException {
 		switchesInfo = new HashMap<Long, SwitchAddInfo>();
 		// TODO how to initialize all the switches?
-		
+
 		refreshTopo();
 
 		// show UI
@@ -109,7 +109,7 @@ public class Scheduler {
 	}
 
 	private void debug(String x) {
-		//System.out.println("NIB debug: " + x + "\n");
+		// System.out.println("NIB debug: " + x + "\n");
 	}
 
 	/**
@@ -122,7 +122,7 @@ public class Scheduler {
 		if (switches == null || switches.size() == 0) {
 			return;
 		}
-		 
+
 		Iterator<Long> it = switches.keySet().iterator();
 
 		while (it.hasNext()) {
@@ -158,7 +158,8 @@ public class Scheduler {
 
 	public boolean validateAndReserveRoute(Route rt, Allocation alloc,
 			boolean reserve) {
-		
+		int count = 0;
+
 		// we need to validate all the possible queue reservations
 		List<NodePortTuple> switchPorts = rt.getPath();
 		for (int a = 0; a < switchPorts.size(); a++) {
@@ -170,15 +171,20 @@ public class Scheduler {
 
 			HashSet<Integer> ps = switchesInfo.get(switchNum).getPort(portNum)
 					.possibleQ(alloc);
-					
 
 			if (ps == null)
 				return false;
 
 			if (reserve) {
 				System.out.println("allocation is registering  ");
-				int res = switchesInfo.get(switchNum).getPort(portNum)
-						.reserve(alloc);
+				int res = switchesInfo
+						.get(switchNum)
+						.getPort(portNum)
+						.reserve(
+								new Allocation(alloc.from, alloc.to, alloc
+										.getBandwidth(),
+										(count++) % 2 == 0 ? ADirection.OUT
+												: ADirection.IN));
 				// assert (
 				if (res < 0) {
 					System.out.println("should not happen");

@@ -28,8 +28,8 @@ public class Auctioneer {
 
 	private boolean busyFlag = false;
 	public static int round = 0;
-	private Logger auctionLogger = Logger.getLogger("Auction Logger");
-	FileHandler fh;  
+	/*private Logger auctionLogger = Logger.getLogger("Auction Logger");
+	FileHandler fh;  */
 
 	public BidRequest currentRequestWaitingLatencyVerification;
 	private float totalIncome = 0;
@@ -89,7 +89,7 @@ public class Auctioneer {
 		resultsForThisRound = new LinkedHashMap<String, BidResult>();
 		requestsForNextRound = new LinkedHashMap<String, BidRequest>();
 		
-		//initialize logger
+	/*	//initialize logger
 		try {
 			fh = new FileHandler("/home/shu/git/DataCenterMarketing/BiddingLog.log");
 		} catch (SecurityException e) {
@@ -101,10 +101,10 @@ public class Auctioneer {
 		}  
         auctionLogger.addHandler(fh);  
         SimpleFormatter formatter = new SimpleFormatter();  
-        fh.setFormatter(formatter);  
+        fh.setFormatter(formatter);  */
           
         // the following statement is used to log any messages  
-        auctionLogger.info("Bidding info logger");  
+        /*auctionLogger.info("Bidding info logger");  */
 		
 		//default strategy..
 		this.strategy = new FirstComeFirstServeStrategy();
@@ -130,8 +130,8 @@ public class Auctioneer {
 		}
 		float incomeThisRound = totalIncome - originalIncome;
 		if(incomeThisRound != 0){
-			auctionLogger.info("Bidding Round " + round + ", thisRoundIncome " + incomeThisRound + ", " +
-					"total income " + totalIncome + ".");
+			/*auctionLogger.info("Bidding Round " + round + ", thisRoundIncome " + incomeThisRound + ", " +
+					"total income " + totalIncome + ".");*/
 		}
 	
 	}
