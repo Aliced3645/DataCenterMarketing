@@ -48,7 +48,7 @@ def randomRequestGenerator():
         destID = random.randint(0,allhosts - 1)
         if destID != 2 and destID != 3:
             break
-    minRate = random.randint(0, 10)
+    minRate = random.randint(1000, 10000)
     #relative time..
     start = random.randint(10000,100000)
     end = random.randint(start, 200000)

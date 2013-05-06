@@ -45,7 +45,7 @@ def randomRequestGenerator():
     #random items to generate:
     value = random.randint(0,1000)
     destID = random.randint(0,allhosts - 4)
-    minRate = random.randint(0, 10)
+    minRate = random.randint(1000, 10000)
     #relative time..
     start = random.randint(10000,100000)
     end = random.randint(start, 200000)
