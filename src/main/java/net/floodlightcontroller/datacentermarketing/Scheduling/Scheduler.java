@@ -256,4 +256,18 @@ public class Scheduler {
 		}
 
 	}
+
+	public float getAverageUtilization() {
+		float result = 0;
+		long currentTime = System.currentTimeMillis();
+		int count = 0;
+		for (Long swLong : switchesInfo.keySet()) {
+			SwitchAddInfo sw = switchesInfo.get(swLong);
+			for (Port p : sw.ports) {
+				count++;
+				result += p.usedPercentage(currentTime);
+			}
+		}
+		return (float) result / (float) count;
+	}
 }
