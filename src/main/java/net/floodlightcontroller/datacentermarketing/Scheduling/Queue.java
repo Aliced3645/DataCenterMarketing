@@ -67,7 +67,7 @@ public class Queue {
 
 	// go ahead and reserve
 	public void reserve(Allocation allocation) {
-
+assert(allocation.bandwidth<=portCap);
 		reservations.add(allocation);
 		System.out.println("allocation " + allocation
 				+ " is registered in queue" + id);

@@ -92,7 +92,7 @@ public class Auctioneer {
 		
 		//initialize logger
 		try {
-			fh = new FileHandler("/home/shu/git/DataCenterMarketing/experiment/BiddingLog.log");
+			fh = new FileHandler("./experiment/BiddingLog.log");
 		} catch (SecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -108,8 +108,8 @@ public class Auctioneer {
         auctionLogger.info("Bidding info logger"); 
 		
 		//default strategy..
-		this.strategy = new FirstComeFirstServeStrategy();
-		//this.strategy = new EstimationBasedStrategy();
+		//this.strategy = new FirstComeFirstServeStrategy();
+		this.strategy = new EstimationBasedStrategy();
 		//this.strategy = new MaxUtilizationStrategy();
 	}
 
@@ -131,14 +131,14 @@ public class Auctioneer {
 			}
 		}
 		float incomeThisRound = totalIncome - originalIncome;
-		if(incomeThisRound != 0){
+		//if(incomeThisRound != 0){
 			//auctionLogger.info("Bidding Round " + round + ", thisRoundIncome " + incomeThisRound + ", " +
 			//		"total income " + totalIncome + ".");
 			float utilization = Scheduler.getInstance().getAverageUtilization();
 			auctionLogger.info("Bidding Round " + round + ", ThisRoundUtilization " +  utilization
 					+ ", thisRoundIncome " + incomeThisRound + ", " + "total income " + totalIncome + ".");
 			
-		}
+		//}
 	
 	}
 	

@@ -49,6 +49,8 @@ def randomRequestGenerator():
         if destID != 2 and destID != 3:
             break
     minRate = random.randint(1000, 10000)
+    # the less people pay the more people want
+    minRate *= math.sqrt(1000/value)
     #relative time..
     start = random.randint(10000,100000)
     end = random.randint(start, 200000)

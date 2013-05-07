@@ -170,6 +170,7 @@ public class Port {
 					}
 					return null;
 				} else {
+					assert (allocated.bandwidth > 0);
 					usedBandWidth += allocated.bandwidth;
 					if (usedBandWidth + allocation.bandwidth > capacity) {
 						if (usedBandwidthHolder != null) {
@@ -180,6 +181,14 @@ public class Port {
 				}
 			}
 		}
+
+		if (usedBandWidth + allocation.bandwidth > capacity) {
+			if (usedBandwidthHolder != null) {
+				usedBandwidthHolder.setHd(Float.MAX_VALUE);
+			}
+			return null;
+		}
+
 		if (usedBandwidthHolder != null) {
 			usedBandwidthHolder.setHd(usedBandWidth);
 		}

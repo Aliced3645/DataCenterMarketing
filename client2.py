@@ -46,6 +46,8 @@ def randomRequestGenerator():
     value = random.randint(0,1000)
     destID = random.randint(2,allhosts - 1)
     minRate = random.randint(1000, 10000)
+    # the less people pay the more people want
+    minRate *= math.sqrt(1000/value)
     #relative time..
     start = random.randint(10000,100000)
     end = random.randint(start, 200000)
